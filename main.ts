@@ -98,6 +98,10 @@ export default class MyPlugin extends Plugin {
 					modifiers: [`Ctrl`, `Meta`, `Shift`],
 					key: `${t}`,
 				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `${t}`,
+				}
 			]
 		});
 	}
