@@ -40,7 +40,19 @@ export default class MyPlugin extends Plugin {
 				const cursor = editor.getCursor();
 				const lineNumber = editor.getCursor().line;
 				const line = editor.getLine(lineNumber);
-				const replacedLine = line.replace(`#wn `, `#w${t} `)
+				const replacedLine = line.replace(` a/wn`, ` a/w${t}`)
+								 	 	 .replace(` a/wl`, ` a/w${t}`)
+										 .replace(` a/ww`, ` a/w${t}`)
+										 .replace(` a/wd`, ` a/w${t}`)
+										 .replace(` a/wa`, ` a/w${t}`)
+										 .replace(` a/wt`, ` a/w${t}`)
+										 .replace(` a/nn`, ` a/n${t}`)
+								 	 	 .replace(` a/nl`, ` a/n${t}`)
+										 .replace(` a/nw`, ` a/n${t}`)
+										 .replace(` a/nd`, ` a/n${t}`)
+										 .replace(` a/na`, ` a/n${t}`)
+										 .replace(` a/nt`, ` a/n${t}`)
+										 .replace(`#wn `, `#w${t} `)
 				                         .replace(`#wl `, `#w${t} `)
 				                         .replace(`#ww `, `#w${t} `)
 										 .replace(`#wd `, `#w${t} `)
