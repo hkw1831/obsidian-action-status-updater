@@ -1,3 +1,4 @@
+import { UpdateNoteTypeModal } from 'modal';
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Command } from 'obsidian';
 
 // Remember to rename these classes and interfaces!
@@ -26,8 +27,33 @@ export default class MyPlugin extends Plugin {
 			this.addNewLaterAction(t);
 		});
 
+		this.addUpdateNoteTypeIcon();
+		this.addCommand({
+			id: "update-note-type",
+			name: "Update Note Type",
+			icon: `update-note-type-icon`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+			  new UpdateNoteTypeModal(this.app, editor).open();
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `z`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `z`,
+				}
+			]
+		});
+
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
+	}
+
+	addUpdateNoteTypeIcon() {
+		var obsidian = require('obsidian');
+		obsidian.addIcon(`update-note-type-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>NT</text>`);
 	}
 
 	addNewLaterActionIcon(t: string) {
