@@ -124,8 +124,6 @@ export class UpdateNoteTypeModal extends SuggestModal<NoteType> {
 
   // Perform action on the selected suggestion.
   onChooseSuggestion(choosenNoteType: NoteType, evt: MouseEvent | KeyboardEvent) {
-    new Notice(`Selected ${choosenNoteType.type}`);
-
     const cursor = this.editor.getCursor();
     const lineNumber = this.editor.getCursor().line;
     const line = this.editor.getLine(lineNumber);

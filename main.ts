@@ -47,8 +47,48 @@ export default class MyPlugin extends Plugin {
 			]
 		});
 
+
+		this.addRemoveActionIcon();
+		this.addCommand({
+			id: "remove-action",
+			name: "Remove action",
+			icon: `remove-action-icon`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const cursor = editor.getCursor();
+				const lineNumber = editor.getCursor().line;
+				const line = editor.getLine(lineNumber);
+				const replacedLine = line.replace('#nn ', '')
+				                         .replace('#nl ', '')
+										 .replace('#nw ', '')
+										 .replace('#nd ', '')
+										 .replace('#na ', '')
+										 .replace('#wn ', '')
+										 .replace('#wl ', '')
+										 .replace('#ww ', '')
+										 .replace('#wd ', '')
+										 .replace('#wa ', '')
+				editor.setLine(lineNumber, replacedLine);
+				editor.setCursor(cursor);
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `x`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `x`,
+				}
+			]
+		});
+
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
+	}
+
+	addRemoveActionIcon() {
+		var obsidian = require('obsidian');
+		obsidian.addIcon(`remove-action-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>-#</text>`);
 	}
 
 	addUpdateNoteTypeIcon() {
@@ -76,7 +116,17 @@ export default class MyPlugin extends Plugin {
 				editor.replaceRange(`#${t}l `, cursor);
 				cursor.ch = cursor.ch + 4;
 				editor.setCursor(cursor);
-			}
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: t == 'n' ? ',' : '.'
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: t == 'n' ? ',' : '.'
+				}
+			]
 		});
 	}
 
