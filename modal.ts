@@ -19,10 +19,6 @@ const ALL_TYPES = [
     description: "Fine Notes",
   },
   {
-    type: "b/p",
-    description: "Permanent Notes",
-  },
-  {
     type: "b/pt",
     description: "Permanent Notes (Tutorial)",
   },
@@ -41,6 +37,10 @@ const ALL_TYPES = [
   {
     type: "b/pr",
     description: "Permanent Notes (References)",
+  },
+  {
+    type: "b/pm",
+    description: "Permanent Notes (Meta Knowledge)",
   },
   {
     type: "b/i",
