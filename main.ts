@@ -1,4 +1,4 @@
-import { UpdateNoteTypeModal } from 'modal';
+import { UpdateNoteTypeModal } from 'updateNoteTypeModal';
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Command } from 'obsidian';
 
 // Remember to rename these classes and interfaces!

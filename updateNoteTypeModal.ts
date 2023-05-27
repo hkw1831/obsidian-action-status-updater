@@ -15,6 +15,10 @@ const ALL_TYPES = [
     description: "Coarse Notes",
   },
   {
+    type: "b/o",
+    description: "Outline Notes",
+  },
+  {
     type: "b/f",
     description: "Fine Notes",
   },

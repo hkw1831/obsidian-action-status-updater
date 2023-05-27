@@ -51,6 +51,7 @@ Quick starting guide for new plugin devs:
 
 - Clone this repo.
 - `npm i` or `yarn` to install dependencies
+- `npm install` to install dependency
 - `npm run dev` to start compilation in watch mode.
 
 ## Manually installing the plugin
