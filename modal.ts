@@ -19,32 +19,32 @@ const ALL_TYPES = [
     description: "Fine Notes",
   },
   {
-    type: "b/pt",
+    type: "b/i",
+    description: "Index Notes",
+  },
+  {
+    type: "d/t",
     description: "Permanent Notes (Tutorial)",
   },
   {
-    type: "b/pw",
+    type: "d/w",
     description: "Permanent Notes (Workflow)",
   },
   {
-    type: "b/pc",
+    type: "d/c",
     description: "Permanent Notes (Concept)",
   },
   {
-    type: "b/pf",
+    type: "d/f",
     description: "Permanent Notes (Fact)",
   },
   {
-    type: "b/pr",
+    type: "d/r",
     description: "Permanent Notes (References)",
   },
   {
-    type: "b/pm",
+    type: "d/m",
     description: "Permanent Notes (Meta Knowledge)",
-  },
-  {
-    type: "b/i",
-    description: "Index Notes",
   },
   {
     type: "a/blog",
@@ -124,24 +124,27 @@ export class UpdateNoteTypeModal extends SuggestModal<NoteType> {
 
   // Perform action on the selected suggestion.
   onChooseSuggestion(choosenNoteType: NoteType, evt: MouseEvent | KeyboardEvent) {
-    const cursor = this.editor.getCursor();
-    const lineNumber = this.editor.getCursor().line;
-    const line = this.editor.getLine(lineNumber);
+    const selection = this.editor.getSelection()
+    const replacedStr = `---\ntag: ${choosenNoteType.type}\n---\n\n`
+    if (selection.length != 0) {
+        this.editor.replaceSelection(replacedStr);
+        // cursor.ch = cursor.ch + replacedStr.length;
+        // this.editor.setCursor(cursor);
+    } else {
+        const cursor = this.editor.getCursor();
+        const lineNumber = this.editor.getCursor().line;
+        const line = this.editor.getLine(lineNumber);
 
-
-    if (this.containsType(line))
-    {
-        let replacedLine = line
-        ALL_TYPES.forEach((noteType) => replacedLine = replacedLine.replace(noteType.type, choosenNoteType.type))
-        this.editor.setLine(lineNumber, replacedLine);
-        this.editor.setCursor(cursor);	 	 
-    }
-    else
-    {
-        const replacedStr = `---\ntag: ${choosenNoteType.type}\n---\n\n`
-        this.editor.replaceRange(replacedStr, cursor);
-        cursor.ch = cursor.ch + replacedStr.length;
-        this.editor.setCursor(cursor);
+        if (this.containsType(line)){
+            let replacedLine = line
+            ALL_TYPES.forEach((noteType) => replacedLine = replacedLine.replace(noteType.type, choosenNoteType.type))
+            this.editor.setLine(lineNumber, replacedLine);
+            this.editor.setCursor(cursor);	 	 
+        } else {
+            this.editor.replaceRange(replacedStr, cursor);
+            cursor.ch = cursor.ch + replacedStr.length;
+            this.editor.setCursor(cursor);
+        }
     }
   }
 }
