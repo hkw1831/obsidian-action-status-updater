@@ -43,7 +43,15 @@ export default class MyPlugin extends Plugin {
 				{
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
 					key: `z`,
-				}
+				},
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `c`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `c`,
+				},
 			]
 		});
 

@@ -83,6 +83,10 @@ const ALL_TYPES = [
     description: "N Archive Task",
   },
   {
+    type: "a/n/p",
+    description: "N Permanent Task",
+  },
+  {
     type: "a/w/n",
     description: "W Current Task",
   },
@@ -101,6 +105,10 @@ const ALL_TYPES = [
   {
     type: "a/w/a",
     description: "W Archive Task",
+  },
+  {
+    type: "a/w/p",
+    description: "W Permanent Task",
   },
 ];
 
