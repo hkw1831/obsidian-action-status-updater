@@ -7,95 +7,99 @@ interface NoteType {
 
 const ALL_TYPES = [
   {
-    type: "b/r",
-    description: "Raw Notes",
+    type: "b/t/r",
+    description: "Transient Notes - Raw Stage",
   },
   {
-    type: "b/c",
-    description: "Coarse Notes",
+    type: "b/t/c",
+    description: "Transient Notes - Coarse Stage",
   },
   {
-    type: "b/o",
-    description: "Outline Notes",
+    type: "b/t/o",
+    description: "Transient Notes - Outline Stage",
   },
   {
-    type: "b/f",
-    description: "Fine Notes",
+    type: "b/t/f",
+    description: "Transient Notes - Fine Stage",
   },
   {
-    type: "b/i",
+    type: "b/o/i",
     description: "Index Notes",
   },
   {
-    type: "d/t",
-    description: "Permanent Notes (Tutorial)",
+    type: "b/o/p",
+    description: "People Notes",
   },
   {
-    type: "d/w",
-    description: "Permanent Notes (Workflow)",
+    type: "b/p/t",
+    description: "Permanent Notes - Tutorial",
   },
   {
-    type: "d/c",
-    description: "Permanent Notes (Concept)",
+    type: "b/p/w",
+    description: "Permanent Notes - Workflow",
   },
   {
-    type: "d/f",
-    description: "Permanent Notes (Fact)",
+    type: "b/p/c",
+    description: "Permanent Notes - Concept",
   },
   {
-    type: "d/r",
-    description: "Permanent Notes (References)",
+    type: "b/p/f",
+    description: "Permanent Notes - Fact",
   },
   {
-    type: "d/m",
-    description: "Permanent Notes (Meta Knowledge)",
+    type: "b/p/r",
+    description: "Permanent Notes - References",
   },
   {
-    type: "a/blog",
-    description: "Blog post in progress",
+    type: "b/p/m",
+    description: "Permanent Notes - Meta Knowledge",
   },
   {
-    type: "a/published",
+    type: "b/b/d",
+    description: "Blog post drafting",
+  },
+  {
+    type: "b/b/p",
     description: "Blog post published",
   },
   {
-    type: "a/nn",
+    type: "a/n/n",
     description: "N Current Task",
   },
   {
-    type: "a/nl",
+    type: "a/n/l",
     description: "N Later Task",
   },
   {
-    type: "a/nw",
+    type: "a/n/w",
     description: "N Waiting Task",
   },
   {
-    type: "a/nd",
+    type: "a/n/d",
     description: "N Done Task",
   },
   {
-    type: "a/na",
+    type: "a/n/a",
     description: "N Archive Task",
   },
   {
-    type: "a/wn",
+    type: "a/w/n",
     description: "W Current Task",
   },
   {
-    type: "a/wl",
+    type: "a/w/l",
     description: "W Later Task",
   },
   {
-    type: "a/ww",
+    type: "a/w/w",
     description: "W Waiting Task",
   },
   {
-    type: "a/wd",
+    type: "a/w/d",
     description: "W Done Task",
   },
   {
-    type: "a/wa",
+    type: "a/w/a",
     description: "W Archive Task",
   },
 ];
