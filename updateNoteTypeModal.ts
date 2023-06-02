@@ -27,6 +27,10 @@ const ALL_TYPES = [
     description: "Index Notes",
   },
   {
+    type: "b/o/m",
+    description: "MOC Notes",
+  },
+  {
     type: "b/o/p",
     description: "People Notes",
   },
