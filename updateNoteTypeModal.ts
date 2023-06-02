@@ -31,6 +31,10 @@ const ALL_TYPES = [
     description: "People Notes",
   },
   {
+    type: "b/o/z",
+    description: "Zettelkasten Index Notes",
+  },
+  {
     type: "b/p/t",
     description: "Permanent Notes - Tutorial",
   },
