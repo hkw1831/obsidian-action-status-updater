@@ -64,7 +64,19 @@ const ALL_TYPES = [
   },
   {
     type: "b/b/d",
-    description: "Blog post drafting",
+    description: "Blog post draft",
+  },
+  {
+    type: "b/b/o",
+    description: "Blog post outlined",
+  },
+  {
+    type: "b/b/s",
+    description: "Blog post raw scripted",
+  },
+  {
+    type: "b/b/f",
+    description: "Blog post fine tuned",
   },
   {
     type: "b/b/p",
