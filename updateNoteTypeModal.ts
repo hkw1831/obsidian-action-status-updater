@@ -83,6 +83,10 @@ const ALL_TYPES = [
     description: "Blog post published",
   },
   {
+    type: "b/b/a",
+    description: "Blog post abandoned",
+  },
+  {
     type: "a/n/n",
     description: "N Current Task",
   },
