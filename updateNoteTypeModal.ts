@@ -7,20 +7,28 @@ interface NoteType {
 
 const ALL_TYPES = [
   {
-    type: "b/z/u",
+    type: "b/a/u",
     description: "Zettelkasten - Unprocessed material - add 1+ HQ&A Here",
   },
   {
-    type: "b/z/n",
+    type: "b/a/n",
     description: "Zettelkasten - Notes (with HQ&A), to deprecated",
   },
   {
-    type: "b/z/c",
+    type: "b/a/c",
     description: "Zettelkasten - Cards (With omni writing method)",
   },
   {
-    type: "b/z/r",
+    type: "b/a/r",
     description: "Zettelkasten - Reference",
+  },
+  {
+    type: "b/a/m",
+    description: "Zettelkasten - MOC Notes",
+  },
+  {
+    type: "b/a/s",
+    description: "Zettelkasten - Slip box",
   },
   {
     type: "b/t/r",
@@ -43,16 +51,8 @@ const ALL_TYPES = [
     description: "Index Notes",
   },
   {
-    type: "b/o/m",
-    description: "MOC Notes",
-  },
-  {
     type: "b/o/p",
     description: "People Notes",
-  },
-  {
-    type: "b/o/z",
-    description: "Zettelkasten Index Notes",
   },
   {
     type: "b/p/t",
