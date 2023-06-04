@@ -7,12 +7,8 @@ interface NoteType {
 
 const ALL_TYPES = [
   {
-    type: "b/z/r",
-    description: "Zettelkasten - Unprocessed raw material",
-  },
-  {
-    type: "b/z/s",
-    description: "Zettelkasten - Source / Reference",
+    type: "b/z/u",
+    description: "Zettelkasten - Unprocessed material",
   },
   {
     type: "b/z/n",
@@ -21,6 +17,10 @@ const ALL_TYPES = [
   {
     type: "b/z/c",
     description: "Zettelkasten - Cards (With omni writing method)",
+  },
+  {
+    type: "b/z/r",
+    description: "Zettelkasten - Reference",
   },
   {
     type: "b/t/r",
