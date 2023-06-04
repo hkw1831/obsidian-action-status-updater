@@ -8,7 +8,11 @@ interface NoteType {
 const ALL_TYPES = [
   {
     type: "b/z/r",
-    description: "Zettelkasten - Raw Stage",
+    description: "Zettelkasten - Unprocessed raw material",
+  },
+  {
+    type: "b/z/s",
+    description: "Zettelkasten - Source / Reference",
   },
   {
     type: "b/z/n",
