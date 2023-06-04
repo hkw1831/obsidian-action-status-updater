@@ -8,11 +8,11 @@ interface NoteType {
 const ALL_TYPES = [
   {
     type: "b/z/u",
-    description: "Zettelkasten - Unprocessed material",
+    description: "Zettelkasten - Unprocessed material - add 1+ HQ&A Here",
   },
   {
     type: "b/z/n",
-    description: "Zettelkasten - Notes (with HQ&A)",
+    description: "Zettelkasten - Notes (with HQ&A), to deprecated",
   },
   {
     type: "b/z/c",
