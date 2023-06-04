@@ -7,6 +7,18 @@ interface NoteType {
 
 const ALL_TYPES = [
   {
+    type: "b/z/r",
+    description: "Zettelkasten - Raw Stage",
+  },
+  {
+    type: "b/z/n",
+    description: "Zettelkasten - Notes (with HQ&A)",
+  },
+  {
+    type: "b/z/c",
+    description: "Zettelkasten - Cards (With omni writing method)",
+  },
+  {
     type: "b/t/r",
     description: "Transient Notes - Raw Stage",
   },
