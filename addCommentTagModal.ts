@@ -24,15 +24,15 @@ const ALL_TYPES = [
   },
   {
     type: "c/s",
-    description: "Card - Statement 觀點"
+    description: "Card - Statement 觀點：自己的一句敍述 / 想法"
   },
   {
     type: "c/e",
-    description: "Card - Explaination 案例"
+    description: "Card - Explaination 案例：用一句範例（故事 / 數據 / 生活經驗 / 解釋 / 原因）說明觀點"
   },
   {
     type: "c/c",
-    description: "Card - Conclusion 總結"
+    description: "Card - Conclusion 總結：用一句話做結論"
   },
   {
     type: "c/eastOppositeNote",
