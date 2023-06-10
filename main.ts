@@ -1,6 +1,7 @@
 import { UpdateNoteTypeModal } from 'updateNoteTypeModal';
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Command } from 'obsidian';
+import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Command, TFile } from 'obsidian';
 import { AddCommentTagModal } from 'addCommentTagModal';
+import { Moment } from 'moment'
 
 // Remember to rename these classes and interfaces!
 
@@ -48,6 +49,25 @@ export default class MyPlugin extends Plugin {
 			]
 		});
 
+		this.updateSchedulingIcon()
+		this.addCommand({
+			id: "update-scheduling",
+			name: "Update Scheduling",
+			icon: "update-scheduling-icon",
+			callback: async () => {
+				const { vault } = this.app;
+				const scheduleNoteWithoutMd = "C/Scheduling"
+				const scheduleNote = `${scheduleNoteWithoutMd}.md`				
+				if (vault.getAbstractFileByPath(scheduleNote) == null) {
+					await vault.create(scheduleNote, "");
+				}
+		
+				let noteContent = ""
+				Array.from(Array(7).keys()).forEach(i => noteContent += this.getQueryDateString(i, scheduleNoteWithoutMd));
+
+				vault.modify(vault.getAbstractFileByPath(scheduleNote) as TFile, noteContent);
+			},
+		})
 
 		this.addAddCommentTagIcon();
 		this.addCommand({
@@ -107,6 +127,20 @@ export default class MyPlugin extends Plugin {
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
+	}
+
+	updateSchedulingIcon() {
+		var obsidian = require('obsidian');
+		obsidian.addIcon(`update-scheduling-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>US</text>`);
+	}
+
+	getQueryDateString(addDay: Number, excludeNote: String): string {
+		let moment = require('moment');
+		const dateMoment = moment().add(addDay, 'd');
+		const dateYYYYMMDD = dateMoment.format('YYYYMMDD');
+		const dateEachYYDD = '\\d\\d\\d\\d' + dateMoment.format('MMDD');
+		const dateEachDD = '\\d\\d\\d\\d\\d\\d' + dateMoment.format('DD');
+		return `${dateYYYYMMDD}\n\`\`\`query\n(${dateYYYYMMDD} OR ${dateEachYYDD} OR ${dateEachDD}) -path:"${excludeNote}" -block:(query)\n\`\`\`\n`
 	}
 
 	addRemoveActionIcon() {
