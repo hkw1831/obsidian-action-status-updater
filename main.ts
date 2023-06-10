@@ -62,7 +62,9 @@ export default class MyPlugin extends Plugin {
 					await vault.create(scheduleNote, "");
 				}
 		
-				let noteContent = ""
+				// let noteContent = `\`\`\`button\nname Update Scheduling\ntype command\naction N Action Status Updater: Update Scheduling\n\`\`\`\n`
+
+				let noteContent = ''
 				Array.from(Array(7).keys()).forEach(i => noteContent += this.getQueryDateString(i, scheduleNoteWithoutMd));
 
 				vault.modify(vault.getAbstractFileByPath(scheduleNote) as TFile, noteContent);
