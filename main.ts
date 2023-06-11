@@ -154,7 +154,7 @@ export default class MyPlugin extends Plugin {
 
 	openDashboardIcon() {
 		var obsidian = require('obsidian');
-		obsidian.addIcon(`this.updateSchedulingIcon()`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>OD</text>`);
+		obsidian.addIcon(`open-dashboard-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>OD</text>`);
 	}
 
 	getQueryDateString(addDay: Number, excludeNote: String): string {
