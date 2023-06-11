@@ -56,7 +56,7 @@ export default class MyPlugin extends Plugin {
 			icon: "update-scheduling-icon",
 			callback: async () => {
 				const { vault } = this.app;
-				const scheduleNoteWithoutMd = "C/Scheduling"
+				const scheduleNoteWithoutMd = "D/Scheduling"
 				const scheduleNote = `${scheduleNoteWithoutMd}.md`				
 				if (vault.getAbstractFileByPath(scheduleNote) == null) {
 					await vault.create(scheduleNote, "");
@@ -70,6 +70,22 @@ export default class MyPlugin extends Plugin {
 				vault.modify(vault.getAbstractFileByPath(scheduleNote) as TFile, noteContent);
 			},
 		})
+
+		this.openDashboardIcon()
+		this.addCommand({
+			id: "open-dashboard",
+			name: "Open Dashboard",
+			icon: "open-dashboard-icon",
+			callback: async () => {
+				const { vault } = this.app;
+				const { workspace } = this.app;
+				const dashboardCanvas = "D/Dashboard.canvas"
+				const mode = (this.app.vault as any).getConfig("defaultViewMode");
+				const leaf = workspace.getLeaf(false);
+				await leaf.openFile(vault.getAbstractFileByPath(dashboardCanvas) as TFile, { active : true,/* mode */});
+			},
+		})
+
 
 		this.addAddCommentTagIcon();
 		this.addCommand({
@@ -134,6 +150,11 @@ export default class MyPlugin extends Plugin {
 	updateSchedulingIcon() {
 		var obsidian = require('obsidian');
 		obsidian.addIcon(`update-scheduling-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>US</text>`);
+	}
+
+	openDashboardIcon() {
+		var obsidian = require('obsidian');
+		obsidian.addIcon(`this.updateSchedulingIcon()`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>OD</text>`);
 	}
 
 	getQueryDateString(addDay: Number, excludeNote: String): string {
