@@ -2,6 +2,7 @@ import { UpdateNoteTypeModal } from 'updateNoteTypeModal';
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Command, TFile } from 'obsidian';
 import { AddCommentTagModal } from 'addCommentTagModal';
 import { Moment } from 'moment'
+import { AddTaskTagModal } from 'addCommentTagModal copy';
 
 // Remember to rename these classes and interfaces!
 
@@ -263,8 +264,16 @@ export default class MyPlugin extends Plugin {
 										 .replace(`#n5 `, `#n${t} `)
 										 .replace(`#n6 `, `#n${t} `)
 										 .replace(`#n7 `, `#n${t} `);
-				editor.setLine(lineNumber, replacedLine);
-				editor.setCursor(cursor);
+				if (line.contains(`#n${t} `) || line.contains(`#w${t} `) || line.contains(` a/n/${t}`) || line.contains(` a/w/${t}`)) {
+					// do nothing
+				}										 
+				else if (replacedLine == line) { // no tag, to add tag
+					new AddTaskTagModal(this.app, editor, t).open();
+				}			
+				else {			 
+					editor.setLine(lineNumber, replacedLine);
+					editor.setCursor(cursor);
+				}
 			},
 			hotkeys: [
 				{
