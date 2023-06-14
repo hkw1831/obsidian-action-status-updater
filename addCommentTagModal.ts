@@ -19,8 +19,8 @@ const ALL_TYPES = [
     description: "HQ&A - Answer"
   },
   {
-    type: "c/h",
-    description: "Card - Header 標題"
+    type: "c/t",
+    description: "Card - Title 標題"
   },
   {
     type: "c/s",
@@ -33,6 +33,22 @@ const ALL_TYPES = [
   {
     type: "c/c",
     description: "Card - Conclusion 總結：用一至兩句話做結論"
+  },
+  {
+    type: "c/e⏩",
+    description: "Idea Compass - East - What competes with this idea?"
+  },
+  {
+    type: "c/w⏪",
+    description: "Idea Compass - West - What are similar / supporting idea?"
+  },
+  {
+    type: "c/n⏫",
+    description: "Idea Compass - North - Where does this idea come from?"
+  },
+  {
+    type: "c/s⏬",
+    description: "Idea Compass - South - Where does the idea lead to?"
   },
   {
     type: "c/eastOppositeNote",
@@ -102,19 +118,9 @@ export class AddCommentTagModal extends FuzzySuggestModal<CommentType> {
         this.editor.replaceSelection(replacedStr);
     } else {
         const cursor = this.editor.getCursor();
-        const lineNumber = this.editor.getCursor().line;
-        const line = this.editor.getLine(lineNumber);
-
-        if (this.containsType(line)){
-            let replacedLine = line
-            ALL_TYPES.forEach((noteType) => replacedLine = replacedLine.replace(noteType.type, choosenNoteType.type))
-            this.editor.setLine(lineNumber, replacedLine);
-            this.editor.setCursor(cursor);	 	 
-        } else {
-            this.editor.replaceRange(replacedStr, cursor);
-            cursor.ch = cursor.ch + replacedStr.length;
-            this.editor.setCursor(cursor);
-        }
+        this.editor.replaceRange(replacedStr, cursor);
+        cursor.ch = cursor.ch + replacedStr.length;
+        this.editor.setCursor(cursor);
     }
   }
 }
