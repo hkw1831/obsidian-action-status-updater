@@ -7,76 +7,40 @@ interface NoteType {
 
 const ALL_TYPES = [
   {
-    type: "b/a/u",
+    type: "b/n/u",
     description: "Zettelkasten - Unprocessed material - add 1+ HQ&A Here",
   },
   {
-    type: "b/a/n",
+    type: "b/n/n",
     description: "Zettelkasten - Notes (with HQ&A), to deprecated",
   },
   {
-    type: "b/a/c",
+    type: "b/n/c",
     description: "Zettelkasten - Cards (With omni writing method)",
   },
   {
-    type: "b/a/r",
+    type: "b/n/r",
     description: "Zettelkasten - Reference",
   },
   {
-    type: "b/a/m",
+    type: "b/n/m",
     description: "Zettelkasten - MOC Notes",
   },
   {
-    type: "b/a/s",
+    type: "b/n/s",
     description: "Zettelkasten - Slip box",
   },
   {
-    type: "b/t/r",
-    description: "Transient Notes - Raw Stage",
-  },
-  {
-    type: "b/t/c",
-    description: "Transient Notes - Coarse Stage",
-  },
-  {
-    type: "b/t/o",
-    description: "Transient Notes - Outline Stage",
-  },
-  {
-    type: "b/t/f",
-    description: "Transient Notes - Fine Stage",
-  },
-  {
-    type: "b/o/i",
+    type: "b/n/i",
     description: "Index Notes",
   },
   {
-    type: "b/o/p",
-    description: "People Notes",
+    type: "b/a/p",
+    description: "Primary Area",
   },
   {
-    type: "b/p/t",
-    description: "Permanent Notes - Tutorial",
-  },
-  {
-    type: "b/p/w",
-    description: "Permanent Notes - Workflow",
-  },
-  {
-    type: "b/p/c",
-    description: "Permanent Notes - Concept",
-  },
-  {
-    type: "b/p/f",
-    description: "Permanent Notes - Fact",
-  },
-  {
-    type: "b/p/r",
-    description: "Permanent Notes - References",
-  },
-  {
-    type: "b/p/m",
-    description: "Permanent Notes - Meta Knowledge",
+    type: "b/a/s",
+    description: "Secondary Area",
   },
   {
     type: "b/b/d",

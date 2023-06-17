@@ -2,7 +2,7 @@ import { UpdateNoteTypeModal } from 'updateNoteTypeModal';
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Command, TFile } from 'obsidian';
 import { AddCommentTagModal } from 'addCommentTagModal';
 import { Moment } from 'moment'
-import { AddTaskTagModal } from 'addCommentTagModal copy';
+import { AddTaskTagModal } from 'addTaskTagModal';
 
 // Remember to rename these classes and interfaces!
 
