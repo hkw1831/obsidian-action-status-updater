@@ -1,82 +1,82 @@
 import { App, Editor, FuzzySuggestModal, FuzzyMatch } from "obsidian";
 
-interface CommentType {
+interface FootnoteType {
   type: string;
   description: string;
 }
 
 const ALL_TYPES = [
   {
-    type: "c/h",
+    type: "f/h",
     description: "HQ&A - Highlight"
   },
   {
-    type: "c/q",
+    type: "f/q",
     description: "HQ&A - Question"
   },
   {
-    type: "c/a",
+    type: "f/a",
     description: "HQ&A - Answer"
   },
   {
-    type: "c/t",
+    type: "f/t",
     description: "Card - Title 標題"
   },
   {
-    type: "c/s",
+    type: "f/s",
     description: "Card - Statement 觀點：自己的一句敍述 / 想法"
   },
   {
-    type: "c/e",
+    type: "f/e",
     description: "Card - Explaination 案例：增加一些範例（故事 / 數據 / 生活經驗 / 解釋 / 原因）說明觀點"
   },
   {
-    type: "c/c",
+    type: "f/c",
     description: "Card - Conclusion 總結：用一至兩句話做結論"
   },
   {
-    type: "c/e⏩",
+    type: "f/e⏩",
     description: "Idea Compass - East - What competes with this idea?"
   },
   {
-    type: "c/w⏪",
+    type: "f/w⏪",
     description: "Idea Compass - West - What are similar / supporting idea?"
   },
   {
-    type: "c/n⏫",
+    type: "f/n⏫",
     description: "Idea Compass - North - Where does this idea come from?"
   },
   {
-    type: "c/s⏬",
+    type: "f/s⏬",
     description: "Idea Compass - South - Where does the idea lead to?"
   },
   {
-    type: "c/eastOppositeNote",
+    type: "f/eastOppositeNote",
     description: "Idea Compass - East - What competes with this idea?"
   },
   {
-    type: "c/westSimilarNote",
+    type: "f/westSimilarNote",
     description: "Idea Compass - West - What are similar / supporting idea?"
   },
   {
-    type: "c/northThemeNote",
+    type: "f/northThemeNote",
     description: "Idea Compass - North - Where does this idea come from?"
   },
   {
-    type: "c/southLeadsToNote",
+    type: "f/southLeadsToNote",
     description: "Idea Compass - South - Where does the idea lead to?"
   },
   {
-    type: "c/toMerge",
+    type: "f/toMerge",
     description: "TODO - To Merge with another note"
   },
   {
-    type: "c/toSplit",
+    type: "f/toSplit",
     description: "ToDO - To Split to multiple note"
   },
 ];
 
-export class AddCommentTagModal extends FuzzySuggestModal<CommentType> {
+export class AddFootnoteTagModal extends FuzzySuggestModal<FootnoteType> {
 
   editor: Editor
 
@@ -86,11 +86,11 @@ export class AddCommentTagModal extends FuzzySuggestModal<CommentType> {
     this.editor = editor
   }
 
-  getItems(): CommentType[] {
+  getItems(): FootnoteType[] {
     return ALL_TYPES;
   }
 
-  getItemText(noteType: CommentType): string {
+  getItemText(noteType: FootnoteType): string {
     return noteType.type;
   }
 
@@ -100,7 +100,7 @@ export class AddCommentTagModal extends FuzzySuggestModal<CommentType> {
   }
 
   // Renders each suggestion item.
-  renderSuggestion(choosenNoteTypeMatch: FuzzyMatch<CommentType>, el: HTMLElement) {
+  renderSuggestion(choosenNoteTypeMatch: FuzzyMatch<FootnoteType>, el: HTMLElement) {
     const noteType = choosenNoteTypeMatch.item
     el.createEl("div", { text: noteType.type });
     el.createEl("small", { text: noteType.description });
@@ -111,7 +111,7 @@ export class AddCommentTagModal extends FuzzySuggestModal<CommentType> {
   }
 
   // Perform action on the selected suggestion.
-  onChooseItem(choosenNoteType: CommentType, evt: MouseEvent | KeyboardEvent) {
+  onChooseItem(choosenNoteType: FootnoteType, evt: MouseEvent | KeyboardEvent) {
     const selection = this.editor.getSelection()
     const replacedStr = `#${choosenNoteType.type} `
     if (selection.length != 0) {

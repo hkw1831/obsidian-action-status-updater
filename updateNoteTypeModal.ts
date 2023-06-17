@@ -11,10 +11,6 @@ const ALL_TYPES = [
     description: "Zettelkasten - Unprocessed material - add 1+ HQ&A Here",
   },
   {
-    type: "b/n/n",
-    description: "Zettelkasten - Notes (with HQ&A), to deprecated",
-  },
-  {
     type: "b/n/c",
     description: "Zettelkasten - Cards (With omni writing method)",
   },
@@ -36,34 +32,34 @@ const ALL_TYPES = [
   },
   {
     type: "b/a/p",
-    description: "Primary Area",
+    description: "Area of Responsibility - Primary",
   },
   {
     type: "b/a/s",
-    description: "Secondary Area",
+    description: "Area of Responsibility - Secondary",
   },
   {
-    type: "b/b/d",
+    type: "c/b/d",
     description: "Blog post draft",
   },
   {
-    type: "b/b/o",
+    type: "c/b/o",
     description: "Blog post outlined",
   },
   {
-    type: "b/b/s",
+    type: "c/b/s",
     description: "Blog post raw scripted",
   },
   {
-    type: "b/b/f",
+    type: "c/b/f",
     description: "Blog post fine tuned",
   },
   {
-    type: "b/b/p",
+    type: "c/b/p",
     description: "Blog post published",
   },
   {
-    type: "b/b/a",
+    type: "c/b/a",
     description: "Blog post abandoned",
   },
   {

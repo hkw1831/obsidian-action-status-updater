@@ -1,6 +1,6 @@
 import { UpdateNoteTypeModal } from 'updateNoteTypeModal';
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Command, TFile } from 'obsidian';
-import { AddCommentTagModal } from 'addCommentTagModal';
+import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Command, TFile, Vault } from 'obsidian';
+import { AddFootnoteTagModal } from 'addCommentTagModal';
 import { Moment } from 'moment'
 import { AddTaskTagModal } from 'addTaskTagModal';
 
@@ -20,7 +20,7 @@ export default class MyPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		['n', 'l', 'w', 'd', 'a', 't'].forEach(t => {
+		['n', 'l', 'w', 'd', 'a', 't', '1', '2', '3', '4', '5', '6', '7'].forEach(t => {
 			this.addIcon(t);
 			this.addActionCommand(t);
 		});
@@ -62,14 +62,23 @@ export default class MyPlugin extends Plugin {
 				if (vault.getAbstractFileByPath(scheduleNote) == null) {
 					await vault.create(scheduleNote, "");
 				}
-		
-				// let noteContent = `\`\`\`button\nname Update Scheduling\ntype command\naction N Action Status Updater: Update Scheduling\n\`\`\`\n`
-
 				let noteContent = ''
 				Array.from(Array(7).keys()).forEach(i => noteContent += this.getQueryDateString(i, scheduleNoteWithoutMd));
-
 				vault.modify(vault.getAbstractFileByPath(scheduleNote) as TFile, noteContent);
+
+				this.addActionNoteContent(vault, "D", "Query W now actions", "w")
+				this.addActionNoteContent(vault, "D", "Query N now actions", "n")
 			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `u`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `u`,
+				},
+			]
 		})
 
 		this.openDashboardIcon()
@@ -94,7 +103,7 @@ export default class MyPlugin extends Plugin {
 			name: "Add Comment Tag",
 			icon: `add-comment-tag-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-			  new AddCommentTagModal(this.app, editor).open();
+			  new AddFootnoteTagModal(this.app, editor).open();
 			},
 			hotkeys: [
 				{
@@ -123,12 +132,26 @@ export default class MyPlugin extends Plugin {
 										 .replace('#nw ', '')
 										 .replace('#nd ', '')
 										 .replace('#na ', '')
+										 .replace('#n1 ', '')
+										 .replace('#n2 ', '')
+										 .replace('#n3 ', '')
+										 .replace('#n4 ', '')
+										 .replace('#n5 ', '')
+										 .replace('#n6 ', '')
+										 .replace('#n7 ', '')
 										 .replace('#wn ', '')
 										 .replace('#wl ', '')
 										 .replace('#ww ', '')
 										 .replace('#wd ', '')
 										 .replace('#wa ', '')
-				replacedLine = AddCommentTagModal.removeTag(replacedLine)
+										 .replace('#w1 ', '')
+										 .replace('#w2 ', '')
+										 .replace('#w3 ', '')
+										 .replace('#w4 ', '')
+										 .replace('#w5 ', '')
+										 .replace('#w6 ', '')
+										 .replace('#w7 ', '')
+				replacedLine = AddFootnoteTagModal.removeTag(replacedLine)
 				editor.setLine(lineNumber, replacedLine);
 				editor.setCursor(cursor);
 			},
@@ -148,6 +171,22 @@ export default class MyPlugin extends Plugin {
 		this.addSettingTab(new SampleSettingTab(this.app, this));
 	}
 
+	async addActionNoteContent(vault: Vault, folderName: String, noteTitleWithoutMd: String, nOrW: String) {
+		const nowActionNoteWithoutMd = `${folderName}/${noteTitleWithoutMd}`
+		const nowActionNote = `${nowActionNoteWithoutMd}.md`				
+		if (vault.getAbstractFileByPath(nowActionNote) == null) {
+			await vault.create(nowActionNote, "");
+		}
+		let nowActionNoteContent = ''
+		Array.from(Array(2).keys()).forEach(i => nowActionNoteContent += this.getQueryActionString(i, nOrW));
+		nowActionNoteContent += `\`\`\`query\n`
+		Array.from(Array(5).keys()).forEach(i => nowActionNoteContent += this.getQueryWeekDay(i + 2, nOrW));
+		nowActionNoteContent += `tag:#${nOrW}t OR tag:#${nOrW}n\n\`\`\`\n`
+		nowActionNoteContent += `[[${noteTitleWithoutMd}]]\n`
+
+		vault.modify(vault.getAbstractFileByPath(nowActionNote) as TFile, nowActionNoteContent);
+	}
+
 	updateSchedulingIcon() {
 		var obsidian = require('obsidian');
 		obsidian.addIcon(`update-scheduling-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>US</text>`);
@@ -165,6 +204,20 @@ export default class MyPlugin extends Plugin {
 		const dateEachYYDD = '\\d\\d\\d\\d' + dateMoment.format('MMDD');
 		const dateEachDD = '\\d\\d\\d\\d\\d\\d' + dateMoment.format('DD');
 		return `${dateYYYYMMDD}\n\`\`\`query\n(${dateYYYYMMDD} OR ${dateEachYYDD} OR ${dateEachDD}) -path:"${excludeNote}" -block:(query)\n\`\`\`\n`
+	}
+
+	getQueryActionString(addDay: Number, actionType: String): string {
+		let moment = require('moment');
+		const dateMoment = moment().add(addDay, 'd');
+		const dayOfWeek = dateMoment.format('E');
+		return `\`\`\`query\ntag:#${actionType}${dayOfWeek}\n\`\`\`\n`
+	}
+
+	getQueryWeekDay(addDay: Number, actionType: String): string {
+		let moment = require('moment');
+		const dateMoment = moment().add(addDay, 'd');
+		const dayOfWeek = dateMoment.format('E');
+		return `tag:#${actionType}${dayOfWeek} OR `
 	}
 
 	addRemoveActionIcon() {
@@ -277,15 +330,23 @@ export default class MyPlugin extends Plugin {
 			},
 			hotkeys: [
 				{
-					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					modifiers: this.is1To7(t) ? [`Ctrl`, `Meta`] : [`Ctrl`, `Meta`, `Shift`],
 					key: `${t}`,
 				},
 				{
-					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					modifiers: this.is1To7(t) ? [`Ctrl`, `Alt`] : [`Ctrl`, `Alt`, `Shift`],
 					key: `${t}`,
 				}
 			]
 		});
+	}
+
+	is1To7(t: string) : boolean {
+		if (t == "1" || t == "2" || t == "3" || t == "4" || t == "5" || t == "6" || t == "7") {
+			return true
+		} else {
+			return false
+		}
 	}
 
 	onunload() {
