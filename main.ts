@@ -66,8 +66,8 @@ export default class MyPlugin extends Plugin {
 				Array.from(Array(7).keys()).forEach(i => noteContent += this.getQueryDateString(i, scheduleNoteWithoutMd));
 				vault.modify(vault.getAbstractFileByPath(scheduleNote) as TFile, noteContent);
 
-				this.addActionNoteContent(vault, "D", "Query W now actions", "w")
-				this.addActionNoteContent(vault, "D", "Query N now actions", "n")
+				this.addActionNoteContent(vault, "D", "Query W now actions", "Weekly Schedule W", "w")
+				this.addActionNoteContent(vault, "D", "Query N now actions", "Weekly Schedule N", "n")
 			},
 			hotkeys: [
 				{
@@ -171,7 +171,7 @@ export default class MyPlugin extends Plugin {
 		this.addSettingTab(new SampleSettingTab(this.app, this));
 	}
 
-	async addActionNoteContent(vault: Vault, folderName: String, noteTitleWithoutMd: String, nOrW: String) {
+	async addActionNoteContent(vault: Vault, folderName: String, noteTitleWithoutMd: String, scheduleNoteTitleWithoutMd: String, nOrW: String) {
 		const nowActionNoteWithoutMd = `${folderName}/${noteTitleWithoutMd}`
 		const nowActionNote = `${nowActionNoteWithoutMd}.md`				
 		if (vault.getAbstractFileByPath(nowActionNote) == null) {
@@ -182,6 +182,7 @@ export default class MyPlugin extends Plugin {
 		nowActionNoteContent += `\`\`\`query\n`
 		Array.from(Array(5).keys()).forEach(i => nowActionNoteContent += this.getQueryWeekDay(i + 2, nOrW));
 		nowActionNoteContent += `tag:#${nOrW}t OR tag:#${nOrW}n\n\`\`\`\n`
+		nowActionNoteContent += `Scheduling: [[${scheduleNoteTitleWithoutMd}]]\n`
 		nowActionNoteContent += `[[${noteTitleWithoutMd}]]\n`
 
 		vault.modify(vault.getAbstractFileByPath(nowActionNote) as TFile, nowActionNoteContent);
