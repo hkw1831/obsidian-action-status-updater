@@ -318,10 +318,14 @@ export default class MyPlugin extends Plugin {
 										 .replace(`#n5 `, `#n${t} `)
 										 .replace(`#n6 `, `#n${t} `)
 										 .replace(`#n7 `, `#n${t} `);
-				if (line.contains(`#n${t} `) || line.contains(`#w${t} `) || line.contains(` a/n/${t}`) || line.contains(` a/w/${t}`)) {
+				if (line.contains(`#n${t} `) || line.contains(`#w${t} `)) {
+					// remove the tag
+					const replaceLineToRemoveTag = line.replace(`#n${t} `, ``).replace(`#n${t} `, ``)
+					editor.setLine(lineNumber, replaceLineToRemoveTag);
+					editor.setCursor(cursor);
+				} else if (line.contains(` a/n/${t}`) || line.contains(` a/w/${t}`)) {
 					// do nothing
-				}										 
-				else if (replacedLine == line) { // no tag, to add tag
+				} else if (replacedLine == line) { // no tag, to add tag
 					new AddTaskTagModal(this.app, editor, t).open();
 				}			
 				else {			 
