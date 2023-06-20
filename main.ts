@@ -320,8 +320,33 @@ export default class MyPlugin extends Plugin {
 										 .replace(`#n7 `, `#n${t} `);
 				if (line.contains(`#n${t} `) || line.contains(`#w${t} `)) {
 					// remove the tag
+					console.log(cursor.line)
+					console.log(cursor.ch)
+					const nt = `#n${t} `
+					const wt = `#w${t} `
+					console.log(`nt=#${line.indexOf(nt)}`)
+					console.log(`wt=#${line.indexOf(wt)}`)
+					console.log(`#0#=${line.charAt(0)}#`)
+					console.log(`#1#=${line.charAt(1)}#`)
+					console.log(`#2#=${line.charAt(2)}#`)
+					console.log(`#3#=${line.charAt(3)}#`)
+					console.log(`#4#=${line.charAt(4)}#`)
+					console.log(`#5#=${line.charAt(5)}#`)
+					console.log(`#6#=${line.charAt(6)}#`)
+					console.log(`#7#=${line.charAt(7)}#`)
+					console.log(`#8#=${line.charAt(8)}#`)
+
 					const replaceLineToRemoveTag = line.replace(`#n${t} `, ``).replace(`#n${t} `, ``)
 					editor.setLine(lineNumber, replaceLineToRemoveTag);
+					// lets say "#nt " is at 3 (char for #)
+					// if ch <= 3 no need to update
+					// if ch >= 7 then need to -4
+					// else ch == 3
+					const ntIndex = line.indexOf(nt)
+					const wtIndex = line.indexOf(wt)
+					const index = ntIndex == -1 ? wtIndex : ntIndex
+					const newCh = cursor.ch <= index ? cursor.ch : (cursor.ch >= index + 4 ? cursor.ch - 4 : index)
+					cursor.ch = newCh
 					editor.setCursor(cursor);
 				} else if (line.contains(` a/n/${t}`) || line.contains(` a/w/${t}`)) {
 					// do nothing
