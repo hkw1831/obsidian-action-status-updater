@@ -52,8 +52,16 @@ export class AddTaskTagModal extends FuzzySuggestModal<CommentType> {
   // Perform action on the selected suggestion.
   onChooseItem(choosenNoteType: CommentType, evt: MouseEvent | KeyboardEvent) {
     const cursor = this.editor.getCursor()
-    this.editor.replaceRange(`#${choosenNoteType.type}${this.taskType} `, cursor);
-    cursor.ch = cursor.ch + 4;
+    const line = this.editor.getLine(cursor.line);
+    // console.log(cursor.line)
+    // console.log(cursor.ch)
+    // console.log(`#0#=${line.charAt(0)}#`)
+    // console.log(`#1#=${line.charAt(1)}#`)
+    // console.log(`#2#=${line.charAt(2)}#`)
+    // console.log(`#3#=${line.charAt(3)}#`)
+    
+    this.editor.replaceRange(`${line.charAt(cursor.ch - 1) != ' ' ? ' ' : ""}#${choosenNoteType.type}${this.taskType} `, cursor);  
+    cursor.ch = cursor.ch + 4 + (line.charAt(cursor.ch - 1) != ' ' ? 1 : 0);
 		this.editor.setCursor(cursor);
   }
 }
