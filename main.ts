@@ -20,7 +20,7 @@ export default class MyPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		['n', 'l', 'w', 'd', 'a', /*'t',*/ '1', '2', '3', '4', '5', '6', '7'].forEach(t => {
+		['n', 'l', 'w', 'd', 'a', 't', '1', '2', '3', '4', '5', '6', '7'].forEach(t => {
 			this.addIcon(t);
 			this.addActionCommand(t);
 		});
