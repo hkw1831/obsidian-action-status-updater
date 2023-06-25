@@ -193,9 +193,10 @@ export default class MyPlugin extends Plugin {
 		}
 		let nowActionNoteContent = ''
 		Array.from(Array(2).keys()).forEach(i => nowActionNoteContent += this.getQueryActionString(i, nOrW));
+		nowActionNoteContent += `\`\`\`query\ntag:#${nOrW}t\n\`\`\`\n`
 		nowActionNoteContent += `\`\`\`query\n`
 		Array.from(Array(5).keys()).forEach(i => nowActionNoteContent += this.getQueryWeekDay(i + 2, nOrW));
-		nowActionNoteContent += `tag:#${nOrW}t OR tag:#${nOrW}n\n\`\`\`\n`
+		nowActionNoteContent += `tag:#${nOrW}n\n\`\`\`\n`
 		nowActionNoteContent += `Scheduling: [[${scheduleNoteTitleWithoutMd}]]\n`
 		nowActionNoteContent += `[[${noteTitleWithoutMd}]]\n`
 
