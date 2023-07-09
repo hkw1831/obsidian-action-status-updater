@@ -15,6 +15,10 @@ const ALL_TYPES = [
     description: "Zettelkasten - Cards (With omni writing method)",
   },
   {
+    type: "b/n/n",
+    description: "Zettelkasten - Notes (To help thinking)",
+  },
+  {
     type: "b/n/r",
     description: "Zettelkasten - Reference",
   },
