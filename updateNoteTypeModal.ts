@@ -15,6 +15,10 @@ const ALL_TYPES = [
     description: "Zettelkasten - Cards (With omni writing method)",
   },
   {
+    type: "b/n/n",
+    description: "Zettelkasten - Notes (Need to think more on this)",
+  },
+  {
     type: "b/n/r",
     description: "Zettelkasten - Reference",
   },
@@ -149,18 +153,30 @@ export class UpdateNoteTypeModal extends FuzzySuggestModal<NoteType> {
         this.editor.replaceSelection(replacedStr);
     } else {
         const cursor = this.editor.getCursor();
-        const lineNumber = this.editor.getCursor().line;
-        const line = this.editor.getLine(lineNumber);
 
-        if (this.containsType(line)){
+        const lineCount = this.editor.lineCount();
+        let tagLineNumber = null;
+        for (let i = 0; i < lineCount; i++) {
+          if (this.editor.getLine(i).startsWith('tag: ')) {
+            tagLineNumber = i;
+            break;
+          }
+        }
+
+        if (tagLineNumber != null) {
+          const line = this.editor.getLine(tagLineNumber);
+          if (this.containsType(line)) {
             let replacedLine = line
             ALL_TYPES.forEach((noteType) => replacedLine = replacedLine.replace(noteType.type, choosenNoteType.type))
-            this.editor.setLine(lineNumber, replacedLine);
-            this.editor.setCursor(cursor);	 	 
+            this.editor.setLine(tagLineNumber, replacedLine);
+            this.editor.setCursor(cursor);	
+          }
         } else {
-            this.editor.replaceRange(replacedStr, cursor);
-            cursor.ch = cursor.ch + replacedStr.length;
-            this.editor.setCursor(cursor);
+          const lineNumber = this.editor.getCursor().line;
+          const line = this.editor.getLine(lineNumber);
+          this.editor.replaceRange(replacedStr, cursor);
+          cursor.ch = cursor.ch + replacedStr.length;
+          this.editor.setCursor(cursor);
         }
     }
   }
