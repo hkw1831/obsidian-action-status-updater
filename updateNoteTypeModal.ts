@@ -63,6 +63,18 @@ const ALL_TYPES = [
     description: "Blog post abandoned",
   },
   {
+    type: "c/t/d",
+    description: "Threads post draft",
+  },
+  {
+    type: "c/t/r",
+    description: "Threads post ready to post",
+  },
+  {
+    type: "c/t/p",
+    description: "Threads post published",
+  },
+  {
     type: "a/n/n",
     description: "N Current Task",
   },
