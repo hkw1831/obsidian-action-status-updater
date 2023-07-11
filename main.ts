@@ -111,7 +111,7 @@ export default class MyPlugin extends Plugin {
 			},
 		})
 
-		this.openInboxIcon()
+		this.openBrainDumpIcon()
 		this.addCommand({
 			id: "open-braindump",
 			name: "Open braindump",
