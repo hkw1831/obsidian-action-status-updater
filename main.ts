@@ -114,26 +114,12 @@ export default class MyPlugin extends Plugin {
 		this.openBrainDumpIcon()
 		this.addCommand({
 			id: "open-braindump",
-			name: "Open braindump",
+			name: "Open BrainDump",
 			icon: "open-braindump-icon",
 			callback: async () => {
 				const { vault } = this.app;
 				const { workspace } = this.app;
 				const inboxMd = "I/Brain Dump.md"
-				const mode = (this.app.vault as any).getConfig("defaultViewMode");
-				const leaf = workspace.getLeaf(false);
-				await leaf.openFile(vault.getAbstractFileByPath(inboxMd) as TFile, { active : true,/* mode */});
-			},
-		})
-
-		this.addCommand({
-			id: "open-inbox",
-			name: "Open Inbox",
-			icon: "open-braindump-icon",
-			callback: async () => {
-				const { vault } = this.app;
-				const { workspace } = this.app;
-				const inboxMd = "I/Inbox.md"
 				const mode = (this.app.vault as any).getConfig("defaultViewMode");
 				const leaf = workspace.getLeaf(false);
 				await leaf.openFile(vault.getAbstractFileByPath(inboxMd) as TFile, { active : true,/* mode */});
