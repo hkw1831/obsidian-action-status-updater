@@ -20,7 +20,7 @@ export default class MyPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		['n', 'l', 'w', 'd', 'a', 't', '1', '2', '3', '4', '5', '6', '7'].forEach(t => {
+		['n', 'l', 'w', 'd', 'a', 't', 'p', '1', '2', '3', '4', '5', '6', '7'].forEach(t => {
 			this.addIcon(t);
 			this.addActionCommand(t);
 		});
@@ -365,6 +365,7 @@ export default class MyPlugin extends Plugin {
 										 .replace(`#wd `, `#w${t} `)
 										 .replace(`#wa `, `#w${t} `)
 										 .replace(`#wt `, `#w${t} `)
+										 .replace(`#wc `, `#w${t} `)
 										 .replace(`#w1 `, `#w${t} `)
 										 .replace(`#w2 `, `#w${t} `)
 										 .replace(`#w3 `, `#w${t} `)
@@ -378,6 +379,7 @@ export default class MyPlugin extends Plugin {
 										 .replace(`#nd `, `#n${t} `)
 										 .replace(`#na `, `#n${t} `)
 										 .replace(`#nt `, `#n${t} `)
+										 .replace(`#nc `, `#n${t} `)
 										 .replace(`#n1 `, `#n${t} `)
 										 .replace(`#n2 `, `#n${t} `)
 										 .replace(`#n3 `, `#n${t} `)
