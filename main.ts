@@ -403,7 +403,7 @@ export default class MyPlugin extends Plugin {
 					// console.log(`#7#=${line.charAt(7)}#`)
 					// console.log(`#8#=${line.charAt(8)}#`)
 
-					const replaceLineToRemoveTag = line.replace(`#n${t} `, ``).replace(`#n${t} `, ``)
+					const replaceLineToRemoveTag = line.replace(`#n${t} `, ``).replace(`#w${t} `, ``)
 					editor.setLine(lineNumber, replaceLineToRemoveTag);
 					// lets say "#nt " is at 3 (char for #)
 					// if ch <= 3 no need to update
