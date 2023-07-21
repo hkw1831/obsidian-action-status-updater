@@ -19,6 +19,10 @@ const ALL_TYPES = [
     description: "Zettelkasten - Notes (Need to think more on this)",
   },
   {
+    type: "b/n/v",
+    description: "Zettelkasten - Voice script",
+  },
+  {
     type: "b/n/r",
     description: "Zettelkasten - Reference",
   },
@@ -49,10 +53,6 @@ const ALL_TYPES = [
   {
     type: "c/b/o",
     description: "Blog post outlined",
-  },
-  {
-    type: "c/b/s",
-    description: "Blog post raw scripted",
   },
   {
     type: "c/b/f",
