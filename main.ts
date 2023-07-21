@@ -222,6 +222,63 @@ export default class MyPlugin extends Plugin {
 			]
 		});
 
+		this.addGrepBlockIcon();
+		this.addCommand({
+			id: "grep-block-to-clipboard",
+			name: "Grep Block to clipboard",
+			icon: `grep-block-to-clipboard-icon`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				let cursor = editor.getCursor();
+				let line = cursor.line;
+				let above = line;
+				let below = line;
+				// first get above
+				
+				while (above >= 0) {
+					let l = editor.getLine(above);
+					if (l == '---') {
+						break;
+					}
+					above--;
+				}
+				above++;
+				while(true) {
+					if (editor.getLine(above) == '') {
+						above++;
+						break;
+					}
+				}
+
+				// then get below
+				while (below < editor.lineCount()) {
+					let l = editor.getLine(below);
+					if (l == '---') {
+						break;
+					}
+					below++;
+				}
+				below--;
+
+				while(true) {
+					if (editor.getLine(below) == '') {
+						below--;
+						break;
+					}
+				}
+
+				// then put them to line
+
+				let text = "";
+				Array.from(Array(below - above + 1).keys()).forEach(i => text = text + editor.getLine(i + above) + "\n")
+			
+				navigator.clipboard.writeText(text).then(function () {
+					new Notice(`Copy\n\`\`\`${text}\`\`\` to clipboard!`);
+				}, function (error) {
+					new Notice(`error when copy to clipboard!`);
+				});
+			},
+		});
+
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
 	}
@@ -285,6 +342,11 @@ export default class MyPlugin extends Plugin {
 		const dateMoment = moment().add(addDay, 'd');
 		const dayOfWeek = dateMoment.format('E');
 		return `tag:#${actionType}${dayOfWeek} OR `
+	}
+
+	addGrepBlockIcon() {
+		var obsidian = require('obsidian');
+		obsidian.addIcon(`grep-block-to-clipboard-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>BC</text>`);
 	}
 
 	addRemoveActionIcon() {
