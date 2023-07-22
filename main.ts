@@ -257,10 +257,13 @@ export default class MyPlugin extends Plugin {
 					}
 					above--;
 				}
-				above++;
+				if (editor.getLine(above) == '---') {
+					above++;
+				}
 				while(true) {
 					if (editor.getLine(above) == '') {
 						above++;
+					} else {
 						break;
 					}
 				}
@@ -273,11 +276,14 @@ export default class MyPlugin extends Plugin {
 					}
 					below++;
 				}
-				below--;
+				if (editor.getLine(below) == '---') {
+					below--;
+				}
 
 				while(true) {
 					if (editor.getLine(below) == '') {
 						below--;
+					} else {
 						break;
 					}
 				}
@@ -288,7 +294,7 @@ export default class MyPlugin extends Plugin {
 				Array.from(Array(below - above + 1).keys()).forEach(i => text = text + editor.getLine(i + above) + "\n")
 			
 				navigator.clipboard.writeText(text).then(function () {
-					new Notice(`Copy\n\`\`\`\n${text}\`\`\` to clipboard!`);
+					new Notice(`Copy\n\`\`\`\n${text}\`\`\`\nto clipboard!`);
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);
 				});
