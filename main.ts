@@ -126,17 +126,17 @@ export default class MyPlugin extends Plugin {
 			},
 		})
 
-		this.addThreadToBlogIcon();
+		this.addThreadsToBlogIcon();
 		this.addCommand({
-			id: "thread-to-blog",
-			name: "Thread to Blog",
-			icon: `thread-to-blog-icon`,
+			id: "threads-to-blog",
+			name: "Threads to Blog",
+			icon: `threads-to-blog-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const lineCount = editor.lineCount();
 				let tagLineNumber = null;
 				let metadataLineCount = 0;
 				for (let i = 0; i < lineCount; i++) {
-					let line = editor.getLine(i).replace('🧵 ', '# ').replace('tag: c/t/p', 'tag: c/b/f')
+					let line = editor.getLine(i).replace('🧵 ', '# ').replace('【', '').replace('】', '').replace('tag: c/t/p', 'tag: c/b/f')
 					if (line == '---') {
 						metadataLineCount++
 						if (metadataLineCount > 2) {
@@ -386,9 +386,9 @@ export default class MyPlugin extends Plugin {
 		obsidian.addIcon(`update-note-type-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>NT</text>`);
 	}
 
-	addThreadToBlogIcon() {
+	addThreadsToBlogIcon() {
 		var obsidian = require('obsidian');
-		obsidian.addIcon(`thread-to-blog-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>TB</text>`);
+		obsidian.addIcon(`threads-to-blog-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>TB</text>`);
 	}
 
 	addAddCommentTagIcon() {
