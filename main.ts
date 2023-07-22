@@ -222,6 +222,22 @@ export default class MyPlugin extends Plugin {
 			]
 		});
 
+		this.addGrepTitleAsLinkToClipboardIcon();
+		this.addCommand({
+			id: "grep-title-as-link-to-clipboard",
+			name: "Grep Title as link to clipboard",
+			icon: `grep-title-as-link-to-clipboard-icon`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const title = view.file.basename;
+				const titleAsLink = `[[${title}]]`;
+				navigator.clipboard.writeText(titleAsLink).then(function () {
+					new Notice(`Copy title "${title}" as link to clipboard!`);
+				}, function (error) {
+					new Notice(`error when copy to clipboard!`);
+				});
+			},
+		});
+
 		this.addGrepBlockIcon();
 		this.addCommand({
 			id: "grep-block-to-clipboard",
@@ -342,6 +358,11 @@ export default class MyPlugin extends Plugin {
 		const dateMoment = moment().add(addDay, 'd');
 		const dayOfWeek = dateMoment.format('E');
 		return `tag:#${actionType}${dayOfWeek} OR `
+	}
+
+	addGrepTitleAsLinkToClipboardIcon() {
+		var obsidian = require('obsidian');
+		obsidian.addIcon(`grep-title-as-link-to-clipboard-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>LC</text>`);
 	}
 
 	addGrepBlockIcon() {
