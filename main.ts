@@ -276,6 +276,8 @@ export default class MyPlugin extends Plugin {
 					const modifiedLine = line == "---" ? "" : line
 					text = text + modifiedLine + "\n"
 				});
+				const re = /\n{3,}/
+				text = text.replace(re, "\n\n\n");
 			
 				navigator.clipboard.writeText(text).then(function () {
 					new Notice(`Copied content to clipboard!`);
