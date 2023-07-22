@@ -295,6 +295,7 @@ export default class MyPlugin extends Plugin {
 			
 				navigator.clipboard.writeText(text).then(function () {
 					new Notice(`Copy\n\`\`\`\n${text}\`\`\`\nto clipboard!`);
+					window.open('shortcuts://run-shortcut?name=Threads%20to%20image');
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);
 				});
