@@ -222,6 +222,31 @@ export default class MyPlugin extends Plugin {
 			]
 		});
 
+		this.addCommand({
+			id: "cursor-go-to-start-of-line",
+			name: "Cursor go to start of line",
+			icon: `arrow-big-left`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const cursor = editor.getCursor();
+				cursor.ch = 0;
+				editor.setCursor(cursor);
+			},
+		});
+
+		this.addCommand({
+			id: "cursor-go-to-end-of-line",
+			name: "Cursor go to end of line",
+			icon: `arrow-big-right`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const cursor = editor.getCursor();
+				const lineNum = cursor.line;
+				const line = editor.getLine(lineNum);
+				const length = line.length;
+				cursor.ch = length;
+				editor.setCursor(cursor);
+			},
+		});
+
 		this.addGrepTitleAsLinkToClipboardIcon();
 		this.addCommand({
 			id: "grep-title-as-link-to-clipboard",
