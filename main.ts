@@ -247,11 +247,10 @@ export default class MyPlugin extends Plugin {
 			},
 		});
 
-		this.addGrepTitleAsLinkToClipboardIcon();
 		this.addCommand({
 			id: "grep-title-as-link-to-clipboard",
 			name: "Grep Title as link to clipboard",
-			icon: `grep-title-as-link-to-clipboard-icon`,
+			icon: `clipboard-list`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const title = view.file.basename;
 				const titleAsLink = `[[${title}]]`;
@@ -418,11 +417,6 @@ export default class MyPlugin extends Plugin {
 	addGrepThreadsToClipboardIcon() {
 		var obsidian = require('obsidian');
 		obsidian.addIcon(`threads-to-clipboard-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>TC</text>`);
-	}
-
-	addGrepTitleAsLinkToClipboardIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`grep-title-as-link-to-clipboard-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>LC</text>`);
 	}
 
 	addGrepThreadsBlockToImageIcon() {
