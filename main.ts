@@ -248,6 +248,23 @@ export default class MyPlugin extends Plugin {
 		});
 
 		this.addCommand({
+			id: "remove-first-tab-from-selected-lines",
+			name: "Remove first tab from selected lines",
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const listSelections = editor.listSelections();
+				listSelections.forEach(listSelection => {
+					const fromLineNum = listSelection.head.line
+					const toLineNum = listSelection.anchor.line
+					for (let i = fromLineNum; i <= toLineNum; i++) {
+						const line = editor.getLine(i)
+						const modifiedLine = line.replace(/\t/, '')
+						editor.setLine(i, modifiedLine);
+					}
+				})
+			},
+		});
+
+		this.addCommand({
 			id: "grep-title-as-link-to-clipboard",
 			name: "Grep Title as link to clipboard",
 			icon: `clipboard-list`,
@@ -276,11 +293,27 @@ export default class MyPlugin extends Plugin {
 					const modifiedLine = line == "---" ? "" : line
 					text = text + modifiedLine + "\n"
 				});
-				const re = /\n{3,}/
-				text = text.replace(re, "\n\n\n");
+				text = text.replace(/[\n\r]{3,}/gm, "\n\n\n");
+
+				const beforeTag = "tag: c/t/r"
+				const afterTag = "tag: c/t/p"
 			
 				navigator.clipboard.writeText(text).then(function () {
-					new Notice(`Copied content to clipboard!`);
+					let foundTag = false;
+					for (let i = 0; i < line; i++) {
+						const lineText = editor.getLine(i);
+						if (lineText.startsWith(beforeTag)) {
+							const replacedLineText = lineText.replace(beforeTag, afterTag)
+							editor.setLine(i, replacedLineText);
+							foundTag = true;
+							break;
+						}
+					}
+					if (foundTag) {
+						new Notice(`Update notes type from "${beforeTag}" to "${afterTag}!\nCopied content to clipboard!`);
+					} else {
+						new Notice(`"${beforeTag}" not found\nCopied content to clipboard!`);
+					}
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);
 				});
