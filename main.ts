@@ -1,6 +1,7 @@
 import { UpdateNoteTypeModal } from 'updateNoteTypeModal';
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Command, TFile, Vault } from 'obsidian';
 import { AddFootnoteTagModal } from 'addCommentTagModal';
+import { OpenActionsModal } from 'openActions';
 import { Moment } from 'moment'
 import { AddTaskTagModal } from 'addTaskTagModal';
 
@@ -125,6 +126,25 @@ export default class MyPlugin extends Plugin {
 				await leaf.openFile(vault.getAbstractFileByPath(inboxMd) as TFile, { active : true,/* mode */});
 			},
 		})
+
+		this.addCommand({
+			id: "open-actions",
+			name: "Open Actions",
+			icon: `aperture`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+			  new OpenActionsModal(this.app).open();
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `x`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `x`,
+				},
+			]
+		});
 
 		this.addThreadsToBlogIcon();
 		this.addCommand({
