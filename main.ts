@@ -313,7 +313,8 @@ export default class MyPlugin extends Plugin {
 					const modifiedLine = line == "---" ? "" : line
 					text = text + modifiedLine + "\n"
 				});
-				text = text.replace(/[\n\r]{3,}/gm, "\n\n\n");
+				text = text.replace(/🧵 (.*)/g, "🧵【$1】");
+				text = text.replace(/[\n\r]{3,}/gm, "\n\n\n▍");
 
 				const beforeTag = "tag: c/t/r"
 				const afterTag = "tag: c/t/p"

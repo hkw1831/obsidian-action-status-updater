@@ -33,7 +33,6 @@ export class OpenActionsModal extends FuzzySuggestModal<string> {
   async onChooseItem(choosenNote: string, evt: MouseEvent | KeyboardEvent) {
       const { vault } = this.app;
       const { workspace } = this.app;
-      new Notice(choosenNote);
       const mode = (this.app.vault as any).getConfig("defaultViewMode");
       const leaf = workspace.getLeaf(false);
       await leaf.openFile(vault.getAbstractFileByPath(choosenNote) as TFile, { active : true,/* mode */});
