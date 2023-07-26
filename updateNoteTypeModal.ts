@@ -7,6 +7,10 @@ interface NoteType {
 
 const ALL_TYPES = [
   {
+    type: "b/n/s",
+    description: "Zettelkasten - Source notes",
+  },
+  {
     type: "b/n/u",
     description: "Zettelkasten - Unprocessed material - add 1+ HQ&A Here",
   },
@@ -31,7 +35,7 @@ const ALL_TYPES = [
     description: "Zettelkasten - MOC Notes",
   },
   {
-    type: "b/n/s",
+    type: "b/n/z",
     description: "Zettelkasten - Slip box",
   },
   {
