@@ -422,7 +422,7 @@ export default class MyPlugin extends Plugin {
 		Array.from(Array(3).keys()).forEach(i => noteContent += this.getQueryDateAndActionString(i, excludeNotes));
 		noteContent = noteContent + `## nn / wn\n\`\`\`query\ntag:#nn OR tag:#wn\n\`\`\`\n\n## nt / wt\n\`\`\`query\ntag:#nt OR tag:#wt\n\`\`\`\n\n`
 		noteContent = noteContent + this.getQueryNext2MonthString(excludeNotes)
-		noteContent = noteContent + `\n\n[[Query Schedule and Actions next 3 days]]`
+		// noteContent = noteContent + `\n\n[[Query Schedule and Actions next 3 days]]`
 		vault.modify(vault.getAbstractFileByPath(scheduleNote) as TFile, noteContent);
 	}
 
