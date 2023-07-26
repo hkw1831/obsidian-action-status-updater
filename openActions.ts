@@ -1,6 +1,7 @@
 import { App, Editor, FuzzySuggestModal, FuzzyMatch, TFile, Notice } from "obsidian";
 
 const ALL_NOTES = [
+  "D/Query Schedule and Actions next 3 days.md",
   "D/Query N now actions.md",
   "D/Query W now actions.md",
   "D/Query N waiting actions or tasks.md",

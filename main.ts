@@ -69,6 +69,8 @@ export default class MyPlugin extends Plugin {
 
 				this.addActionNoteContent(vault, "D", "Query W now actions", "Weekly Schedule W", "w")
 				this.addActionNoteContent(vault, "D", "Query N now actions", "Weekly Schedule N", "n")
+				this.add3DaysActionNoteContent(vault);
+				new Notice("Updated schedule");
 			},
 			hotkeys: [
 				{
@@ -409,6 +411,21 @@ export default class MyPlugin extends Plugin {
 		this.addSettingTab(new SampleSettingTab(this.app, this));
 	}
 
+	async add3DaysActionNoteContent(vault: Vault) {
+		const scheduleNoteWithoutMd = "D/Query Schedule and Actions next 3 days"
+		const scheduleNote = `${scheduleNoteWithoutMd}.md`				
+		if (vault.getAbstractFileByPath(scheduleNote) == null) {
+			await vault.create(scheduleNote, "");
+		}
+		let noteContent = '\n'
+		const excludeNotes = [scheduleNoteWithoutMd, "D/Scheduling"];
+		Array.from(Array(3).keys()).forEach(i => noteContent += this.getQueryDateAndActionString(i, excludeNotes));
+		noteContent = noteContent + `## nn / wn\n\`\`\`query\ntag:#nn OR tag:#wn\n\`\`\`\n\n## nt / wt\n\`\`\`query\ntag:#nt OR tag:#wt\n\`\`\`\n\n`
+		noteContent = noteContent + this.getQueryNext2MonthString(excludeNotes)
+		noteContent = noteContent + `\n\n[[Query Schedule and Actions next 3 days]]`
+		vault.modify(vault.getAbstractFileByPath(scheduleNote) as TFile, noteContent);
+	}
+
 	async addActionNoteContent(vault: Vault, folderName: String, noteTitleWithoutMd: String, scheduleNoteTitleWithoutMd: String, nOrW: String) {
 		const nowActionNoteWithoutMd = `${folderName}/${noteTitleWithoutMd}`
 		const nowActionNote = `${nowActionNoteWithoutMd}.md`				
@@ -445,6 +462,26 @@ export default class MyPlugin extends Plugin {
 	openBrainDumpIcon() {
 		var obsidian = require('obsidian');
 		obsidian.addIcon(`open-braindump-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>OB</text>`);
+	}
+
+	getQueryDateAndActionString(addDay: Number, excludeNotes: String[]): string {
+		let moment = require('moment');
+		const dateMoment = moment().add(addDay, 'd');
+		const dateYYYYMMDD = dateMoment.format('YYYYMMDD');
+		const dateEachYYDD = '\\d\\d\\d\\d' + dateMoment.format('MMDD');
+		const dateEachDD = '\\d\\d\\d\\d\\d\\d' + dateMoment.format('DD');
+		const dayOfWeek = dateMoment.format('E');
+		const excludeNoteStr = excludeNotes.map(excludeNote => `-path:"${excludeNote}" `).join("")
+		return `## ${dateYYYYMMDD}\n\`\`\`query\n(${dateYYYYMMDD} OR ${dateEachYYDD} OR ${dateEachDD} OR tag:#n${dayOfWeek} OR tag:#w${dayOfWeek}) ${excludeNoteStr}-path:"D/Scheduling" -block:(query)\n\`\`\`\n\n`
+	}
+
+	getQueryNext2MonthString(excludeNotes: String[]): string {
+		let moment = require('moment');
+		const currentMonthYYYYMM = moment().format('YYYYMM');
+		const dateMoment = moment().add(1, 'M');
+		const nextMonthYYYYMM = dateMoment.format('YYYYMM');
+		const excludeNoteStr = excludeNotes.map(excludeNote => `-path:"${excludeNote}" `).join("")
+		return `## ${currentMonthYYYYMM} and ${nextMonthYYYYMM}\n\`\`\`query\n(${currentMonthYYYYMM}\\d\\d OR ${nextMonthYYYYMM}\\d\\d ${excludeNoteStr}-path:"D/Scheduling" -block:(query)\n\`\`\`\n\n`
 	}
 
 	getQueryDateString(addDay: Number, excludeNote: String): string {
