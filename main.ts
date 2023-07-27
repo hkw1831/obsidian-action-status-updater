@@ -417,7 +417,7 @@ export default class MyPlugin extends Plugin {
 		if (vault.getAbstractFileByPath(scheduleNote) == null) {
 			await vault.create(scheduleNote, "");
 		}
-		let noteContent = '\n[[Query Schedule and Actions next 3 days]]\n'
+		let noteContent = '[[Query Schedule and Actions next 3 days]]\n'
 		const excludeNotes = [scheduleNoteWithoutMd, "D/Scheduling"];
 		Array.from(Array(3).keys()).forEach(i => noteContent += this.getQueryDateAndActionString(i, excludeNotes));
 		noteContent = noteContent + `## nn / wn\n\`\`\`query\ntag:#nn OR tag:#wn\n\`\`\`\n\n## nt / wt\n\`\`\`query\ntag:#nt OR tag:#wt\n\`\`\`\n\n`
