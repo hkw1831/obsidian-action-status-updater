@@ -176,6 +176,39 @@ export class UpdateNoteTypeModal extends FuzzySuggestModal<NoteType> {
     this.editor.setCursor(cursor)
   }
 
+  addTagAssumingHasFrontMatter(value: string) {
+    const cursor = this.editor.getCursor()
+    const oldLine = cursor.line
+    const oldCh = cursor.ch
+
+    let firstLineIndex = 0;
+    const lineCount = this.editor.lineCount();
+    for (let i = 0; i < lineCount; i++) {
+      new Notice(this.editor.getLine(i))
+      if (this.editor.getLine(i).trim() == "---".trim()) {
+        firstLineIndex = i;
+        break;
+      }
+    }
+    if (firstLineIndex == lineCount) {
+      new Notice("Something wrong here")
+      return;
+    }
+    let text = ""
+    for (let i = 0; i <= firstLineIndex; i++) {
+      text = text + this.editor.getLine(i) + "\n";
+    }
+    text = text + `tag: ${value}\n`
+    for (let i = firstLineIndex + 1; i <= this.editor.lineCount(); i++) {
+      text = text + this.editor.getLine(i) + "\n";
+    }
+
+    this.editor.setValue(text)
+    cursor.line = oldLine + (oldLine <= firstLineIndex ? 0 : 1)
+    cursor.ch = oldCh
+    this.editor.setCursor(cursor)
+  }
+
   // Perform action on the selected suggestion.
   onChooseItem(choosenNoteType: NoteType, evt: MouseEvent | KeyboardEvent) {
     if (!hasFrontMatter(this.file)) {
@@ -191,7 +224,7 @@ export class UpdateNoteTypeModal extends FuzzySuggestModal<NoteType> {
         // new File(app, this.file.path, null, 0).replaceInFrontMatter;
 
         // TODO add tags
-        this.addFrontMatterWithTag(choosenNoteType.type)
+        this.addTagAssumingHasFrontMatter(choosenNoteType.type)
       }
     
 
