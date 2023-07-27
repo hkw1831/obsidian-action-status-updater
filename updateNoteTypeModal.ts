@@ -1,4 +1,6 @@
-import { App, Editor, FuzzySuggestModal, FuzzyMatch } from "obsidian";
+import { App, Editor, FuzzySuggestModal, FuzzyMatch, TFile, Notice } from "obsidian";
+import { hasFrontMatter, hasTags, renameTag } from "tagrenamer/renaming";
+import {File} from "tagrenamer/File";
 
 interface NoteType {
   type: string;
@@ -135,11 +137,13 @@ const ALL_TYPES = [
 export class UpdateNoteTypeModal extends FuzzySuggestModal<NoteType> {
 
   editor: Editor
+  file: TFile
 
-  constructor(app: App, editor: Editor)
+  constructor(app: App, editor: Editor, file: TFile)
   {
     super(app)
     this.editor = editor
+    this.file = file
   }
 
   getItems(): NoteType[] {
@@ -161,39 +165,69 @@ export class UpdateNoteTypeModal extends FuzzySuggestModal<NoteType> {
     return ALL_TYPES.filter((noteType) => line.contains(noteType.type)).length > 0
   }
 
+  addFrontMatterWithTag(value: string) {
+    const cursor = this.editor.getCursor()
+    const oldLine = cursor.line
+    const oldCh = cursor.ch
+    const addText = `---\ntag: ${value}\n---\n\n${this.editor.getValue()}`
+    this.editor.setValue(addText)
+    cursor.line = oldLine + 4
+    cursor.ch = oldCh
+    this.editor.setCursor(cursor)
+  }
+
   // Perform action on the selected suggestion.
   onChooseItem(choosenNoteType: NoteType, evt: MouseEvent | KeyboardEvent) {
-    const selection = this.editor.getSelection()
-    const replacedStr = `---\ntag: ${choosenNoteType.type}\n---\n\n`
-    if (selection.length != 0) {
-        this.editor.replaceSelection(replacedStr);
+    if (!hasFrontMatter(this.file)) {
+      this.addFrontMatterWithTag(choosenNoteType.type)
     } else {
-        const cursor = this.editor.getCursor();
+      if (hasTags(this.file))
+      {
+        ALL_TYPES.forEach(t => {
+          renameTag(this.file, t.type, choosenNoteType.type)
+          })
+      } else {
+        // new Notice("adding tag todo")
+        // new File(app, this.file.path, null, 0).replaceInFrontMatter;
 
-        const lineCount = this.editor.lineCount();
-        let tagLineNumber = null;
-        for (let i = 0; i < lineCount; i++) {
-          if (this.editor.getLine(i).startsWith('tag: ')) {
-            tagLineNumber = i;
-            break;
-          }
-        }
+        // TODO add tags
+        this.addFrontMatterWithTag(choosenNoteType.type)
+      }
+    
 
-        if (tagLineNumber != null) {
-          const line = this.editor.getLine(tagLineNumber);
-          if (this.containsType(line)) {
-            let replacedLine = line
-            ALL_TYPES.forEach((noteType) => replacedLine = replacedLine.replace(noteType.type, choosenNoteType.type))
-            this.editor.setLine(tagLineNumber, replacedLine);
-            this.editor.setCursor(cursor);	
-          }
-        } else {
-          const lineNumber = this.editor.getCursor().line;
-          const line = this.editor.getLine(lineNumber);
-          this.editor.replaceRange(replacedStr, cursor);
-          cursor.ch = cursor.ch + replacedStr.length;
-          this.editor.setCursor(cursor);
-        }
+  // old solution
+  //   const selection = this.editor.getSelection()
+  //   const replacedStr = `---\ntag: ${choosenNoteType.type}\n---\n\n`
+  //   if (selection.length != 0) {
+  //       this.editor.replaceSelection(replacedStr);
+  //   } else {
+  //       const cursor = this.editor.getCursor();
+
+  //       const lineCount = this.editor.lineCount();
+  //       let tagLineNumber = null;
+  //       for (let i = 0; i < lineCount; i++) {
+  //         if (this.editor.getLine(i).startsWith('tag: ')) {
+  //           tagLineNumber = i;
+  //           break;
+  //         }
+  //       }
+
+  //       if (tagLineNumber != null) {
+  //         const line = this.editor.getLine(tagLineNumber);
+  //         if (this.containsType(line)) {
+  //           let replacedLine = line
+  //           ALL_TYPES.forEach((noteType) => replacedLine = replacedLine.replace(noteType.type, choosenNoteType.type))
+  //           this.editor.setLine(tagLineNumber, replacedLine);
+  //           this.editor.setCursor(cursor);	
+  //         }
+  //       } else {
+  //         const lineNumber = this.editor.getCursor().line;
+  //         const line = this.editor.getLine(lineNumber);
+  //         this.editor.replaceRange(replacedStr, cursor);
+  //         cursor.ch = cursor.ch + replacedStr.length;
+  //         this.editor.setCursor(cursor);
+  //       }
+  //   }
     }
   }
 }

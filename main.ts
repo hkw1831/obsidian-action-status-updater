@@ -37,7 +37,7 @@ export default class MyPlugin extends Plugin {
 			name: "Update Note Type",
 			icon: `update-note-type-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-			  new UpdateNoteTypeModal(this.app, editor).open();
+			  new UpdateNoteTypeModal(this.app, editor, view.file).open();
 			},
 			hotkeys: [
 				{

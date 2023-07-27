@@ -21,6 +21,7 @@
 		"obsidian": "latest",
 		"moment": "2.29.1",
 		"tslib": "2.4.0",
-		"typescript": "4.7.4"
+		"typescript": "4.7.4",
+		"yaml": "2.0.0-10"
 	}
 }
