@@ -327,7 +327,6 @@ export default class MyPlugin extends Plugin {
 						break;
 					}
 				}
-				new Notice(editor.getLine(numLineFirstContent))
 
 				Array.from(Array(line - numLineFirstContent).keys()).forEach(i => {
 					const line = editor.getLine(i + numLineFirstContent);
@@ -349,9 +348,28 @@ export default class MyPlugin extends Plugin {
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				let line = editor.lineCount();
 
+				let numLineFirstContent = 0
+				let frontMatterLineCount = 0
+				for (let i = 0; i < line; i++) {
+					if (frontMatterLineCount == 2) {
+						numLineFirstContent = i;
+						break;
+					}
+					if (editor.getLine(i) == "---") {
+						frontMatterLineCount++
+					}
+				}
+				for (let i = 0; i < line; i++) {
+					if (editor.getLine(numLineFirstContent).trim() == "") {
+						numLineFirstContent++;
+					} else {
+						break;
+					}
+				}
+
 				let text = "";
-				Array.from(Array(line - 4).keys()).forEach(i => {
-					const line = editor.getLine(i + 4);
+				Array.from(Array(line - numLineFirstContent).keys()).forEach(i => {
+					const line = editor.getLine(i + numLineFirstContent);
 					const modifiedLine = line == "---" ? "" : line
 					text = text + modifiedLine + "\n"
 				});
