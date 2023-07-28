@@ -332,9 +332,16 @@ export default class MyPlugin extends Plugin {
 				Array.from(Array(line - numLineFirstContent).keys()).forEach(i => {
 					const line = editor.getLine(i + numLineFirstContent);
 					text = text + line + "\n"
-				});			
+				});
+				const beforeTag = "c/b/f"
+				const afterTag = "c/b/p"
 				navigator.clipboard.writeText(text).then(function () {
-					new Notice(`copied blog to clipboard!`);
+					let foundTag = renameTag(view.file, beforeTag, afterTag)
+					if (foundTag) {
+						new Notice(`Update notes type from tag="${beforeTag}" to tag="${afterTag}!\nCopied blog content to clipboard!`);
+					} else {
+						new Notice(`Tag "${beforeTag}" not found\nCopied blog content to clipboard!`);
+					}
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);
 				});
@@ -383,9 +390,9 @@ export default class MyPlugin extends Plugin {
 				navigator.clipboard.writeText(text).then(function () {
 					let foundTag = renameTag(view.file, beforeTag, afterTag)
 					if (foundTag) {
-						new Notice(`Update notes type from tag="${beforeTag}" to tag="${afterTag}!\nCopied content to clipboard!`);
+						new Notice(`Update notes type from tag="${beforeTag}" to tag="${afterTag}!\nCopied thread content to clipboard!`);
 					} else {
-						new Notice(`Tag "${beforeTag}" not found\nCopied content to clipboard!`);
+						new Notice(`Tag "${beforeTag}" not found\nCopied thread content to clipboard!`);
 					}
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);
