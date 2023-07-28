@@ -14,7 +14,7 @@ export function hasTags(file: TFile) : boolean {
     return (fmtags.length || aliasTags.length) ? true : false
 }
 
-export async function renameTag(file: TFile, tagName: string, newName:string) {
+export async function renameTag(file: TFile, tagName: string, newName:string) : boolean {
     const
         oldTag  = new Tag(tagName),
         newTag  = new Tag(newName),
@@ -22,9 +22,10 @@ export async function renameTag(file: TFile, tagName: string, newName:string) {
 
     const target = await findTargets(oldTag, file);
     if (!target) {
-        return;
+        return false;
     }
     await target.renamed(replace)
+    return true
 }
 
 export async function findTargets(tag: Tag, file: TFile) {

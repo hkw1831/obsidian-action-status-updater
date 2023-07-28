@@ -4,6 +4,7 @@ import { AddFootnoteTagModal } from 'addCommentTagModal';
 import { OpenActionsModal } from 'openActions';
 import { Moment } from 'moment'
 import { AddTaskTagModal } from 'addTaskTagModal';
+import { renameTag } from 'tagrenamer/renaming';
 
 // Remember to rename these classes and interfaces!
 
@@ -376,24 +377,15 @@ export default class MyPlugin extends Plugin {
 				text = text.replace(/🧵 (.*)/g, "🧵【$1】");
 				text = text.replace(/[\n\r]{3,}/gm, "\n\n\n▍");
 
-				const beforeTag = "tag: c/t/r"
-				const afterTag = "tag: c/t/p"
+				const beforeTag = "c/t/r"
+				const afterTag = "c/t/p"
 			
 				navigator.clipboard.writeText(text).then(function () {
-					let foundTag = false;
-					for (let i = 0; i < line; i++) {
-						const lineText = editor.getLine(i);
-						if (lineText.startsWith(beforeTag)) {
-							const replacedLineText = lineText.replace(beforeTag, afterTag)
-							editor.setLine(i, replacedLineText);
-							foundTag = true;
-							break;
-						}
-					}
+					let foundTag = renameTag(view.file, beforeTag, afterTag)
 					if (foundTag) {
-						new Notice(`Update notes type from "${beforeTag}" to "${afterTag}!\nCopied content to clipboard!`);
+						new Notice(`Update notes type from tag="${beforeTag}" to tag="${afterTag}!\nCopied content to clipboard!`);
 					} else {
-						new Notice(`"${beforeTag}" not found\nCopied content to clipboard!`);
+						new Notice(`Tag "${beforeTag}" not found\nCopied content to clipboard!`);
 					}
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);
