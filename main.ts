@@ -301,6 +301,46 @@ export default class MyPlugin extends Plugin {
 			},
 		});
 
+		this.addCommand({
+			id: "blog-to-clipboard",
+			name: "Blog to clipboard",
+			icon: `blog-to-clipboard-icon`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				let line = editor.lineCount();
+
+				let text = "";
+				let numLineFirstContent = 0
+				let frontMatterLineCount = 0
+				for (let i = 0; i < line; i++) {
+					if (frontMatterLineCount == 2) {
+						numLineFirstContent = i;
+						break;
+					}
+					if (editor.getLine(i) == "---") {
+						frontMatterLineCount++
+					}
+				}
+				for (let i = 0; i < line; i++) {
+					if (editor.getLine(numLineFirstContent).trim() == "") {
+						numLineFirstContent++;
+					} else {
+						break;
+					}
+				}
+				new Notice(editor.getLine(numLineFirstContent))
+
+				Array.from(Array(line - numLineFirstContent).keys()).forEach(i => {
+					const line = editor.getLine(i + numLineFirstContent);
+					text = text + line + "\n"
+				});			
+				navigator.clipboard.writeText(text).then(function () {
+					new Notice(`copied blog to clipboard!`);
+				}, function (error) {
+					new Notice(`error when copy to clipboard!`);
+				});
+			},
+		});
+
 		this.addGrepThreadsToClipboardIcon();
 		this.addCommand({
 			id: "threads-to-clipboard",
