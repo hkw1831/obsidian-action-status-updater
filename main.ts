@@ -158,16 +158,23 @@ export default class MyPlugin extends Plugin {
 				const lineCount = editor.lineCount();
 				let tagLineNumber = null;
 				let metadataLineCount = 0;
+				let text = ""
 				for (let i = 0; i < lineCount; i++) {
-					let line = editor.getLine(i).replace('🧵 ', '# ').replace('【', '').replace('】', '').replace('tag: c/t/p', 'tag: c/b/f')
-					if (line == '---') {
-						metadataLineCount++
-						if (metadataLineCount > 2) {
-							line = line.replace('---', '## > ')
+					let line = editor.getLine(i);
+					if (!line.trim().startsWith("%%") || !line.trim().endsWith("%%")) {
+						let modifiedLine = line.replace('🧵 ', '# ').replace('【', '').replace('】', '')
+						if (modifiedLine == '---') {
+							metadataLineCount++
+							if (metadataLineCount > 2) {
+								modifiedLine = modifiedLine.replace('---', '## > ')
+							}
 						}
+						text = text + modifiedLine + "\n";
+						// editor.setLine(i, line)
 					}
-					editor.setLine(i, line)
 				}
+				editor.setValue(text)
+				renameTag(view.file, "c/t/p", "c/b/f")
 			}
 		});
 
@@ -379,8 +386,10 @@ export default class MyPlugin extends Plugin {
 				let text = "";
 				Array.from(Array(line - numLineFirstContent).keys()).forEach(i => {
 					const line = editor.getLine(i + numLineFirstContent);
-					const modifiedLine = line == "---" ? "" : line
-					text = text + modifiedLine + "\n"
+					if (!line.trim().startsWith("%%") || !line.trim().endsWith("%%")) {
+						const modifiedLine = line == "---" ? "" : line
+						text = text + modifiedLine + "\n"
+					}
 				});
 				text = text.replace(/🧵 (.*)/g, "🧵【$1】");
 				text = text.replace(/[\n\r]{3,}/gm, "\n\n\n▍");
@@ -484,7 +493,12 @@ export default class MyPlugin extends Plugin {
 		// then put them to line
 
 		let text = "";
-		Array.from(Array(below - above + 1).keys()).forEach(i => text = text + editor.getLine(i + above) + "\n")
+		Array.from(Array(below - above + 1).keys()).forEach(i => {
+			const line = editor.getLine(i + above)
+			if (!line.trim().startsWith("%%") || !line.trim().endsWith("%%")) {
+				text = text + editor.getLine(i + above) + "\n"
+			}
+		})
 		return text
 	}
 
