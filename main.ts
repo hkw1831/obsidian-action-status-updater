@@ -152,7 +152,7 @@ export default class MyPlugin extends Plugin {
 		this.addThreadsToBlogIcon();
 		this.addCommand({
 			id: "threads-to-blog",
-			name: "Threads to Blog",
+			name: "Threads as pre Blog format to Clipboard",
 			icon: `threads-to-blog-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const lineCount = editor.lineCount();
@@ -169,12 +169,18 @@ export default class MyPlugin extends Plugin {
 								modifiedLine = modifiedLine.replace('---', '## > ')
 							}
 						}
+						if (metadataLineCount == 1 || metadataLineCount == 2) {
+							modifiedLine = modifiedLine.replace("c/t/p", "c/b/f")
+							modifiedLine = modifiedLine.replace("c/t/r", "c/b/f")
+						}
 						text = text + modifiedLine + "\n";
-						// editor.setLine(i, line)
 					}
 				}
-				editor.setValue(text)
-				renameTag(view.file, "c/t/p", "c/b/f")
+				navigator.clipboard.writeText(text).then(function () {
+					new Notice(`Copied blog content to clipboard!`);
+				}, function (error) {
+					new Notice(`error when copy to clipboard!`);
+				});
 			}
 		});
 
