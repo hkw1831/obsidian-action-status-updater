@@ -305,7 +305,7 @@ export default class MyPlugin extends Plugin {
 		this.addGrepBlogToClipboardIcon();
 		this.addCommand({
 			id: "blog-to-clipboard",
-			name: "Blog to clipboard",
+			name: "Blog content to clipboard",
 			icon: `blog-to-clipboard-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				let line = editor.lineCount();
@@ -352,7 +352,7 @@ export default class MyPlugin extends Plugin {
 		this.addGrepThreadsToClipboardIcon();
 		this.addCommand({
 			id: "threads-to-clipboard",
-			name: "Threads to clipboard",
+			name: "Threads content to clipboard",
 			icon: `threads-to-clipboard-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				let line = editor.lineCount();
@@ -404,61 +404,28 @@ export default class MyPlugin extends Plugin {
 		this.addGrepThreadsBlockToImageIcon();
 		this.addCommand({
 			id: "threads-block-to-image",
-			name: "Threads block to image",
+			name: "Threads segment to image",
 			icon: `threads-block-to-image`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				let cursor = editor.getCursor();
-				let line = cursor.line;
-				let above = line;
-				let below = line;
-				// first get above
-				
-				while (above >= 0) {
-					let l = editor.getLine(above);
-					if (l == '---') {
-						break;
-					}
-					above--;
-				}
-				if (editor.getLine(above) == '---') {
-					above++;
-				}
-				while(true) {
-					if (editor.getLine(above) == '') {
-						above++;
-					} else {
-						break;
-					}
-				}
-
-				// then get below
-				while (below < editor.lineCount()) {
-					let l = editor.getLine(below);
-					if (l == '---') {
-						break;
-					}
-					below++;
-				}
-				if (editor.getLine(below) == '---') {
-					below--;
-				}
-
-				while(true) {
-					if (editor.getLine(below) == '') {
-						below--;
-					} else {
-						break;
-					}
-				}
-
-				// then put them to line
-
-				let text = "";
-				Array.from(Array(below - above + 1).keys()).forEach(i => text = text + editor.getLine(i + above) + "\n")
-			
-				navigator.clipboard.writeText(text).then(function () {
-					new Notice(`Copied\n\`\`\`\n${text}\`\`\`\nto clipboard!`);
+				const threadSegment = this.getThreadSegment(editor)
+				navigator.clipboard.writeText(threadSegment).then(function () {
+					new Notice(`Copied\n\`\`\`\n${threadSegment}\`\`\`\nto clipboard!`);
 					window.open('shortcuts://run-shortcut?name=Threads%20to%20image&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://');
+				}, function (error) {
+					new Notice(`error when copy to clipboard!`);
+				});
+			},
+		});
+
+		this.addGrepThreadsSegmentToClipboard();
+		this.addCommand({
+			id: "threads-segment-to-clipboard",
+			name: "Threads segment to clipboard",
+			icon: `threads-segment-to-clipboard`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const threadSegment = this.getThreadSegment(editor)
+				navigator.clipboard.writeText(threadSegment).then(function () {
+					new Notice(`Copied\n\`\`\`\n${threadSegment}\`\`\`\nto clipboard!`);
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);
 				});
@@ -467,6 +434,58 @@ export default class MyPlugin extends Plugin {
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
+	}
+
+	getThreadSegment(editor: Editor) : string {
+		let cursor = editor.getCursor();
+		let line = cursor.line;
+		let above = line;
+		let below = line;
+		// first get above
+		
+		while (above >= 0) {
+			let l = editor.getLine(above);
+			if (l == '---') {
+				break;
+			}
+			above--;
+		}
+		if (editor.getLine(above) == '---') {
+			above++;
+		}
+		while(true) {
+			if (editor.getLine(above) == '') {
+				above++;
+			} else {
+				break;
+			}
+		}
+
+		// then get below
+		while (below < editor.lineCount()) {
+			let l = editor.getLine(below);
+			if (l == '---') {
+				break;
+			}
+			below++;
+		}
+		if (editor.getLine(below) == '---') {
+			below--;
+		}
+
+		while(true) {
+			if (editor.getLine(below) == '') {
+				below--;
+			} else {
+				break;
+			}
+		}
+
+		// then put them to line
+
+		let text = "";
+		Array.from(Array(below - above + 1).keys()).forEach(i => text = text + editor.getLine(i + above) + "\n")
+		return text
 	}
 
 	async add3DaysActionNoteContent(vault: Vault) {
@@ -577,7 +596,12 @@ export default class MyPlugin extends Plugin {
 
 	addGrepThreadsBlockToImageIcon() {
 		var obsidian = require('obsidian');
-		obsidian.addIcon(`threads-block-to-image`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>TI</text>`);
+		obsidian.addIcon(`threads-block-to-image`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>SI</text>`);
+	}
+
+	addGrepThreadsSegmentToClipboard() {
+		var obsidian = require('obsidian');
+		obsidian.addIcon(`threads-segment-to-clipboard`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>SC</text>`);
 	}
 
 	addRemoveActionIcon() {
