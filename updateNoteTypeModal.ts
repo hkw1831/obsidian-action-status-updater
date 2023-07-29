@@ -65,6 +65,10 @@ const ALL_TYPES = [
     description: "Blog post fine tuned",
   },
   {
+    type: "c/b/r",
+    description: "Blog post ready to publish",
+  },
+  {
     type: "c/b/p",
     description: "Blog post published",
   },
