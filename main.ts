@@ -173,6 +173,12 @@ export default class MyPlugin extends Plugin {
 							modifiedLine = modifiedLine.replace("c/t/p", "c/b/f")
 							modifiedLine = modifiedLine.replace("c/t/r", "c/b/f")
 						}
+
+						if (/^!\[.*\]\(.*\)/.test(modifiedLine.trim())) {
+							if (!modifiedLine.contains("https://roulesophy.github.io")) {
+								modifiedLine = '`' + modifiedLine + '`'
+							}
+						}
 						text = text + modifiedLine + "\n";
 					}
 				}
