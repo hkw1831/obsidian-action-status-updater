@@ -162,7 +162,7 @@ export default class MyPlugin extends Plugin {
 				for (let i = 0; i < lineCount; i++) {
 					let line = editor.getLine(i);
 					if (!line.trim().startsWith("%%") || !line.trim().endsWith("%%")) {
-						let modifiedLine = line.replace('🧵 ', '# ').replace('【', '').replace('】', '')
+						let modifiedLine = line.replace('🧵 ', '# ').replace('【', '').replace('】', '').replace('👇', '')
 						if (modifiedLine == '---') {
 							metadataLineCount++
 							if (metadataLineCount > 2) {
@@ -447,10 +447,11 @@ export default class MyPlugin extends Plugin {
 	}
 
 	convertThreadsContentToFormatForFacebookApp(editor: Editor) : string {
-		return this.convertThreadsContentToLightPostFormat(editor, "", "\n\n")
+		return this.convertThreadsContentToLightPostFormat(editor, "", "\n\n", (a) => a.replace("👇", ""))
 	}
 
-	convertThreadsContentToLightPostFormat(editor: Editor, headerIcon: string, paragraphSeparator: string) : string {
+	convertThreadsContentToLightPostFormat(editor: Editor, headerIcon: string, paragraphSeparator: string
+		, additionReplaceFn: (a: string) => string = (a) => a) : string {
 		let line = editor.lineCount();
 
 		let numLineFirstContent = 0
@@ -482,6 +483,7 @@ export default class MyPlugin extends Plugin {
 		});
 		
 		text = text.replace(/🧵 (.*)/g, headerIcon + "【$1】")
+		text = additionReplaceFn(text)
 		text = text.replace(/^		- /g, "　　• ").replace(/^	- /g, "　• ").replace(/^- /, "• ");
 		text = text.replace(/[\n\r]{3,}/gm, `${paragraphSeparator}▍`);
 		return text
