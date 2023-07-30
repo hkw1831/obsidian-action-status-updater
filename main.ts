@@ -374,38 +374,7 @@ export default class MyPlugin extends Plugin {
 			name: "Threads content to clipboard",
 			icon: `threads-to-clipboard-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				let line = editor.lineCount();
-
-				let numLineFirstContent = 0
-				let frontMatterLineCount = 0
-				for (let i = 0; i < line; i++) {
-					if (frontMatterLineCount == 2) {
-						numLineFirstContent = i;
-						break;
-					}
-					if (editor.getLine(i) == "---") {
-						frontMatterLineCount++
-					}
-				}
-				for (let i = 0; i < line; i++) {
-					if (editor.getLine(numLineFirstContent).trim() == "") {
-						numLineFirstContent++;
-					} else {
-						break;
-					}
-				}
-
-				let text = "";
-				Array.from(Array(line - numLineFirstContent).keys()).forEach(i => {
-					const line = editor.getLine(i + numLineFirstContent);
-					if (!line.trim().startsWith("%%") || !line.trim().endsWith("%%")) {
-						const modifiedLine = line == "---" ? "" : line
-						text = text + modifiedLine + "\n"
-					}
-				});
-				text = text.replace(/🧵 (.*)/g, "🧵【$1】");
-				text = text.replace(/[\n\r]{3,}/gm, "\n\n\n▍");
-
+				const text = this.convertThreadsContentToFormatForThreadsApp(editor)
 				const beforeTag = "c/t/r"
 				const afterTag = "c/t/p"
 			
@@ -416,6 +385,22 @@ export default class MyPlugin extends Plugin {
 					} else {
 						new Notice(`Tag "${beforeTag}" not found\nCopied thread content to clipboard!`);
 					}
+				}, function (error) {
+					new Notice(`error when copy to clipboard!`);
+				});
+			},
+		});
+
+		this.addGrepThreadsAsFacebookPostToClipboardIcon();
+		this.addCommand({
+			id: "threads-as-facebook-post-to-clipboard",
+			name: "Threads as Facebook post format to Clipboard",
+			icon: `threads-as-facebook-post-to-clipboard-icon`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const text = this.convertThreadsContentToFormatForFacebookApp(editor)
+			
+				navigator.clipboard.writeText(text).then(function () {
+					new Notice(`Copied thread content to clipboard!`);
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);
 				});
@@ -455,6 +440,51 @@ export default class MyPlugin extends Plugin {
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
+	}
+
+	convertThreadsContentToFormatForThreadsApp(editor: Editor) : string {
+		return this.convertThreadsContentToLightPostFormat(editor, "🧵", "\n\n\n")
+	}
+
+	convertThreadsContentToFormatForFacebookApp(editor: Editor) : string {
+		return this.convertThreadsContentToLightPostFormat(editor, "", "\n\n")
+	}
+
+	convertThreadsContentToLightPostFormat(editor: Editor, headerIcon: string, paragraphSeparator: string) : string {
+		let line = editor.lineCount();
+
+		let numLineFirstContent = 0
+		let frontMatterLineCount = 0
+		for (let i = 0; i < line; i++) {
+			if (frontMatterLineCount == 2) {
+				numLineFirstContent = i;
+				break;
+			}
+			if (editor.getLine(i) == "---") {
+				frontMatterLineCount++
+			}
+		}
+		for (let i = 0; i < line; i++) {
+			if (editor.getLine(numLineFirstContent).trim() == "") {
+				numLineFirstContent++;
+			} else {
+				break;
+			}
+		}
+
+		let text = "";
+		Array.from(Array(line - numLineFirstContent).keys()).forEach(i => {
+			const line = editor.getLine(i + numLineFirstContent);
+			if (!line.trim().startsWith("%%") || !line.trim().endsWith("%%")) {
+				const modifiedLine = line == "---" ? "" : line
+				text = text + modifiedLine + "\n"
+			}
+		});
+		
+		text = text.replace(/🧵 (.*)/g, headerIcon + "【$1】")
+		text = text.replace(/^		- /g, "　　• ").replace(/^	- /g, "　• ").replace(/^- /, "• ");
+		text = text.replace(/[\n\r]{3,}/gm, `${paragraphSeparator}▍`);
+		return text
 	}
 
 	getThreadSegment(editor: Editor) : string {
@@ -613,6 +643,11 @@ export default class MyPlugin extends Plugin {
 	addGrepThreadsToClipboardIcon() {
 		var obsidian = require('obsidian');
 		obsidian.addIcon(`threads-to-clipboard-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>TC</text>`);
+	}
+
+	addGrepThreadsAsFacebookPostToClipboardIcon() {
+		var obsidian = require('obsidian');
+		obsidian.addIcon(`threads-as-facebook-post-to-clipboard-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>FC</text>`);
 	}
 
 	addGrepBlogToClipboardIcon() {
