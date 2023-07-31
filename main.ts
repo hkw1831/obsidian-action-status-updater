@@ -374,6 +374,7 @@ export default class MyPlugin extends Plugin {
 			name: "Threads content to clipboard",
 			icon: `threads-to-clipboard-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
+				this.addTaskToPutIntoCardInThreadsContent(editor)
 				const text = this.convertThreadsContentToFormatForThreadsApp(editor)
 				const beforeTag = "c/t/r"
 				const afterTag = "c/t/p"
@@ -449,6 +450,27 @@ export default class MyPlugin extends Plugin {
 	convertThreadsContentToFormatForFacebookApp(editor: Editor) : string {
 		return this.convertThreadsContentToLightPostFormat(editor, "", "\n\n", (a) => a.replace("👇", ""))
 	}
+
+	addTaskToPutIntoCardInThreadsContent(editor: Editor) {
+		let line = editor.lineCount();
+
+		let frontMatterLineCount = 0
+		let text = "";
+		for (let i = 0; i < line; i++) {
+			if (editor.getLine(i) == "---") {
+				frontMatterLineCount++
+			}
+			const line = editor.getLine(i);
+			
+			if (frontMatterLineCount > 2 && line == "---") {
+				text = text + "%% #nl to zk %%\n\n"
+			}
+			text = text + line + "\n"
+		}
+
+		editor.setValue(text);
+	}
+
 
 	convertThreadsContentToLightPostFormat(editor: Editor, headerIcon: string, paragraphSeparator: string
 		, additionReplaceFn: (a: string) => string = (a) => a) : string {
