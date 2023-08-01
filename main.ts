@@ -499,14 +499,15 @@ export default class MyPlugin extends Plugin {
 		Array.from(Array(line - numLineFirstContent).keys()).forEach(i => {
 			const line = editor.getLine(i + numLineFirstContent);
 			if (!line.trim().startsWith("%%") || !line.trim().endsWith("%%")) {
-				const modifiedLine = line == "---" ? "" : line
+				let modifiedLine = line == "---" ? "" : line
+				modifiedLine = modifiedLine.replace(/^		- /g, "　　　　• ").replace(/^	- /g, "　　• ").replace(/^- /, "• ");
 				text = text + modifiedLine + "\n"
 			}
 		});
 		
-		text = text.replace(/🧵 (.*)/g, headerIcon + "【$1】")
+		text = text.replace(/🧵[ ]+(.*)/g, headerIcon + "【$1】")
 		text = additionReplaceFn(text)
-		text = text.replace(/^		- /g, "　　• ").replace(/^	- /g, "　• ").replace(/^- /, "• ");
+		// text = text.replace(/^		- /g, "　　• ").replace(/^	- /g, "　• ").replace(/^- /, "• ");
 		text = text.replace(/[\n\r]{3,}/gm, `${paragraphSeparator}▍`);
 		return text
 	}
