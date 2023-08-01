@@ -463,7 +463,7 @@ export default class MyPlugin extends Plugin {
 			const line = editor.getLine(i);
 			
 			if (frontMatterLineCount > 2 && line == "---") {
-				text = text + "%% #nl to zk %%\n\n"
+				text = text + "%% #nm to zk %%\n\n"
 			}
 			text = text + line + "\n"
 		}
