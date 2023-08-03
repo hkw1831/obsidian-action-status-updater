@@ -501,6 +501,7 @@ export default class MyPlugin extends Plugin {
 			if (!line.trim().startsWith("%%") || !line.trim().endsWith("%%")) {
 				let modifiedLine = line == "---" ? "" : line
 				modifiedLine = modifiedLine.replace(/^		- /g, "　　　　• ").replace(/^	- /g, "　　• ").replace(/^- /, "• ");
+				modifiedLine = modifiedLine.replace(/\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
 				text = text + modifiedLine + "\n"
 			}
 		});
@@ -563,7 +564,9 @@ export default class MyPlugin extends Plugin {
 		Array.from(Array(below - above + 1).keys()).forEach(i => {
 			const line = editor.getLine(i + above)
 			if (!line.trim().startsWith("%%") || !line.trim().endsWith("%%")) {
-				text = text + editor.getLine(i + above) + "\n"
+				let modifiedLine = editor.getLine(i + above)
+				modifiedLine = modifiedLine.replace(/\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
+				text = text + modifiedLine + "\n"
 			}
 		})
 		return text
