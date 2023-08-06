@@ -170,8 +170,8 @@ export default class MyPlugin extends Plugin {
 							}
 						}
 						if (metadataLineCount == 1 || metadataLineCount == 2) {
-							modifiedLine = modifiedLine.replace("c/t/p", "c/b/f")
-							modifiedLine = modifiedLine.replace("c/t/r", "c/b/f")
+							modifiedLine = modifiedLine.replace("c/t/p", "c/b/d")
+							modifiedLine = modifiedLine.replace("c/t/r", "c/b/d")
 						}
 
 						if (/^!\[.*\]\(.*\)/.test(modifiedLine.trim())) {
