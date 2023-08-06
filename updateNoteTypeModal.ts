@@ -45,6 +45,10 @@ const ALL_TYPES = [
     description: "Index Notes",
   },
   {
+    type: "b/n/p",
+    description: "Placeholder Notes",
+  },
+  {
     type: "b/a/p",
     description: "Area of Responsibility - Primary",
   },
