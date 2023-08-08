@@ -100,6 +100,21 @@ export default class MyPlugin extends Plugin {
 			},
 		})
 
+		this.openRecentDaysScheduleIcon()
+		this.addCommand({
+			id: "open-recent-days-schedule",
+			name: "Open Recent Days Schedule",
+			icon: "open-recent-day-schedule-icon",
+			callback: async () => {
+				const { vault } = this.app;
+				const { workspace } = this.app;
+				const dashboardCanvas = "D/Query Schedule and Actions next 3 days.md"
+				const mode = (this.app.vault as any).getConfig("defaultViewMode");
+				const leaf = workspace.getLeaf(false);
+				await leaf.openFile(vault.getAbstractFileByPath(dashboardCanvas) as TFile, { active : true,/* mode */});
+			},
+		})
+
 		this.openInboxIcon()
 		this.addCommand({
 			id: "open-inbox",
@@ -641,6 +656,11 @@ export default class MyPlugin extends Plugin {
 	openDashboardIcon() {
 		var obsidian = require('obsidian');
 		obsidian.addIcon(`open-dashboard-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>OD</text>`);
+	}
+
+	openRecentDaysScheduleIcon() {
+		var obsidian = require('obsidian');
+		obsidian.addIcon(`open-recent-day-schedule-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>OR</text>`);
 	}
 
 	openInboxIcon() {
