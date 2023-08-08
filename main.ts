@@ -635,8 +635,9 @@ export default class MyPlugin extends Plugin {
 		const dateEachYYDD = '\\d\\d\\d\\d' + dateMoment.format('MMDD');
 		const dateEachDD = '\\d\\d\\d\\d\\d\\d' + dateMoment.format('DD');
 		const dayOfWeek = dateMoment.format('E');
+		const dayOfWeekLong = dateMoment.format('ddd');
 		const excludeNoteStr = excludeNotes.map(excludeNote => `-path:"${excludeNote}" `).join("")
-		return `## ${dateYYYYMMDD}\n\`\`\`query\n(${dateYYYYMMDD} OR ${dateEachYYDD} OR ${dateEachDD} OR tag:#n${dayOfWeek} OR tag:#w${dayOfWeek}) ${excludeNoteStr}-path:"D/Scheduling" -block:(query)\n\`\`\`\n\n`
+		return `## ${dateYYYYMMDD} ${dayOfWeekLong}\n\`\`\`query\n(${dateYYYYMMDD} OR ${dateEachYYDD} OR ${dateEachDD} OR tag:#n${dayOfWeek} OR tag:#w${dayOfWeek}) ${excludeNoteStr}-path:"D/Scheduling" -block:(query)\n\`\`\`\n\n`
 	}
 
 	getQueryNext2MonthString(excludeNotes: String[]): string {
