@@ -374,7 +374,10 @@ export default class MyPlugin extends Plugin {
 			name: "Threads content to clipboard",
 			icon: `threads-to-clipboard-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				this.addTaskToPutIntoCardInThreadsContent(editor)
+				const value = editor.getValue()
+				if (!value.contains("%% #nm to zk %%") && !value.contains("%% #nd to zk %%")) {
+					this.addTaskToPutIntoCardInThreadsContent(editor)
+				}
 				const text = this.convertThreadsContentToFormatForThreadsApp(editor)
 				const beforeTag = "c/t/r"
 				const afterTag = "c/t/p"
