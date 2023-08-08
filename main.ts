@@ -401,10 +401,22 @@ export default class MyPlugin extends Plugin {
 			name: "Threads as Facebook post format to Clipboard",
 			icon: `threads-as-facebook-post-to-clipboard-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const value = editor.getValue()
+				if (!value.contains("%% #nm to zk %%") && !value.contains("%% #nd to zk %%")) {
+					this.addTaskToPutIntoCardInThreadsContent(editor)
+				}
 				const text = this.convertThreadsContentToFormatForFacebookApp(editor)
 			
+				const beforeTag = "c/t/r"
+				const afterTag = "c/t/p"
+			
 				navigator.clipboard.writeText(text).then(function () {
-					new Notice(`Copied thread content to clipboard!`);
+					let foundTag = renameTag(view.file, beforeTag, afterTag)
+					if (foundTag) {
+						new Notice(`Update notes type from tag="${beforeTag}" to tag="${afterTag}!\nCopied fb content to clipboard!`);
+					} else {
+						new Notice(`Tag "${beforeTag}" not found\nCopied fb content to clipboard!`);
+					}
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);
 				});
