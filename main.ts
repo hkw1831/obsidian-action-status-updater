@@ -186,6 +186,7 @@ export default class MyPlugin extends Plugin {
 						}
 						if (metadataLineCount == 1 || metadataLineCount == 2) {
 							modifiedLine = modifiedLine.replace("c/t/p", "c/b/d")
+							modifiedLine = modifiedLine.replace("c/t/t", "c/b/d")
 							modifiedLine = modifiedLine.replace("c/t/r", "c/b/d")
 						}
 
@@ -405,7 +406,7 @@ export default class MyPlugin extends Plugin {
 				}
 				const text = this.convertThreadsContentToFormatForThreadsApp(editor)
 				const beforeTag = "c/t/r"
-				const afterTag = "c/t/p"
+				const afterTag = "c/t/t"
 			
 				navigator.clipboard.writeText(text).then(function () {
 					let foundTag = renameTag(view.file, beforeTag, afterTag)
@@ -432,7 +433,7 @@ export default class MyPlugin extends Plugin {
 				}
 				const text = this.convertThreadsContentToFormatForFacebookApp(editor)
 			
-				const beforeTag = "c/t/r"
+				const beforeTag = "c/t/t"
 				const afterTag = "c/t/p"
 			
 				navigator.clipboard.writeText(text).then(function () {

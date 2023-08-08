@@ -89,6 +89,10 @@ const ALL_TYPES = [
     description: "Threads post ready to post",
   },
   {
+    type: "c/t/t",
+    description: "Threads post threads published",
+  },
+  {
     type: "c/t/p",
     description: "Threads post published",
   },
