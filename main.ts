@@ -319,6 +319,16 @@ export default class MyPlugin extends Plugin {
 					new Notice(`error when copy to clipboard!`);
 				});
 			},
+			hotkeys: [
+				{
+					modifiers: [`Meta`, `Shift`],
+					key: `l`,
+				},
+				{
+					modifiers: [`Ctrl`, `Shift`],
+					key: `l`,
+				}
+			]
 		});
 
 		this.addGrepBlogToClipboardIcon();
