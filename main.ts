@@ -627,7 +627,9 @@ export default class MyPlugin extends Plugin {
 		Array.from(Array(3).keys()).forEach(i => noteContent += this.getQueryDateAndActionString(i, excludeNotes));
 		const otherDays = this.getQueryActionsThisWeek(3);
 		noteContent = noteContent + `## nn / wn\n\`\`\`query\ntag:#nn OR tag:#wn${otherDays}\n\`\`\`\n\n## nt / wt\n\`\`\`query\ntag:#nt OR tag:#wt\n\`\`\`\n\n`
+		noteContent = noteContent + this.getQueryFutureDaysThisWeek("Future Dates", 3, 6, excludeNotes)
 		noteContent = noteContent + this.getQueryNext2MonthString(excludeNotes)
+		noteContent = noteContent + this.getQueryFutureDaysThisWeek("Past Dates", -7, -1, excludeNotes)
 		// noteContent = noteContent + `\n\n[[Query Schedule and Actions next 3 days]]`
 		vault.modify(vault.getAbstractFileByPath(scheduleNote) as TFile, noteContent);
 	}
@@ -684,7 +686,7 @@ export default class MyPlugin extends Plugin {
 		const dayOfWeek = dateMoment.format('E');
 		const dayOfWeekLong = dateMoment.format('ddd');
 		const excludeNoteStr = excludeNotes.map(excludeNote => `-path:"${excludeNote}" `).join("")
-		return `## ${dateYYYYMMDD} ${dayOfWeekLong}\n\`\`\`query\n(${dateYYYYMMDD} OR ${dateEachYYDD} OR ${dateEachDD} OR tag:#n${dayOfWeek} OR tag:#w${dayOfWeek}) ${excludeNoteStr}-path:"D/Scheduling" -block:(query)\n\`\`\`\n\n`
+		return `## ${dateYYYYMMDD} ${dayOfWeekLong}\n\`\`\`query\n(${dateYYYYMMDD} OR ${dateEachYYDD} OR ${dateEachDD} OR tag:#n${dayOfWeek} OR tag:#w${dayOfWeek}) ${excludeNoteStr}-block:(query)\n\`\`\`\n\n`
 	}
 
 	getQueryActionsThisWeek(excludeNumDays: Number): string {
@@ -709,6 +711,28 @@ export default class MyPlugin extends Plugin {
 		})
 		let output = ""
 		aaa.forEach(i => output += ` OR tag:#n${i} OR tag:#w${i}`)
+		return output
+	}
+
+	getQueryFutureDaysThisWeek(header: String, from: number, to: number, excludeNotes: String[]): string {
+		let includes = []
+		let moment = require('moment');
+		for (let i = from; i <= to; i++) {
+			let dateMoment = moment().add(i, 'd');
+			includes.push(dateMoment)
+		}
+		let output = `## ${header}\n\`\`\`query\n(`
+		includes.forEach(i => {
+			const dateYYYYMMDD = i.format('YYYYMMDD');
+			const dateEachYYDD = '\\d\\d\\d\\d' + i.format('MMDD');
+			const dateEachDD = '\\d\\d\\d\\d\\d\\d' + i.format('DD');
+			output += `${dateYYYYMMDD} OR ${dateEachYYDD} OR ${dateEachDD} OR `
+		})
+		output = output.replace(/ OR $/, "")
+		output += ")"
+		const excludeNoteStr = excludeNotes.map(excludeNote => `-path:"${excludeNote}" `).join("")
+		output += ` ${excludeNoteStr}-block:(query)`
+		output += `\n\`\`\`\n\n`
 		return output
 	}
 
