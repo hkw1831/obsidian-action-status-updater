@@ -55,6 +55,5 @@ export class ThreadsToImagesModal extends FuzzySuggestModal<CommentType> {
     }, function (error) {
         new Notice(`error when copy to clipboard!`);
     });
-    new Notice("aaa" + this.threadSegment.toString())
   }
 }
