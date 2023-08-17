@@ -625,7 +625,8 @@ export default class MyPlugin extends Plugin {
 		let noteContent = '[[Query Schedule and Actions next 3 days]]\n'
 		const excludeNotes = [scheduleNoteWithoutMd, "D/Scheduling"];
 		Array.from(Array(3).keys()).forEach(i => noteContent += this.getQueryDateAndActionString(i, excludeNotes));
-		noteContent = noteContent + `## nn / wn\n\`\`\`query\ntag:#nn OR tag:#wn\n\`\`\`\n\n## nt / wt\n\`\`\`query\ntag:#nt OR tag:#wt\n\`\`\`\n\n`
+		const otherDays = this.getQueryActionsThisWeek(3);
+		noteContent = noteContent + `## nn / wn\n\`\`\`query\ntag:#nn OR tag:#wn${otherDays}\n\`\`\`\n\n## nt / wt\n\`\`\`query\ntag:#nt OR tag:#wt\n\`\`\`\n\n`
 		noteContent = noteContent + this.getQueryNext2MonthString(excludeNotes)
 		// noteContent = noteContent + `\n\n[[Query Schedule and Actions next 3 days]]`
 		vault.modify(vault.getAbstractFileByPath(scheduleNote) as TFile, noteContent);
@@ -684,6 +685,31 @@ export default class MyPlugin extends Plugin {
 		const dayOfWeekLong = dateMoment.format('ddd');
 		const excludeNoteStr = excludeNotes.map(excludeNote => `-path:"${excludeNote}" `).join("")
 		return `## ${dateYYYYMMDD} ${dayOfWeekLong}\n\`\`\`query\n(${dateYYYYMMDD} OR ${dateEachYYDD} OR ${dateEachDD} OR tag:#n${dayOfWeek} OR tag:#w${dayOfWeek}) ${excludeNoteStr}-path:"D/Scheduling" -block:(query)\n\`\`\`\n\n`
+	}
+
+	getQueryActionsThisWeek(excludeNumDays: Number): string {
+		let excludes : Number[] = []
+		let includes : Number[] = [1, 2, 3, 4, 5, 6, 7]
+		
+		Array.from(Array(excludeNumDays).keys()).forEach(i => {
+			let moment = require('moment');
+			const dateMoment = moment().add(i, 'd');
+			const dayOfWeek = dateMoment.format('E');
+			excludes.push(dayOfWeek)
+		})
+		let aaa = includes.filter(i => {
+			for (const e of excludes)
+			{
+				if (e == i)
+				{
+					return false
+				}
+			}
+			return true
+		})
+		let output = ""
+		aaa.forEach(i => output += ` OR tag:#n${i} OR tag:#w${i}`)
+		return output
 	}
 
 	getQueryNext2MonthString(excludeNotes: String[]): string {
