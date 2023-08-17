@@ -1,5 +1,5 @@
 import { UpdateNoteTypeModal } from 'updateNoteTypeModal';
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Command, TFile, Vault } from 'obsidian';
+import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Command, TFile, Vault, EditorSelection } from 'obsidian';
 import { AddFootnoteTagModal } from 'addCommentTagModal';
 import { OpenActionsModal } from 'openActions';
 import { Moment } from 'moment'
@@ -304,6 +304,33 @@ export default class MyPlugin extends Plugin {
 				cursor.ch = length;
 				editor.setCursor(cursor);
 			},
+		});
+
+		this.addEventToFantasticalIcon();
+		this.addCommand({
+			id: "add-fantastical-event",
+			name: "Add Fantastical Event",
+			icon: `event-to-fantastical-icon`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				let text = ""
+				const listSelections : EditorSelection[] = editor.listSelections()
+				listSelections.forEach(listSelection => {
+					const fromLineNum = listSelection.head.line
+					const toLineNum = listSelection.anchor.line
+					for (let i = fromLineNum; i <= toLineNum; i++) {
+						const line = editor.getLine(i)
+						if (/^- \d\d\d\d-\d\d-\d\d \d\d:\d\d /.test(line)) {
+							const modifiedLine = line.replace(/^- /, `- #nm `)
+							editor.setLine(i, modifiedLine);
+							text += line + "\n"
+						}
+					}
+				})
+				if (text.length != 0) {
+					text = encodeURI(text)
+					window.open(`shortcuts://run-shortcut?name=Add%20Obsidian%20Inbox%20Event%20via%20Fantastical&input=text&text=${text}&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://`);
+				}
+			}
 		});
 
 		this.addCommand({
@@ -778,6 +805,11 @@ export default class MyPlugin extends Plugin {
 	addGrepThreadsAsFacebookPostToClipboardIcon() {
 		var obsidian = require('obsidian');
 		obsidian.addIcon(`threads-as-facebook-post-to-clipboard-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>FC</text>`);
+	}
+
+	addEventToFantasticalIcon() {
+		var obsidian = require('obsidian');
+		obsidian.addIcon(`event-to-fantastical-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>FE</text>`);
 	}
 
 	addGrepBlogToClipboardIcon() {
