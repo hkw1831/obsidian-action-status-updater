@@ -5,6 +5,7 @@ import { OpenActionsModal } from 'openActions';
 import { Moment } from 'moment'
 import { AddTaskTagModal } from 'addTaskTagModal';
 import { renameTag } from 'tagrenamer/renaming';
+import { ThreadsToImagesModal } from 'ThreadsToImagesModal';
 
 // Remember to rename these classes and interfaces!
 
@@ -456,12 +457,13 @@ export default class MyPlugin extends Plugin {
 			icon: `threads-block-to-image`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const threadSegment = this.getThreadSegment(editor)
-				navigator.clipboard.writeText(threadSegment).then(function () {
-					new Notice(`Copied\n\`\`\`\n${threadSegment}\`\`\`\nto clipboard!`);
-					window.open('shortcuts://run-shortcut?name=Threads%20to%20image&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://');
-				}, function (error) {
-					new Notice(`error when copy to clipboard!`);
-				});
+				new ThreadsToImagesModal(this.app, threadSegment).open()
+				// navigator.clipboard.writeText(threadSegment).then(function () {
+				// 	new Notice(`Copied\n\`\`\`\n${threadSegment}\`\`\`\nto clipboard!`);
+				// 	window.open('shortcuts://run-shortcut?name=Threads%20to%20image&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://');
+				// }, function (error) {
+				// 	new Notice(`error when copy to clipboard!`);
+				// });
 			},
 		});
 
