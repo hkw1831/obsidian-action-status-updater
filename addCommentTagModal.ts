@@ -7,72 +7,68 @@ interface FootnoteType {
 
 const ALL_TYPES = [
   {
-    type: "f/h",
-    description: "HQ&A - Highlight"
+    type: "d/question",
+    description: "Question"
   },
   {
-    type: "f/q",
-    description: "HQ&A - Question"
+    type: "d/answer",
+    description: "Answer"
   },
   {
-    type: "f/a",
-    description: "HQ&A - Answer"
+    type: "d/solves",
+    description: "Solves some problem"
   },
   {
-    type: "f/t",
-    description: "Card - Title 標題"
+    type: "d/ref",
+    description: "Reference"
   },
   {
-    type: "f/s",
-    description: "Card - Statement 觀點：自己的一句敍述 / 想法"
+    type: "d/selfthink",
+    description: "Self think"
   },
   {
-    type: "f/e",
-    description: "Card - Explaination 案例：增加一些範例（故事 / 數據 / 生活經驗 / 解釋 / 原因）說明觀點"
+    type: "d/notsure",
+    description: "Not sure"
   },
   {
-    type: "f/c",
-    description: "Card - Conclusion 總結：用一至兩句話做結論"
+    type: "d/a1⏹️",
+    description: "A1 - my experience"
   },
   {
-    type: "f/e⏩",
-    description: "Idea Compass - East - What competes with this idea?"
+    type: "d/a2⏺️",
+    description: "A2 - future action"
   },
   {
-    type: "f/w⏪",
+    type: "d/c🔄",
+    description: "Context"
+  },
+  {
+    type: "d/w⏪",
     description: "Idea Compass - West - What are similar / supporting idea?"
   },
   {
-    type: "f/n⏫",
+    type: "d/n⏫",
     description: "Idea Compass - North - Where does this idea come from?"
   },
   {
-    type: "f/s⏬",
+    type: "d/s⏬",
     description: "Idea Compass - South - Where does the idea lead to?"
   },
   {
-    type: "f/eastOppositeNote",
-    description: "Idea Compass - East - What competes with this idea?"
-  },
-  {
-    type: "f/westSimilarNote",
-    description: "Idea Compass - West - What are similar / supporting idea?"
-  },
-  {
-    type: "f/northThemeNote",
-    description: "Idea Compass - North - Where does this idea come from?"
-  },
-  {
-    type: "f/southLeadsToNote",
-    description: "Idea Compass - South - Where does the idea lead to?"
-  },
-  {
-    type: "f/toMerge",
+    type: "d/toMerge",
     description: "TODO - To Merge with another note"
   },
   {
-    type: "f/toSplit",
+    type: "d/toMove",
+    description: "TODO - To Merge with another note"
+  },
+  {
+    type: "d/toSplit",
     description: "ToDO - To Split to multiple note"
+  },
+  {
+    type: "d/toCard",
+    description: "TODO - To Write card"
   },
 ];
 
