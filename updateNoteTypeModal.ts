@@ -10,31 +10,19 @@ interface NoteType {
 const ALL_TYPES = [
   {
     type: "b/n/s",
-    description: "Zettelkasten - Source notes",
+    description: "Zettelkasten - Source notes (like books / video / thoughts / conversation)",
   },
   {
     type: "b/n/u",
-    description: "Zettelkasten - Unprocessed material - add 1+ HQ&A Here",
+    description: "Zettelkasten - Unprocessed material like an inbox",
   },
   {
     type: "b/n/c",
-    description: "Zettelkasten - Cards (With omni writing method)",
-  },
-  {
-    type: "b/n/n",
-    description: "Zettelkasten - Notes (Need to think more on this)",
-  },
-  {
-    type: "b/n/v",
-    description: "Zettelkasten - Voice script",
-  },
-  {
-    type: "b/n/r",
-    description: "Zettelkasten - Reference",
+    description: "Zettelkasten - Cards (With your own thought)",
   },
   {
     type: "b/n/m",
-    description: "Zettelkasten - MOC Notes",
+    description: "Zettelkasten - MOC Notes for a small topic",
   },
   {
     type: "b/n/z",
@@ -42,11 +30,23 @@ const ALL_TYPES = [
   },
   {
     type: "b/n/i",
-    description: "Index Notes",
+    description: "Index Notes for a big topic",
+  },
+  {
+    type: "b/n/n",
+    description: "Zettelkasten - Notes (Deprecated)",
+  },
+  {
+    type: "b/n/v",
+    description: "Zettelkasten - Voice script (Deprecated?)",
+  },
+  {
+    type: "b/n/r",
+    description: "Zettelkasten - Reference (Deprecated?)",
   },
   {
     type: "b/n/p",
-    description: "Placeholder Notes",
+    description: "Placeholder Notes (Deprecated?)",
   },
   {
     type: "b/a/p",
@@ -61,14 +61,6 @@ const ALL_TYPES = [
     description: "Blog post draft",
   },
   {
-    type: "c/b/o",
-    description: "Blog post outlined",
-  },
-  {
-    type: "c/b/f",
-    description: "Blog post fine tuned",
-  },
-  {
     type: "c/b/r",
     description: "Blog post ready to publish",
   },
@@ -77,8 +69,20 @@ const ALL_TYPES = [
     description: "Blog post published",
   },
   {
+    type: "c/b/i",
+    description: "Blog post series index",
+  },
+  {
     type: "c/b/a",
     description: "Blog post abandoned",
+  },
+  {
+    type: "c/b/o",
+    description: "Blog post outlined (Deprecated?)",
+  },
+  {
+    type: "c/b/f",
+    description: "Blog post fine tuned (Deprecated?)",
   },
   {
     type: "c/t/d",
@@ -95,6 +99,14 @@ const ALL_TYPES = [
   {
     type: "c/t/p",
     description: "Threads post published",
+  },
+  {
+    type: "c/t/i",
+    description: "Threads post series index",
+  },
+  {
+    type: "c/t/a",
+    description: "Threads post abandoned",
   },
   {
     type: "a/n/n",
