@@ -109,6 +109,18 @@ const ALL_TYPES = [
     description: "Threads post abandoned",
   },
   {
+    type: "c/x/d",
+    description: "Twitter post drafting",
+  },
+  {
+    type: "c/x/p",
+    description: "Twitter post ready to publish",
+  },
+  {
+    type: "c/x/p",
+    description: "Twitter post published",
+  },
+  {
     type: "a/n/n",
     description: "N Current Task",
   },
