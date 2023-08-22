@@ -715,7 +715,7 @@ export default class MyPlugin extends Plugin {
 		const dayOfWeek = dateMoment.format('E');
 		const dayOfWeekLong = dateMoment.format('ddd');
 		const excludeNoteStr = excludeNotes.map(excludeNote => `-path:"${excludeNote}" `).join("")
-		return `## ${dateYYYYMMDD} ${dayOfWeekLong}\n\`\`\`query\n(${dateYYYYMMDD} OR ${dateEachYYDD} OR ${dateEachDD} OR tag:#n${dayOfWeek} OR tag:#w${dayOfWeek}) ${excludeNoteStr}-block:(query)\n\`\`\`\n\n`
+		return `## ${dateYYYYMMDD} ${dayOfWeekLong}\n\`\`\`query\n(" ${dateYYYYMMDD}" OR "${dateYYYYMMDD} " OR ${dateEachYYDD} OR ${dateEachDD} OR tag:#n${dayOfWeek} OR tag:#w${dayOfWeek}) ${excludeNoteStr}-block:(query)\n\`\`\`\n\n`
 	}
 
 	getQueryActionsThisWeek(excludeNumDays: Number): string {
@@ -755,7 +755,7 @@ export default class MyPlugin extends Plugin {
 			const dateYYYYMMDD = i.format('YYYYMMDD');
 			const dateEachYYDD = '\\d\\d\\d\\d' + i.format('MMDD');
 			const dateEachDD = '\\d\\d\\d\\d\\d\\d' + i.format('DD');
-			output += `${dateYYYYMMDD} OR ${dateEachYYDD} OR ${dateEachDD} OR `
+			output += `" ${dateYYYYMMDD}" OR "${dateYYYYMMDD} " OR ${dateEachYYDD} OR ${dateEachDD} OR `
 		})
 		output = output.replace(/ OR $/, "")
 		output += ")"
