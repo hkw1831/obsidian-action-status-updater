@@ -449,6 +449,73 @@ export default class MyPlugin extends Plugin {
 			},
 		});
 
+		this.addTwitterToChatGPTIcon();
+		this.addCommand({
+			id: "twitter-to-chatgpt",
+			name: "XG Twitter to ChatGPT",
+			icon: `twitter-to-chatgpt`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const value = editor.getValue()
+				
+				let prompt = this.convertThreadsContentToFormatForFacebookApp(editor)
+				let numTweet = Math.ceil(prompt.length / 110)
+				prompt = `Convert the following content to twitter threads less than ${numTweet} tweet in traditional Chinese. No need to add any tags to the tweet. Each tweet separated by newline character and 3 "-" characters and another newline character\n\n${prompt}`
+			
+
+				navigator.clipboard.writeText(prompt).then(function () {
+
+					let line = editor.lineCount();
+
+					let numLineFirstContent = 0
+					let frontMatterLineCount = 0
+					for (let i = 0; i < line; i++) {
+						if (frontMatterLineCount == 2) {
+							numLineFirstContent = i;
+							break;
+						}
+						if (editor.getLine(i) == "---") {
+							frontMatterLineCount++
+						}
+					}
+					for (let i = 0; i < line; i++) {
+						if (editor.getLine(numLineFirstContent).trim() == "") {
+							numLineFirstContent++;
+						} else {
+							break;
+						}
+					}
+
+					let text = "";
+					Array.from(Array(numLineFirstContent).keys()).forEach(i => {
+						const line = editor.getLine(i);
+						text = text + line + "\n"
+					})
+					editor.setValue(text)
+
+					renameTag(view.file, "c/t/d", "c/x/d")
+					renameTag(view.file, "c/t/r", "c/x/d")
+					renameTag(view.file, "c/t/t", "c/x/d")
+					renameTag(view.file, "c/t/p", "c/x/d")
+
+					new Notice("copied to clipboard, please open chatgpt to paste")
+				}, function (error) {
+					new Notice(`error when copy to clipboard!`);
+				});
+			},
+		});
+
+
+		this.addChatGPTToTwitterIcon();
+		this.addCommand({
+			id: "chatgpt-to-twitter",
+			name: "GX ChatGPT to Twitter",
+			icon: `chatgpt-to-twitte`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				this.convertChatGPTToTwitterFormat(editor)
+				renameTag(view.file, "c/x/d", "c/x/r")
+			},
+		});
+
 		this.addGrepThreadsAsFacebookPostToClipboardIcon();
 		this.addCommand({
 			id: "threads-as-facebook-post-to-clipboard",
@@ -513,6 +580,66 @@ export default class MyPlugin extends Plugin {
 		this.addSettingTab(new SampleSettingTab(this.app, this));
 	}
 
+	convertChatGPTToTwitterFormat(editor: Editor) {
+		let line = editor.lineCount();
+
+		let numLineFirstContent = 0
+		let frontMatterLineCount = 0
+		for (let i = 0; i < line; i++) {
+			if (frontMatterLineCount == 2) {
+				numLineFirstContent = i;
+				break;
+			}
+			if (editor.getLine(i) == "---") {
+				frontMatterLineCount++
+			}
+		}
+		for (let i = 0; i < line; i++) {
+			if (editor.getLine(numLineFirstContent).trim() == "") {
+				numLineFirstContent++;
+			} else {
+				break;
+			}
+		}
+
+		let totalTweetCount = 1
+
+		Array.from(Array(line - numLineFirstContent).keys()).forEach(i => {
+			const line = editor.getLine(i + numLineFirstContent);
+			let modifiedLine = line.replace(/^____+/, "---").replace(/^----+/, "---")
+			editor.setLine(i + numLineFirstContent, modifiedLine)
+			if (modifiedLine == "---") {
+				totalTweetCount = totalTweetCount + 1
+			}
+		});
+
+		let numTweet = 1
+		let readyToAddTweetCount = true
+
+		let text = "";
+		Array.from(Array(numLineFirstContent).keys()).forEach(i => {
+			const line = editor.getLine(i);
+			text = text + line + "\n"
+		})
+
+		Array.from(Array(line - numLineFirstContent).keys()).forEach(i => {
+			const line = editor.getLine(i + numLineFirstContent);
+			let modifiedLine = line;
+			if (line == "---") {
+				readyToAddTweetCount = true
+				numTweet = numTweet + 1
+			} else if (line != "" && readyToAddTweetCount) {
+				if (!/^\d+\/\d+.*/.test(line)) {
+					modifiedLine = `${numTweet}/${totalTweetCount} ${line}`
+				}
+				readyToAddTweetCount = false
+			}
+			text = text + modifiedLine + "\n"
+		});
+
+		editor.setValue(text)
+	}
+
 	convertThreadsContentToFormatForThreadsApp(editor: Editor) : string {
 		return this.convertThreadsContentToLightPostFormat(editor, "🧵", "\n\n\n")
 	}
@@ -540,7 +667,6 @@ export default class MyPlugin extends Plugin {
 
 		editor.setValue(text);
 	}
-
 
 	convertThreadsContentToLightPostFormat(editor: Editor, headerIcon: string, paragraphSeparator: string
 		, additionReplaceFn: (a: string) => string = (a) => a) : string {
@@ -805,6 +931,16 @@ export default class MyPlugin extends Plugin {
 	addGrepThreadsAsFacebookPostToClipboardIcon() {
 		var obsidian = require('obsidian');
 		obsidian.addIcon(`threads-as-facebook-post-to-clipboard-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>FC</text>`);
+	}
+
+	addTwitterToChatGPTIcon() {
+		var obsidian = require('obsidian');
+		obsidian.addIcon(`twitter-to-chatgpt`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>XG</text>`);
+	}
+
+	addChatGPTToTwitterIcon() {
+		var obsidian = require('obsidian');
+		obsidian.addIcon(`chatgpt-to-twitter`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>GX</text>`);
 	}
 
 	addEventToFantasticalIcon() {
