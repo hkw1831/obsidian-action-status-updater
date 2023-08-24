@@ -490,6 +490,7 @@ export default class MyPlugin extends Plugin {
 						const line = editor.getLine(i);
 						text = text + line + "\n"
 					})
+					text = text.replace("▍", "")
 					editor.setValue(text)
 
 					renameTag(view.file, "c/t/d", "c/x/d")

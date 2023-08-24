@@ -113,7 +113,7 @@ const ALL_TYPES = [
     description: "Twitter post drafting",
   },
   {
-    type: "c/x/p",
+    type: "c/x/r",
     description: "Twitter post ready to publish",
   },
   {
