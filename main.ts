@@ -636,10 +636,13 @@ export default class MyPlugin extends Plugin {
 			}
 			text = text + modifiedLine + "\n"
 		});
-		
+
 		text = text.replace("▍", "")
 
 		editor.setValue(text)
+		const cursor = editor.getCursor()
+		cursor.line = editor.lineCount() - 1
+		editor.setCursor(cursor)
 	}
 
 	convertThreadsContentToFormatForThreadsApp(editor: Editor) : string {
