@@ -524,6 +524,10 @@ export default class MyPlugin extends Plugin {
 			name: "GX ChatGPT to Twitter",
 			icon: `chatgpt-to-twitte`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
+				if (!editor.getValue().contains("c/x/d")) {
+					new Notice("Note type not c/x/d, do the action in wrong note?")
+					return
+				}
 				this.convertChatGPTToTwitterFormat(editor)
 				renameTag(view.file, "c/x/d", "c/x/r")
 			},
