@@ -458,11 +458,16 @@ export default class MyPlugin extends Plugin {
 			icon: `twitter-to-chatgpt`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const value = editor.getValue()
+
+				if (!view.file.basename.contains("Twitter")) {
+					new Notice("Note name not contains 'Twitter', did not copy from thread note?")
+					return;
+				}
 				
 				let prompt = this.convertThreadsContentToFormatForFacebookApp(editor)
 				let numTweet = Math.ceil(prompt.length / 110)
 				prompt = `Convert the following content to twitter threads less than ${numTweet} tweet in traditional Chinese. No need to add any tags to the tweet. Do not have any number in each tweet. Each tweet separated by newline character and 3 "-" characters and another newline character\n\n${prompt}`
-			
+				prompt = prompt.replace("▍", "")
 
 				navigator.clipboard.writeText(prompt).then(function () {
 
@@ -492,7 +497,6 @@ export default class MyPlugin extends Plugin {
 						const line = editor.getLine(i);
 						text = text + line + "\n"
 					})
-					text = text.replace("▍", "")
 					editor.setValue(text)
 
 					renameTag(view.file, "c/t/d", "c/x/d")
