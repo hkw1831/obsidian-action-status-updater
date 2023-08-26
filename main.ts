@@ -199,6 +199,8 @@ export default class MyPlugin extends Plugin {
 						text = text + modifiedLine + "\n";
 					}
 				}
+				text += `---\n\n## Thread post:\n\n- [[${view.file.basename}]]\n`
+
 				navigator.clipboard.writeText(text).then(function () {
 					new Notice(`Copied blog content to clipboard!`);
 				}, function (error) {
