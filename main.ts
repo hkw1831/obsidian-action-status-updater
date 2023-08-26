@@ -468,6 +468,7 @@ export default class MyPlugin extends Plugin {
 				let numTweet = Math.ceil(prompt.length / 110)
 				prompt = `Convert the following content to twitter threads less than ${numTweet} tweet in traditional Chinese. No need to add any tags to the tweet. Do not have any number in each tweet. Each tweet separated by newline character and 3 "-" characters and another newline character\n\n${prompt}`
 				prompt = prompt.replace(/▍/g, "")
+				prompt = prompt.replace(/】\n+https\:\/\/github.com[^\n]+\n/m, "】\n")
 
 				navigator.clipboard.writeText(prompt).then(function () {
 
