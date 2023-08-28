@@ -1049,64 +1049,16 @@ export default class MyPlugin extends Plugin {
 				const cursor = editor.getCursor();
 				const lineNumber = editor.getCursor().line;
 				const line = editor.getLine(lineNumber);
-				const replacedLine = line.replace(` a/w/n`, ` a/w/${t}`)
-								 	 	 .replace(` a/w/l`, ` a/w/${t}`)
-										 .replace(` a/w/w`, ` a/w/${t}`)
-										 .replace(` a/w/d`, ` a/w/${t}`)
-										 .replace(` a/w/a`, ` a/w/${t}`)
-										 .replace(` a/w/t`, ` a/w/${t}`)
-										 .replace(` a/n/n`, ` a/n/${t}`)
-								 	 	 .replace(` a/n/l`, ` a/n/${t}`)
-										 .replace(` a/n/w`, ` a/n/${t}`)
-										 .replace(` a/n/d`, ` a/n/${t}`)
-										 .replace(` a/n/a`, ` a/n/${t}`)
-										 .replace(` a/n/t`, ` a/n/${t}`)
-										 .replace(`#wn `, `#w${t} `)
-				                         .replace(`#wl `, `#w${t} `)
-				                         .replace(`#ww `, `#w${t} `)
-										 .replace(`#wd `, `#w${t} `)
-										 .replace(`#wa `, `#w${t} `)
-										 .replace(`#wt `, `#w${t} `)
-										 .replace(`#wm `, `#w${t} `)
-										 .replace(`#w1 `, `#w${t} `)
-										 .replace(`#w2 `, `#w${t} `)
-										 .replace(`#w3 `, `#w${t} `)
-										 .replace(`#w4 `, `#w${t} `)
-										 .replace(`#w5 `, `#w${t} `)
-										 .replace(`#w6 `, `#w${t} `)
-										 .replace(`#w7 `, `#w${t} `)
-										 .replace(`#nn `, `#n${t} `)
-										 .replace(`#nl `, `#n${t} `)
-										 .replace(`#nw `, `#n${t} `)
-										 .replace(`#nd `, `#n${t} `)
-										 .replace(`#na `, `#n${t} `)
-										 .replace(`#nt `, `#n${t} `)
-										 .replace(`#nm `, `#n${t} `)
-										 .replace(`#n1 `, `#n${t} `)
-										 .replace(`#n2 `, `#n${t} `)
-										 .replace(`#n3 `, `#n${t} `)
-										 .replace(`#n4 `, `#n${t} `)
-										 .replace(`#n5 `, `#n${t} `)
-										 .replace(`#n6 `, `#n${t} `)
-										 .replace(`#n7 `, `#n${t} `);
+				const replacedLine = line.replace(/ a\/w\/./, ` a/w/${t}`)
+				                         .replace(/ a\/n\/./, ` a/n/${t}`)
+								 	 	 .replace(/#w. /, `#w${t} `)
+										 .replace(/#n. /, `#n${t} `)
+										 .replace(/#w.$/, `#w${t}`)
+										 .replace(/#n.$/, `#n${t}`)
 				if (line.contains(`#n${t} `) || line.contains(`#w${t} `)) {
-					// remove the tag
-					// console.log(cursor.line)
-					// console.log(cursor.ch)
 					const nt = `#n${t} `
 					const wt = `#w${t} `
-					// console.log(`nt=#${line.indexOf(nt)}`)
-					// console.log(`wt=#${line.indexOf(wt)}`)
-					// console.log(`#0#=${line.charAt(0)}#`)
-					// console.log(`#1#=${line.charAt(1)}#`)
-					// console.log(`#2#=${line.charAt(2)}#`)
-					// console.log(`#3#=${line.charAt(3)}#`)
-					// console.log(`#4#=${line.charAt(4)}#`)
-					// console.log(`#5#=${line.charAt(5)}#`)
-					// console.log(`#6#=${line.charAt(6)}#`)
-					// console.log(`#7#=${line.charAt(7)}#`)
-					// console.log(`#8#=${line.charAt(8)}#`)
-
+					
 					const replaceLineToRemoveTag = line.replace(`#n${t} `, ``).replace(`#w${t} `, ``)
 					editor.setLine(lineNumber, replaceLineToRemoveTag);
 					// lets say "#nt " is at 3 (char for #)
@@ -1123,8 +1075,7 @@ export default class MyPlugin extends Plugin {
 					// do nothing
 				} else if (replacedLine == line) { // no tag, to add tag
 					new AddTaskTagModal(this.app, editor, t).open();
-				}			
-				else {			 
+				} else {			 
 					editor.setLine(lineNumber, replacedLine);
 					editor.setCursor(cursor);
 				}
