@@ -790,6 +790,7 @@ export default class MyPlugin extends Plugin {
 				text = text + modifiedLine + "\n"
 			}
 		})
+		text = text.replace(/\n+$/, "")
 		return text
 	}
 
