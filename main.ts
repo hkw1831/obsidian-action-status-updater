@@ -409,7 +409,7 @@ export default class MyPlugin extends Plugin {
 					const line = editor.getLine(i + numLineFirstContent);
 					text = text + line + "\n"
 				});
-				const beforeTag = "c/b/d"
+				const beforeTag = "c/b/r"
 				const afterTag = "c/b/p"
 				navigator.clipboard.writeText(text).then(function () {
 					let foundTag = renameTag(view.file, beforeTag, afterTag)
