@@ -593,6 +593,49 @@ export default class MyPlugin extends Plugin {
 			},
 		});
 
+		this.addCommand({
+			id: "toggle-bullet-number-list",
+			name: "Toggle Bullet Number List",
+			icon: `bullet-list`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const cursor = editor.getCursor()
+				const ch = cursor.ch
+				const line = cursor.line
+				const lineContent = editor.getLine(line)
+
+				if (/^(> )*\s*- /.test(lineContent)) { // bullet list case
+					// toggle to number list
+					const replacedLineContent = lineContent.replace(/^((> )*)(\s*)- /, "$1$31. ")
+					editor.setLine(line, replacedLineContent)
+					cursor.ch = cursor.ch + 1
+					editor.setCursor(cursor)
+				} else if (/^(> )*\s*[\d]+\. /.test(lineContent)) { // number list case
+					// toggle to non list
+					const replacedLineContent = lineContent.replace(/^((> )*)(\s*)[\d]+\. /, "$1$3")
+					editor.setLine(line, replacedLineContent)
+					cursor.ch = cursor.ch - 3
+					editor.setCursor(cursor)
+				} else { // no list
+					// toggle to bullet list
+					const replacedLineContent = lineContent.replace(/^((> )*)(\s*)/, "$1$3- ")
+					editor.setLine(line, replacedLineContent)
+					cursor.ch = cursor.ch + 2
+					editor.setCursor(cursor)
+				}
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `-`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `-`,
+				},
+			]
+		});
+
+
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
 	}
