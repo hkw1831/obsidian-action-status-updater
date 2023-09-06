@@ -418,6 +418,7 @@ export default class MyPlugin extends Plugin {
 					} else {
 						new Notice(`Tag "${beforeTag}" not found\nCopied blog content to clipboard!`);
 					}
+					window.open(`shortcuts://run-shortcut?name=Jekyll%20blog&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://`);
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);
 				});
