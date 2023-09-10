@@ -321,7 +321,6 @@ export default class MyPlugin extends Plugin {
 					const b = listSelection.anchor.line
 					const fromLineNum = b > a ? a : b
 					const toLineNum = b > a ? b : a
-					new Notice(fromLineNum + " " + toLineNum)
 					for (let i = fromLineNum; i <= toLineNum; i++) {
 						const line = editor.getLine(i)
 						if (/^- \d\d\d\d-\d\d-\d\d \d\d:\d\d /.test(line)) {
