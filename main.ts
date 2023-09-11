@@ -589,7 +589,14 @@ export default class MyPlugin extends Plugin {
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const threadSegment = this.getThreadSegment(editor)
 				navigator.clipboard.writeText(threadSegment).then(function () {
-					new Notice(`Copied\n\`\`\`\n${threadSegment}\`\`\`\nto clipboard!`);
+					const beforeTag = "c/x/r"
+					const afterTag = "c/x/p"
+					let foundTag = renameTag(view.file, beforeTag, afterTag)
+					if (foundTag) {
+						new Notice(`Update notes type from tag="${beforeTag}" to tag="${afterTag}!\nCopied\n\`\`\`\n${threadSegment}\`\`\`\nto clipboard!`);
+					} else {
+						new Notice(`Tag "${beforeTag}" not found\nCopied\n\`\`\`\n${threadSegment}\`\`\`\nto clipboard!`);
+					}
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);
 				});
