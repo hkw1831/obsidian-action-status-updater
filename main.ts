@@ -193,7 +193,7 @@ export default class MyPlugin extends Plugin {
 
 						if (/^!\[.*\]\(.*\)/.test(modifiedLine.trim())) {
 							if (!modifiedLine.contains("https://roulesophy.github.io")) {
-								modifiedLine = '`' + modifiedLine + '`'
+								modifiedLine = modifiedLine.replace(/!\[([^\[\]\(\)]+)\]\(([^\[\]\(\)]+)\)/g, "$2")
 							}
 						}
 						text = text + modifiedLine + "\n";
