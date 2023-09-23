@@ -525,7 +525,7 @@ export default class MyPlugin extends Plugin {
 		this.addCommand({
 			id: "chatgpt-to-twitter",
 			name: "GX ChatGPT to Twitter",
-			icon: `chatgpt-to-twitte`,
+			icon: `chatgpt-to-twitter`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				if (!editor.getValue().contains("c/x/d")) {
 					new Notice("Note type not c/x/d, do the action in wrong note?")
@@ -533,6 +533,21 @@ export default class MyPlugin extends Plugin {
 				}
 				this.convertChatGPTToTwitterFormat(editor)
 				renameTag(view.file, "c/x/d", "c/x/r")
+			},
+		});
+
+		this.addReverseTwitterNumberingIcon();
+		this.addCommand({
+			id: "reverse-twitter-numbering",
+			name: "RT Reverse Twitter Numbering",
+			icon: `reverse-twitter-number-icon`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				if (!editor.getValue().contains("c/x/r")) {
+					new Notice("Note type not c/x/r, do the action in wrong note?")
+					return
+				}
+				this.reverseTwitterNumbering(editor)
+				renameTag(view.file, "c/x/r", "c/x/d")
 			},
 		});
 
@@ -714,6 +729,47 @@ export default class MyPlugin extends Plugin {
 		cursor.line = editor.lineCount() - 1
 		editor.setCursor(cursor)
 	}
+
+	reverseTwitterNumbering(editor: Editor) {
+		let line = editor.lineCount();
+
+		let numLineFirstContent = 0
+		let frontMatterLineCount = 0
+		for (let i = 0; i < line; i++) {
+			if (frontMatterLineCount == 2) {
+				numLineFirstContent = i;
+				break;
+			}
+			if (editor.getLine(i) == "---") {
+				frontMatterLineCount++
+			}
+		}
+		for (let i = 0; i < line; i++) {
+			if (editor.getLine(numLineFirstContent).trim() == "") {
+				numLineFirstContent++;
+			} else {
+				break;
+			}
+		}
+
+		let text = "";
+		Array.from(Array(numLineFirstContent).keys()).forEach(i => {
+			const line = editor.getLine(i);
+			text = text + line + "\n"
+		})
+
+		Array.from(Array(line - numLineFirstContent).keys()).forEach(i => {
+			const line = editor.getLine(i + numLineFirstContent);
+			const modifiedLine = line.replace(/^\d+\/\d+ /, "")
+			text = text + modifiedLine + "\n"
+		});
+
+		editor.setValue(text)
+		const cursor = editor.getCursor()
+		cursor.line = editor.lineCount() - 1
+		editor.setCursor(cursor)
+	}
+
 
 	convertThreadsContentToFormatForThreadsApp(editor: Editor) : string {
 		return this.convertThreadsContentToLightPostFormat(editor, "🧵", "\n\n\n")
@@ -1017,6 +1073,11 @@ export default class MyPlugin extends Plugin {
 	addChatGPTToTwitterIcon() {
 		var obsidian = require('obsidian');
 		obsidian.addIcon(`chatgpt-to-twitter`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>GX</text>`);
+	}
+
+	addReverseTwitterNumberingIcon() {
+		var obsidian = require('obsidian');
+		obsidian.addIcon(`reverse-twitter-number-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>RT</text>`);
 	}
 
 	addEventToFantasticalIcon() {
