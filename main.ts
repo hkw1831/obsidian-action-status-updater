@@ -6,6 +6,7 @@ import { Moment } from 'moment'
 import { AddTaskTagModal } from 'addTaskTagModal';
 import { renameTag } from 'tagrenamer/renaming';
 import { ThreadsToImagesModal } from 'ThreadsToImagesModal';
+import { CopyOrMoveToNewNoteModal } from 'copyOrMoveToNewNoteModal';
 
 // Remember to rename these classes and interfaces!
 
@@ -660,10 +661,20 @@ export default class MyPlugin extends Plugin {
 			]
 		});
 
+		this.addCommand({
+			id: 'copy-or-move-to-new-note',
+			name: 'Copy or Move to new note CMN',
+			icon: `airplay`,
+			editorCallback: async (editor: Editor, view: MarkdownView) => {
+				new CopyOrMoveToNewNoteModal(this.app, editor).open();
+			}
+		});
+
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
 	}
+
 
 	convertChatGPTToTwitterFormat(editor: Editor) {
 		let line = editor.lineCount();
