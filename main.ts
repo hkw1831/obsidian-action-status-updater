@@ -787,7 +787,7 @@ export default class MyPlugin extends Plugin {
 	}
 
 	convertThreadsContentToFormatForFacebookApp(editor: Editor) : string {
-		return this.convertThreadsContentToLightPostFormat(editor, "", "\n\n", (a) => a.replace("👇", ""))
+		return this.convertThreadsContentToLightPostFormat(editor, "", "\n\nᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳ\n\n", (a) => a.replace("👇", ""))
 	}
 
 	addTaskToPutIntoCardInThreadsContent(editor: Editor) {
@@ -849,6 +849,9 @@ export default class MyPlugin extends Plugin {
 		text = text.replace(/🧵[ ]+(.*)/g, headerIcon + "【$1】")
 		text = additionReplaceFn(text)
 		// text = text.replace(/^		- /g, "　　• ").replace(/^	- /g, "　• ").replace(/^- /, "• ");
+		text = text.replace(/[\n\r]{3,}([^\n\r]+。[\n\r])/gm, `${paragraphSeparator}$1`);
+		text = text.replace(/[\n\r]{3,}([^\n\r]+：[\n\r])/gm, `${paragraphSeparator}$1`);
+		text = text.replace(/[\n\r]{3,}(http[^\n\r]+[\n\r])/gm, `${paragraphSeparator}$1`);
 		text = text.replace(/[\n\r]{3,}/gm, `${paragraphSeparator}▍`);
 		return text
 	}
