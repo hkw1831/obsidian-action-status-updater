@@ -670,6 +670,59 @@ export default class MyPlugin extends Plugin {
 			}
 		});
 
+		this.addCommand({
+			id: "editor-cut-line-to-clipboard",
+			name: "Editor Cut Line to Clipboard",
+			icon: `align-vertical-justify-center`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const cursor = editor.getCursor()
+			    const line = editor.getLine(cursor.line)
+				const copyContent = line.replace(/^\t*- /, '').replace(/^\t*\d+\. /, '')
+				let newContent = ''
+				for (let i = 0; i < editor.lineCount(); i++) {
+					if (i != cursor.line) {
+						newContent = newContent + editor.getLine(i) + "\n"
+					}
+				}
+				navigator.clipboard.writeText(copyContent).then(function () {
+					new Notice(`Copied content "${copyContent}" to clipboard!`);
+				}, function (error) {
+					new Notice(`error when copy to clipboard!`);
+				});
+				editor.setValue(newContent)
+				cursor.ch = cursor.line + 1
+				editor.setCursor(cursor)
+			}
+		})
+
+		this.addCommand({
+			id: "editor-indent-line",
+			name: "Editor Indent Line",
+			icon: `right-arrow-with-tail`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const cursor = editor.getCursor()
+			    const line = editor.getLine(cursor.line)
+				editor.setLine(cursor.line, line.replace(/^/, "\t"))
+				cursor.ch = cursor.ch + 1
+				editor.setCursor(cursor)
+			}
+		})
+
+		this.addCommand({
+			id: "editor-outdent-line",
+			name: "Editor Outdent Line",
+			icon: `left-arrow-with-tail`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const cursor = editor.getCursor()
+			    const line = editor.getLine(cursor.line)
+				if (line.match(/^\t+.*/)) {
+					editor.setLine(cursor.line, line.replace(/^\t/, ""))
+					cursor.ch = cursor.ch - 1
+					editor.setCursor(cursor)
+				}
+			}
+		})
+
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
