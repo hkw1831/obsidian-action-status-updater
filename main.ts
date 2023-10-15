@@ -902,11 +902,30 @@ export default class MyPlugin extends Plugin {
 		text = text.replace(/🧵[ ]+(.*)/g, headerIcon + "【$1】")
 		text = additionReplaceFn(text)
 		// text = text.replace(/^		- /g, "　　• ").replace(/^	- /g, "　• ").replace(/^- /, "• ");
-		text = text.replace(/[\n\r]{3,}([^\n\r]+。[\n\r])/gm, `${paragraphSeparator}$1`);
-		text = text.replace(/[\n\r]{3,}([^\n\r]+：[\n\r])/gm, `${paragraphSeparator}$1`);
-		text = text.replace(/[\n\r]{3,}(http[^\n\r]+[\n\r])/gm, `${paragraphSeparator}$1`);
+		//text = text.replace(/[\n\r]{3,}([^\n\r]+。[\n\r])/gm, `${paragraphSeparator}$1`);
+		//text = text.replace(/[\n\r]{3,}([^\n\r]+：[\n\r])/gm, `${paragraphSeparator}$1`);
+		//text = text.replace(/[\n\r]{3,}(http[^\n\r]+[\n\r])/gm, `${paragraphSeparator}$1`);
 		text = text.replace(/[\n\r]{3,}/gm, `${paragraphSeparator}▍`);
-		return text
+
+		text = text.replace("\nᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳ\n\n▍\n", "") // remove empty line
+
+		let text2 = ""
+
+		text.split("\n").forEach(line => {
+			var l = ""
+
+			if (line.endsWith("。") || line.endsWith("：") || line.startsWith("▍http") || line.startsWith("▍#") || line == "▍") {
+				l = line.replace(/^▍/gm, "")
+			} else {
+				l = line
+			}
+			text2 = text2 + l + "\n"
+		})
+
+		text2 = text2.replace("\n\n\n\n", "") // remove empty line
+		text2 = text2.replace("\nᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳ\n\n\n", "") // remove empty line
+
+		return text2
 	}
 
 	getThreadSegment(editor: Editor) : string {
