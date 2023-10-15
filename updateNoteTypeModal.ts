@@ -9,16 +9,40 @@ interface NoteType {
 
 const ALL_TYPES = [
   {
+    type: "a/n/n",
+    description: "N Current Task",
+  },
+  {
+    type: "a/w/n",
+    description: "W Current Task",
+  },
+  {
+    type: "a/n/l",
+    description: "N Later Task",
+  },
+  {
+    type: "a/w/l",
+    description: "W Later Task",
+  },
+  {
     type: "b/n/s",
     description: "Zettelkasten - Source notes (like books / video / thoughts / conversation)",
   },
   {
-    type: "b/n/u",
-    description: "Zettelkasten - Unprocessed material like an inbox",
-  },
-  {
     type: "b/n/c",
     description: "Zettelkasten - Cards (With your own thought)",
+  },
+  {
+    type: "c/t/d",
+    description: "Threads post draft",
+  },
+  {
+    type: "c/b/d",
+    description: "Blog post draft",
+  },
+  {
+    type: "b/n/u",
+    description: "Zettelkasten - Unprocessed material like an inbox",
   },
   {
     type: "b/n/m",
@@ -57,10 +81,6 @@ const ALL_TYPES = [
     description: "Area of Responsibility - Secondary",
   },
   {
-    type: "c/b/d",
-    description: "Blog post draft",
-  },
-  {
     type: "c/b/r",
     description: "Blog post ready to publish",
   },
@@ -83,10 +103,6 @@ const ALL_TYPES = [
   {
     type: "c/b/f",
     description: "Blog post fine tuned (Deprecated?)",
-  },
-  {
-    type: "c/t/d",
-    description: "Threads post draft",
   },
   {
     type: "c/t/r",
@@ -121,14 +137,6 @@ const ALL_TYPES = [
     description: "Twitter post published",
   },
   {
-    type: "a/n/n",
-    description: "N Current Task",
-  },
-  {
-    type: "a/n/l",
-    description: "N Later Task",
-  },
-  {
     type: "a/n/w",
     description: "N Waiting Task",
   },
@@ -143,14 +151,6 @@ const ALL_TYPES = [
   {
     type: "a/n/p",
     description: "N Permanent Task",
-  },
-  {
-    type: "a/w/n",
-    description: "W Current Task",
-  },
-  {
-    type: "a/w/l",
-    description: "W Later Task",
   },
   {
     type: "a/w/w",
