@@ -914,7 +914,7 @@ export default class MyPlugin extends Plugin {
 		text.split("\n").forEach(line => {
 			var l = ""
 
-			if (line.endsWith("。") || line.endsWith("：") || line.startsWith("▍http") || line.startsWith("▍#") || line == "▍") {
+			if (line.endsWith("。") || line.endsWith("：") || line.endsWith("～") || line.endsWith("！") || line.startsWith("▍http") || line.startsWith("▍#") || line == "▍") {
 				l = line.replace(/^▍/gm, "")
 			} else {
 				l = line

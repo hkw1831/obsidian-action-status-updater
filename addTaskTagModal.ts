@@ -14,6 +14,38 @@ const ALL_TYPES = [
     type: "w",
     description: "W"
   },
+  {
+    type: "n",
+    description: "N"
+  },
+  {
+    type: "w",
+    description: "W"
+  },
+  {
+    type: "n",
+    description: "N"
+  },
+  {
+    type: "w",
+    description: "W"
+  },
+  {
+    type: "n",
+    description: "N"
+  },
+  {
+    type: "w",
+    description: "W"
+  },
+  {
+    type: "n",
+    description: "N"
+  },
+  {
+    type: "w",
+    description: "W"
+  }
 ];
 
 export class AddTaskTagModal extends FuzzySuggestModal<CommentType> {
