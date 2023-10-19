@@ -543,12 +543,12 @@ export default class MyPlugin extends Plugin {
 			name: "RT Reverse Twitter Numbering",
 			icon: `reverse-twitter-number-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				if (!editor.getValue().contains("c/x/r")) {
-					new Notice("Note type not c/x/r, do the action in wrong note?")
+				if (!editor.getValue().contains("c/x/r") && !editor.getValue().contains("c/x/p")) {
+					new Notice("Note type not c/x/r nor c/x/p, do the action in wrong note?")
 					return
 				}
 				this.reverseTwitterNumbering(editor)
-				renameTag(view.file, "c/x/r", "c/x/d")
+				renameTag(view.file, "c/x/p", "c/x/r")
 			},
 		});
 
