@@ -548,7 +548,8 @@ export default class MyPlugin extends Plugin {
 					return
 				}
 				this.reverseTwitterNumbering(editor)
-				renameTag(view.file, "c/x/p", "c/x/r")
+				renameTag(view.file, "c/x/p", "c/x/d")
+				renameTag(view.file, "c/x/r", "c/x/d")
 			},
 		});
 
