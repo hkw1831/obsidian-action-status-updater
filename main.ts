@@ -260,7 +260,7 @@ export default class MyPlugin extends Plugin {
 				+ (v.match(/#w6/g) || []).length
 				+ (v.match(/#w7/g) || []).length
 				
-				new Notice(`There are ${count} actions in this notes`);
+				new Notice(`There are ${count} outstanding actions in this notes`);
 			}
 		});
 
