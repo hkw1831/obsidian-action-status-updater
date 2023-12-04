@@ -230,6 +230,40 @@ export default class MyPlugin extends Plugin {
 			]
 		});
 
+		this.addActionTagCountIcon();
+		this.addCommand({
+			id: "action-tag-count-icon",
+			name: "Count Action Tag",
+			icon: `action-tag-count-icon`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const v = editor.getValue()
+				let count = (v.match(/#nn/g) || []).length
+				+ (v.match(/#nl/g) || []).length
+				+ (v.match(/#nw/g) || []).length
+				+ (v.match(/#nm/g) || []).length
+				+ (v.match(/#n1/g) || []).length
+				+ (v.match(/#n2/g) || []).length
+				+ (v.match(/#n3/g) || []).length
+				+ (v.match(/#n4/g) || []).length
+				+ (v.match(/#n5/g) || []).length
+				+ (v.match(/#n6/g) || []).length
+				+ (v.match(/#n7/g) || []).length
+				+ (v.match(/#wn/g) || []).length
+				+ (v.match(/#wl/g) || []).length
+				+ (v.match(/#ww/g) || []).length
+				+ (v.match(/#wm/g) || []).length
+				+ (v.match(/#w1/g) || []).length
+				+ (v.match(/#w2/g) || []).length
+				+ (v.match(/#w3/g) || []).length
+				+ (v.match(/#w4/g) || []).length
+				+ (v.match(/#w5/g) || []).length
+				+ (v.match(/#w6/g) || []).length
+				+ (v.match(/#w7/g) || []).length
+				
+				new Notice(`There are ${count} actions in this notes`);
+			}
+		});
+
 
 		this.addRemoveActionIcon();
 		this.addCommand({
@@ -1140,6 +1174,11 @@ export default class MyPlugin extends Plugin {
 		const dateMoment = moment().add(addDay, 'd');
 		const dayOfWeek = dateMoment.format('E');
 		return `tag:#${actionType}${dayOfWeek} OR `
+	}
+
+	addActionTagCountIcon() {
+		var obsidian = require('obsidian');
+		obsidian.addIcon(`action-tag-count-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>AC</text>`);
 	}
 
 	addGrepThreadsToClipboardIcon() {
