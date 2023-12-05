@@ -1101,11 +1101,10 @@ export default class MyPlugin extends Plugin {
 				modifiedLine = modifiedLine.replace(/^\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
 										   .replace(/[^!]\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
 										   .replace(/https[^\n]+\.jpeg/g, "")
-										   .replace(/https[^\n]+\.jpeg/g, "")
-										   .replace(/？[^\n]/, "？\n\n")
-										   .replace(/。[^\n]/, "。\n\n")
-										   .replace(/！[^\n]/, "！\n\n")
-										   .replace(/～[^\n]/, "～\n\n")
+										   .replace(/？[^】\n]/, "？\n\n")
+										   .replace(/。[^】\n]/, "。\n\n")
+										   .replace(/！[^】\n]/, "！\n\n")
+										   .replace(/～[^】\n]/, "～\n\n")
 				text = text + modifiedLine + "\n"
 			}
 		})
