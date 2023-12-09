@@ -200,6 +200,7 @@ export default class MyPlugin extends Plugin {
 						text = text + modifiedLine + "\n";
 					}
 				}
+				text += `\n\n#nl generate summary for meta description below:\n\n\n\n`
 				text += `---\n\n## Thread post:\n\n- [[${view.file.basename}]]\n`
 
 				navigator.clipboard.writeText(text).then(function () {
