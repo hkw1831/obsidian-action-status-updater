@@ -201,7 +201,7 @@ export default class MyPlugin extends Plugin {
 					}
 				}
 				text += `\n\n---\n\n#nl generate summary for meta description below:\n\n\n\n`
-				text += `---\n\n## Thread post:\n\n- [[${view.file.basename}]]\n`
+				text += `---\n\n## References:\n\n- Thread post: [[${view.file.basename}]]\n- Blog link: \n`
 
 				navigator.clipboard.writeText(text).then(function () {
 					new Notice(`Copied blog content to clipboard!`);
