@@ -1,5 +1,5 @@
 import { UpdateNoteTypeModal } from 'updateNoteTypeModal';
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Command, TFile, Vault, EditorSelection } from 'obsidian';
+import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Command, TFile, Vault, EditorSelection, TAbstractFile } from 'obsidian';
 import { AddFootnoteTagModal } from 'addCommentTagModal';
 import { OpenActionsModal } from 'openActions';
 import { Moment } from 'moment'
@@ -450,12 +450,45 @@ export default class MyPlugin extends Plugin {
 			id: "blog-to-clipboard",
 			name: "Blog content to clipboard",
 			icon: `blog-to-clipboard-icon`,
-			editorCallback: (editor: Editor, view: MarkdownView) => {
+			editorCallback: async (editor: Editor, view: MarkdownView) => {
 				const v = editor.getValue()
 				if (v.contains("#nn") || v.contains("#nl") || v.contains("#nw") || v.contains("#wn") || v.contains("#wl") || v.contains("#ww")) {
 					new Notice(`Will not proceed. As there are unfinished action tag.`);
 					return;
 				}
+
+				const path = view.file.path
+				let moment = require('moment');
+				//const dateMoment = moment().add(addDay, 'd');
+				const dateYYYYMMDD = moment().format('YYYYMMDD');
+				if (path.match(/^.\/Blog \d\d\d\d\d\d\d\d/)) {
+					//new Notice("no need to rename")
+				} else if (path.match(/^.\/blog \d\d\d\d\d\d\d\d/)) {
+					new Notice("start with blog with date, renaming blog to Blog")
+					const renamedPath = path.replace(/^(.\/)blog /, `$1Blog `)
+					//new Notice("renamedPath: " + renamedPath)
+					//this.app.fileManager.renameFile(view.file, renamedPath)
+					await this.renameFile(view.file, renamedPath);
+				} else if (path.match(/^.\/Blog /)) {
+					new Notice("starts with Blog but no date, adding date")
+					const renamedPath = path.replace(/^(.\/Blog )/, `$1${dateYYYYMMDD} `)
+					//new Notice("renamedPath: " + renamedPath)
+					// this.app.fileManager.renameFile(view.file, renamedPath)
+					await this.renameFile(view.file, renamedPath);
+				} else if (path.match(/^.\/blog /)) {
+					new Notice("starts with blog but no date, adding date")
+					const renamedPath = path.replace(/^(.\/)blog /, `$1Blog ${dateYYYYMMDD} `)
+					//new Notice("renamedPath: " + renamedPath)
+					// this.app.fileManager.renameFile(view.file, renamedPath)
+					await this.renameFile(view.file, renamedPath);
+				} else {
+					new Notice("starts without blog, adding Blog + date")
+					const renamedPath = path.replace(/^(.\/)/, `$1Blog ${dateYYYYMMDD} `)
+					//new Notice("renamedPath: " + renamedPath)
+					// this.app.fileManager.renameFile(view.file, renamedPath)
+					await this.renameFile(view.file, renamedPath);
+				}
+				
 
 				let line = editor.lineCount();
 
@@ -486,6 +519,9 @@ export default class MyPlugin extends Plugin {
 				const beforeTagCBR = "c/b/r"
 				const beforeTagCBD = "c/b/d"
 				const afterTag = "c/b/p"
+
+				text = text.replace(/## References\:([\n]*.*)*$/, "")
+				
 				navigator.clipboard.writeText(text).then(function () {
 					let foundTagFromCBR = renameTag(view.file, beforeTagCBR, afterTag)
 					let foundTagFromCBD = renameTag(view.file, beforeTagCBD, afterTag)
@@ -826,6 +862,9 @@ export default class MyPlugin extends Plugin {
 		this.addSettingTab(new SampleSettingTab(this.app, this));
 	}
 
+	async renameFile(file : TAbstractFile, newPath: string) {
+		this.app.fileManager.renameFile(file, newPath)
+	}
 
 	convertChatGPTToTwitterFormat(editor: Editor) {
 		let line = editor.lineCount();
