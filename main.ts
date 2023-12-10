@@ -451,6 +451,12 @@ export default class MyPlugin extends Plugin {
 			name: "Blog content to clipboard",
 			icon: `blog-to-clipboard-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const v = editor.getValue()
+				if (v.contains("#nn") || v.contains("#nl") || v.contains("#nw") || v.contains("#wn") || v.contains("#wl") || v.contains("#ww")) {
+					new Notice(`Will not proceed. As there are unfinished action tag.`);
+					return;
+				}
+
 				let line = editor.lineCount();
 
 				let text = "";
