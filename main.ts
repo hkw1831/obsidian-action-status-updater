@@ -483,14 +483,18 @@ export default class MyPlugin extends Plugin {
 					const line = editor.getLine(i + numLineFirstContent);
 					text = text + line + "\n"
 				});
-				const beforeTag = "c/b/r"
+				const beforeTagCBR = "c/b/r"
+				const beforeTagCBD = "c/b/d"
 				const afterTag = "c/b/p"
 				navigator.clipboard.writeText(text).then(function () {
-					let foundTag = renameTag(view.file, beforeTag, afterTag)
-					if (foundTag) {
-						new Notice(`Update notes type from tag="${beforeTag}" to tag="${afterTag}!\nCopied blog content to clipboard!`);
-					} else {
-						new Notice(`Tag "${beforeTag}" not found\nCopied blog content to clipboard!`);
+					let foundTagFromCBR = renameTag(view.file, beforeTagCBR, afterTag)
+					let foundTagFromCBD = renameTag(view.file, beforeTagCBD, afterTag)
+					if (foundTagFromCBR) {
+						new Notice(`Update notes type from tag="${beforeTagCBR}" to tag="${afterTag}!\nCopied blog content to clipboard!`);
+					} else if (foundTagFromCBD) {
+						new Notice(`Update notes type from tag="${beforeTagCBD}" to tag="${afterTag}!\nCopied blog content to clipboard!`);
+				    } else {
+						new Notice(`Tag "${beforeTagCBR}" not found\nCopied blog content to clipboard!`);
 					}
 					window.open(`shortcuts://run-shortcut?name=Jekyll%20blog&x-cancel=obsidian://&x-error=obsidian://`);
 				}, function (error) {
