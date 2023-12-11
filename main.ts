@@ -54,6 +54,39 @@ export default class MyPlugin extends Plugin {
 			]
 		});
 
+
+		// combined version
+		//this.updateSchedulingIcon()
+		this.addCommand({
+			id: "open-recent-days-schedule-with-updated-schedule",
+			name: "Open Recent Days Updated Schedule",
+			icon: "open-recent-day-schedule-icon",
+			callback: async () => {
+				// update scheduling part
+				const { vault } = this.app;
+				const scheduleNoteWithoutMd = "D/Scheduling"
+				const scheduleNote = `${scheduleNoteWithoutMd}.md`				
+				if (vault.getAbstractFileByPath(scheduleNote) == null) {
+					await vault.create(scheduleNote, "");
+				}
+				let noteContent = ''
+				Array.from(Array(7).keys()).forEach(i => noteContent += this.getQueryDateString(i, scheduleNoteWithoutMd));
+				vault.modify(vault.getAbstractFileByPath(scheduleNote) as TFile, noteContent);
+
+				this.addActionNoteContent(vault, "D", "Query W now actions", "Weekly Schedule W", "w")
+				this.addActionNoteContent(vault, "D", "Query N now actions", "Weekly Schedule N", "n")
+				this.add3DaysActionNoteContent(vault);
+				new Notice("Updated schedule");
+
+				// open schedule part
+				const { workspace } = this.app;
+				const dashboardCanvas = "D/Query Schedule and Actions next 3 days.md"
+				const mode = (this.app.vault as any).getConfig("defaultViewMode");
+				const leaf = workspace.getLeaf(false);
+				await leaf.openFile(vault.getAbstractFileByPath(dashboardCanvas) as TFile, { active : true,/* mode */});
+			}
+		})
+
 		this.updateSchedulingIcon()
 		this.addCommand({
 			id: "update-scheduling",
