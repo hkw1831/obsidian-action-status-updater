@@ -445,6 +445,36 @@ export default class MyPlugin extends Plugin {
 			]
 		});
 
+
+		this.addThreadsToTwitterIcon();
+		this.addCommand({
+			id: "threads-to-twitter",
+			name: "Threads to Twitter",
+			icon: `threads-to-twitter`,
+			editorCallback: async (editor: Editor, view: MarkdownView) => {
+				const { vault } = this.app;
+				const v = editor.getValue()
+				const path = view.file.path
+				if (!path.match(/.\/Threads \d\d\d\d\d\d\d\d/)) {
+					new Notice(`Will not proceed. It is not a threads post.`);
+					return;
+				}
+				const newPath = path.replace(/(.\/)Threads /, "$1Twitter ")
+				const fileExists = await vault.adapter.exists(newPath);
+				if (fileExists) {
+					new Notice(`Will not proceed. Twitter post already exist.`);
+					return;
+				}
+				await vault.create(newPath, v);
+
+
+				const { workspace } = this.app;
+				const mode = (this.app.vault as any).getConfig("defaultViewMode");
+				const leaf = workspace.getLeaf(false);
+				await leaf.openFile(vault.getAbstractFileByPath(newPath) as TFile, { active : true,});
+			}
+		})
+
 		this.addGrepBlogToClipboardIcon();
 		this.addCommand({
 			id: "blog-to-clipboard",
@@ -1357,6 +1387,11 @@ export default class MyPlugin extends Plugin {
 	addGrepThreadsAsFacebookPostToClipboardIcon() {
 		var obsidian = require('obsidian');
 		obsidian.addIcon(`threads-as-facebook-post-to-clipboard-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>FC</text>`);
+	}
+
+	addThreadsToTwitterIcon() {
+		var obsidian = require('obsidian');
+		obsidian.addIcon(`threads-to-twitter`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>TT</text>`);
 	}
 
 	addTwitterToChatGPTIcon() {
