@@ -772,6 +772,16 @@ export default class MyPlugin extends Plugin {
 			},
 		});
 
+		this.addChatGPTGenerateImageIcon();
+		this.addCommand({
+			id: "chatgpt-generate-image",
+			name: "ChatGPT image",
+			icon: `chatgpt-generate-image`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				window.open('shortcuts://run-shortcut?name=ChatGPT%20Generate%20Image&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://');
+			},
+		});
+
 		this.addGrepThreadsSegmentToClipboard();
 		this.addCommand({
 			id: "threads-segment-to-clipboard",
@@ -1460,6 +1470,11 @@ export default class MyPlugin extends Plugin {
 	addGrepTwitterSegmentToClipboard() {
 		var obsidian = require('obsidian');
 		obsidian.addIcon(`twitter-segment-to-clipboard`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>XC</text>`);
+	}
+
+	addChatGPTGenerateImageIcon() {
+		var obsidian = require('obsidian');
+		obsidian.addIcon(`chatgpt-generate-image`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>GI</text>`);
 	}
 
 	addGrepThreadsSegmentToClipboard() {
