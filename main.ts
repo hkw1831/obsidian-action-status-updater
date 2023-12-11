@@ -1449,7 +1449,7 @@ export default class MyPlugin extends Plugin {
 
 	addGrepBlogToClipboardIcon() {
 		var obsidian = require('obsidian');
-		obsidian.addIcon(`blog-to-clipboard-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>BC</text>`);
+		obsidian.addIcon(`blog-to-clipboard-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>BJ</text>`);
 	}
 
 	addGrepThreadsBlockToImageIcon() {
@@ -1484,7 +1484,7 @@ export default class MyPlugin extends Plugin {
 
 	addThreadsToBlogIcon() {
 		var obsidian = require('obsidian');
-		obsidian.addIcon(`threads-to-blog-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>TB</text>`);
+		obsidian.addIcon(`threads-to-blog-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>PB</text>`);
 	}
 
 	addAddCommentTagIcon() {
