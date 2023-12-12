@@ -328,6 +328,53 @@ export default class MyPlugin extends Plugin {
 			}
 		});
 
+		this.addToggleNWTaskIcon();
+		this.addCommand({
+			id: `toggle-n-w-task`,
+			name: `Toggle N W Task`,
+			icon: `toggle-n-w-task`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				console.log(editor.getSelection());
+				const cursor = editor.getCursor();
+				const lineNumber = editor.getCursor().line;
+				const line = editor.getLine(lineNumber);
+				if (line.match(/ a\/w\/./)) {
+					const replacedLine = line.replace(/ a\/w\/(.)/, ` a/n/$1`)
+					editor.setLine(lineNumber, replacedLine);
+					editor.setCursor(cursor)
+				} else if (line.match(/ a\/n\/./)) {
+					const replacedLine = line.replace(/ a\/n\/(.)/, ` a/w/$1`)
+					editor.setLine(lineNumber, replacedLine);
+					editor.setCursor(cursor)
+				} else if (line.match(/#w. /)) {
+					const replacedLine = line.replace(/#w(.) /, `#n$1 `)
+					editor.setLine(lineNumber, replacedLine);
+					editor.setCursor(cursor)
+				} else if (line.match(/#n. /)) {
+					const replacedLine = line.replace(/#n(.) /, `#w$1 `)
+					editor.setLine(lineNumber, replacedLine);
+					editor.setCursor(cursor)
+				} else if (line.match(/ #w./)) {
+					const replacedLine = line.replace(/ #w(.)/, ` #n$1`)
+					editor.setLine(lineNumber, replacedLine);
+					editor.setCursor(cursor)
+				} else if (line.match(/ #n./)) {
+					const replacedLine = line.replace(/ #n(.)/, ` #w$1`)
+					editor.setLine(lineNumber, replacedLine);
+					editor.setCursor(cursor)
+				}
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `=`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `=`,
+				}
+			]
+		});
 
 		this.addRemoveActionIcon();
 		this.addCommand({
@@ -1490,6 +1537,11 @@ export default class MyPlugin extends Plugin {
 	addRemoveActionIcon() {
 		var obsidian = require('obsidian');
 		obsidian.addIcon(`remove-action-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>-#</text>`);
+	}
+
+	addToggleNWTaskIcon() {
+		var obsidian = require('obsidian');
+		obsidian.addIcon(`toggle-n-w-task`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>#=</text>`);
 	}
 
 	addUpdateNoteTypeIcon() {
