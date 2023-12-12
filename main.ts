@@ -630,6 +630,7 @@ export default class MyPlugin extends Plugin {
 				const beforeTagCBD = "c/b/d"
 				const afterTag = "c/b/p"
 
+				text = text.replace(/\n---\n\n#nd generate summary for meta description below:\n[^\n]*\n([^\n]*)\n[^\n]*\n---\n/, "\n<!-- Meta Summary -->\n<!--\n$1\n-->\n")
 				text = text.replace(/## References\:([\n]*.*)*$/, "")
 				
 				navigator.clipboard.writeText(text).then(function () {
