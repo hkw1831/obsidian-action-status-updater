@@ -25,6 +25,14 @@ const ALL_TYPES = [
     description: "W Later Task",
   },
   {
+    type: "a/n/p",
+    description: "N Permanent Task",
+  },
+  {
+    type: "a/w/p",
+    description: "W Permanent Task",
+  },
+  {
     type: "b/n/s",
     description: "Zettelkasten - Source notes (like books / video / thoughts / conversation)",
   },
@@ -149,10 +157,6 @@ const ALL_TYPES = [
     description: "N Archive Task",
   },
   {
-    type: "a/n/p",
-    description: "N Permanent Task",
-  },
-  {
     type: "a/w/w",
     description: "W Waiting Task",
   },
@@ -163,10 +167,6 @@ const ALL_TYPES = [
   {
     type: "a/w/a",
     description: "W Archive Task",
-  },
-  {
-    type: "a/w/p",
-    description: "W Permanent Task",
   },
 ];
 
