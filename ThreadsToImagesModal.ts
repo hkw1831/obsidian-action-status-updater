@@ -14,6 +14,10 @@ const ALL_TYPES = [
     type: "custom-font-size",
     description: "custom font size"
   },
+  {
+    type: "global-font-size",
+    description: "global font size"
+  },
 ];
 
 export class ThreadsToImagesModal extends FuzzySuggestModal<CommentType> {
