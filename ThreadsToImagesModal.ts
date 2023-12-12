@@ -7,16 +7,20 @@ interface CommentType {
 
 const ALL_TYPES = [
   {
-    type: "default",
-    description: "default"
+    type: "first-page",
+    description: "first page"
+  },
+  {
+    type: "with-header",
+    description: "with header"
+  },
+  {
+    type: "without-header",
+    description: "without header"
   },
   {
     type: "custom-font-size",
     description: "custom font size"
-  },
-  {
-    type: "global-font-size",
-    description: "global font size"
   },
 ];
 
