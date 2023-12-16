@@ -21,20 +21,11 @@ export class ClipboardPasteModal extends FuzzySuggestModal<string> {
     return item;
   }
 
-  //static removeTag(line: string): string {
-  //  ALL_TYPES.forEach((noteType) => line = line.replace(`#${noteType.type} `, ''))
-  //  return line
-  //}
-
   // Renders each suggestion item.
   renderSuggestion(i: FuzzyMatch<string>, el: HTMLElement) {
     const item = i.item
     el.createEl("div", { text: item });
   }
-
-  //containsType(line: String) : Boolean {
-  //  return ALL_TYPES.filter((noteType) => line.contains(noteType.type)).length > 0
-  //}
 
   // Perform action on the selected suggestion.
   onChooseItem(selectedContent: string, evt: MouseEvent | KeyboardEvent) {

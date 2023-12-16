@@ -561,6 +561,7 @@ export default class MyPlugin extends Plugin {
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const title = view.file.basename;
 				const titleAsLink = `[[${title}]]`;
+				clipboardHistory.push(titleAsLink)
 				navigator.clipboard.writeText(titleAsLink).then(function () {
 					new Notice(`Copied title "${title}" as link to clipboard!`);
 				}, function (error) {
@@ -994,6 +995,7 @@ export default class MyPlugin extends Plugin {
 						newContent = newContent + editor.getLine(i) + "\n"
 					}
 				}
+				clipboardHistory.push(copyContent)
 				navigator.clipboard.writeText(copyContent).then(function () {
 					new Notice(`Copied content "${copyContent}" to clipboard!`);
 				}, function (error) {
