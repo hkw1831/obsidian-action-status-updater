@@ -584,7 +584,7 @@ export default class MyPlugin extends Plugin {
 		this.addThreadsToTwitterIcon();
 		this.addCommand({
 			id: "threads-to-twitter",
-			name: "Threads to Twitter",
+			name: "TT Threads to Twitter",
 			icon: `threads-to-twitter`,
 			editorCallback: async (editor: Editor, view: MarkdownView) => {
 				const { vault } = this.app;
@@ -745,9 +745,11 @@ export default class MyPlugin extends Plugin {
 					return;
 				}
 				
-				let prompt = this.convertThreadsContentToFormatForFacebookApp(editor)
-				let numTweet = Math.ceil(prompt.length / 110)
-				prompt = `Convert the following content to twitter threads less than ${numTweet} tweet in traditional Chinese. Preserve the title. Do not add any additional information which is not mentioned from the original content. No need to add any tags to the tweet. Do not have any number in each tweet. Each tweet separated by newline character and 3 "-" characters and another newline character\n\n${prompt}`
+				let content = this.convertThreadsContentToFormatForFacebookApp(editor)
+				let numTweet = Math.ceil(content.length / 110)
+				let prompt = `You are a social media content copywriter. Convert the following content to twitter threads less than ${numTweet} tweet in traditional Chinese. Preserve the title. Merge title with the first tweet while add 2 newline characters between title and first tweet. Every tweet has to over 80 but less than 120 Chinese characters. Do not simplify the content. Do not add any additional information which is not mentioned from the original content. Preserve the example from the content. No need to add any tags to the tweet. Do not have any number in each tweet. Each tweet separated by 2 newline and 3 "-" characters and another newline. Add a space character between each English character and Chinese character. If the original content contains link, preserve the link in the tweet while remove the markdown format.`
+				//let prompt = `Convert the following content to twitter threads less than ${numTweet} tweet in traditional Chinese. Preserve the title. Do not add any additional information which is not mentioned from the original content. No need to add any tags to the tweet. Do not have any number in each tweet. Each tweet separated by newline character and 3 "-" characters and another newline character.`
+				prompt = prompt + "\n\n" + content
 				prompt = prompt.replace(/▍/g, "")
 				prompt = prompt.replace(/】\n+https\:\/\/github.com[^\n]+\n/m, "】\n")
 				prompt = prompt.replace(/\*\*/gm, "")
