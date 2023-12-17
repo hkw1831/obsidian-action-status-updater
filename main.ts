@@ -812,8 +812,11 @@ export default class MyPlugin extends Plugin {
 					new Notice("Note type not c/x/d, do the action in wrong note?")
 					return
 				}
-				this.convertChatGPTToTwitterFormat(editor)
-				renameTag(view.file, "c/x/d", "c/x/r")
+				const isSuccess = this.convertChatGPTToTwitterFormat(editor)
+				if (isSuccess)
+				{
+					renameTag(view.file, "c/x/d", "c/x/r")
+				}
 			},
 		});
 
@@ -1046,7 +1049,7 @@ export default class MyPlugin extends Plugin {
 		this.app.fileManager.renameFile(file, newPath)
 	}
 
-	convertChatGPTToTwitterFormat(editor: Editor) {
+	convertChatGPTToTwitterFormat(editor: Editor) : boolean { // true means success
 		let line = editor.lineCount();
 
 		let numLineFirstContent = 0
@@ -1105,10 +1108,23 @@ export default class MyPlugin extends Plugin {
 
 		text = text.replace("▍", "")
 
+		// should I add check segment?
+		const tweets = text.split("---")
+		for (let i = 0; i < tweets.length; i++)
+		{
+			const tweet = tweets[i].replace(/(https:|http:|www\.)\S*/gm, "").replace(/^\n+/m, "").replace(/\n+$/m, "")
+			if (tweet.length > 140)
+			{
+				new Notice("```\n" + tweet + "\n```\n\nexceed 140 characters. Probably cannot post in twitter. Please refine the tweet. Aborting")
+				return false;
+			}
+		}
+
 		editor.setValue(text)
 		const cursor = editor.getCursor()
 		cursor.line = editor.lineCount() - 1
 		editor.setCursor(cursor)
+		return true
 	}
 
 	reverseTwitterNumbering(editor: Editor) {
