@@ -747,12 +747,13 @@ export default class MyPlugin extends Plugin {
 				
 				let content = this.convertThreadsContentToFormatForFacebookApp(editor)
 				let numTweet = Math.ceil(content.length / 110)
-				let prompt = `You are a social media content copywriter. Convert the following content to twitter threads less than ${numTweet} tweet in traditional Chinese. Preserve the title. Merge title with the first tweet while add 2 newline characters between title and first tweet. Every tweet has to over 100 but less than 140 Chinese characters. Do not simplify the content. Do not add any additional information which is not mentioned from the original content. Preserve the example from the content. No need to add any tags to the tweet. Do not have any number in each tweet. Each tweet separated by 2 newline and 3 "-" characters and another newline. Add a space character between each English character and Chinese character. If the original content contains link, preserve the link in the tweet while remove the markdown format.`
+				let prompt = `You are a social media content copywriter. Convert the following content to twitter threads less than ${numTweet} tweet in traditional Chinese. Preserve the title. Merge title with the first tweet while add 2 newline characters between title and first tweet. Every tweet has to over 100 but less than 140 Chinese characters. Do not simplify the content. Do not add any additional information which is not mentioned from the original content. Preserve the example from the content. No need to add any tags to the tweet. Do not have any number in each tweet. Each tweet separated by 2 newline and 3 "-" characters and another newline. Add a space character between each English character and Chinese character. If the original content contains any URL, preserve the URL in the tweet without using any Markdown format for the URL while add 2 newline character before the URL.`
 				//let prompt = `Convert the following content to twitter threads less than ${numTweet} tweet in traditional Chinese. Preserve the title. Do not add any additional information which is not mentioned from the original content. No need to add any tags to the tweet. Do not have any number in each tweet. Each tweet separated by newline character and 3 "-" characters and another newline character.`
 				prompt = prompt + "\n\n" + content
 				prompt = prompt.replace(/▍/g, "")
 				prompt = prompt.replace(/】\n+https\:\/\/github.com[^\n]+\n/m, "】\n")
 				prompt = prompt.replace(/\*\*/gm, "")
+				//prompt = prompt.replace(/!\[\S*\]\(((https:|http:|www\.)\S*)\)/gm, "$1")
 
 				navigator.clipboard.writeText(prompt).then(function () {
 
@@ -1382,6 +1383,7 @@ export default class MyPlugin extends Plugin {
 										   .replace(/。([^】」\n])/g, "。\n\n$1")
 										   .replace(/！([^】」\n])/g, "！\n\n$1")
 										   .replace(/～([^】」\n])/g, "～\n\n$1")
+										   .replace(/^\s+$/, "")
 				text = text + modifiedLine + "\n"
 			}
 		})
