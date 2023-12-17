@@ -256,7 +256,7 @@ export default class MyPlugin extends Plugin {
 		this.addThreadsToBlogIcon();
 		this.addCommand({
 			id: "threads-to-blog",
-			name: "Threads as pre Blog format to Clipboard",
+			name: "TB Threads as pre Blog format to Clipboard",
 			icon: `threads-to-blog-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const lineCount = editor.lineCount();
@@ -301,7 +301,7 @@ export default class MyPlugin extends Plugin {
 		this.addChatGPTPromptForGeneratingSummaryToClipboard();
 		this.addCommand({
 			id: "chatgpt-prompt-for-generating-summary-to-clipboard",
-			name: "ChatGPT prompt for generating summary to clipboard",
+			name: "GS ChatGPT prompt for generating summary to clipboard",
 			icon: `chatgpt-prompt-for-generating-summary-to-clipboard`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const prompt = "請將以下的文章節錄縮短成約150字的中文摘要，確保摘要內容精煉且突出重點。你需要注意以下幾點：\n" +
@@ -331,7 +331,7 @@ export default class MyPlugin extends Plugin {
 		this.addAddCommentTagIcon();
 		this.addCommand({
 			id: "add-comment-tag",
-			name: "Add Comment Tag",
+			name: "CT Add Comment Tag",
 			icon: `add-comment-tag-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 			  new AddFootnoteTagModal(this.app, editor).open();
@@ -351,7 +351,7 @@ export default class MyPlugin extends Plugin {
 		this.addActionTagCountIcon();
 		this.addCommand({
 			id: "action-tag-count-icon",
-			name: "Count Action Tag",
+			name: "CA Count Action Tag",
 			icon: `action-tag-count-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const v = editor.getValue()
@@ -511,7 +511,7 @@ export default class MyPlugin extends Plugin {
 		this.addEventToFantasticalIcon();
 		this.addCommand({
 			id: "add-fantastical-event",
-			name: "Add Fantastical Event",
+			name: "FE Add Fantastical Event",
 			icon: `event-to-fantastical-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				let text = ""
@@ -613,7 +613,7 @@ export default class MyPlugin extends Plugin {
 		this.addGrepBlogToClipboardIcon();
 		this.addCommand({
 			id: "blog-to-clipboard",
-			name: "Blog content to clipboard",
+			name: "BJ Blog content to clipboard",
 			icon: `blog-to-clipboard-icon`,
 			editorCallback: async (editor: Editor, view: MarkdownView) => {
 				const v = editor.getValue()
@@ -864,7 +864,7 @@ export default class MyPlugin extends Plugin {
 		this.addGrepThreadsBlockToImageIcon();
 		this.addCommand({
 			id: "threads-block-to-image",
-			name: "Threads segment to image",
+			name: "TI Threads segment to image",
 			icon: `threads-block-to-image`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const threadSegment = this.getThreadSegment(editor)
@@ -881,7 +881,7 @@ export default class MyPlugin extends Plugin {
 		this.addChatGPTGenerateImageIcon();
 		this.addCommand({
 			id: "chatgpt-generate-image",
-			name: "ChatGPT image",
+			name: "GI ChatGPT image",
 			icon: `chatgpt-generate-image`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				window.open('shortcuts://run-shortcut?name=ChatGPT%20Generate%20Image&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://');
