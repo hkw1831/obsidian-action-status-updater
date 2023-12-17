@@ -708,7 +708,7 @@ export default class MyPlugin extends Plugin {
 		this.addGrepThreadsToClipboardIcon();
 		this.addCommand({
 			id: "threads-to-clipboard",
-			name: "Threads content to clipboard",
+			name: "TC Threads content to clipboard",
 			icon: `threads-to-clipboard-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const value = editor.getValue()
@@ -840,7 +840,7 @@ export default class MyPlugin extends Plugin {
 		this.addGrepThreadsAsFacebookPostToClipboardIcon();
 		this.addCommand({
 			id: "threads-as-facebook-post-to-clipboard",
-			name: "Threads as Facebook post format to Clipboard",
+			name: "FC Threads as Facebook post format to Clipboard",
 			icon: `threads-as-facebook-post-to-clipboard-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const value = editor.getValue()
@@ -917,7 +917,7 @@ export default class MyPlugin extends Plugin {
 		this.addGrepTwitterSegmentToClipboard();
 		this.addCommand({
 			id: "twitter-segment-to-clipboard",
-			name: "Twitter segment to clipboard",
+			name: "XC Twitter segment to clipboard",
 			icon: `twitter-segment-to-clipboard`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const threadSegment = this.getTwitterSegment(editor)
