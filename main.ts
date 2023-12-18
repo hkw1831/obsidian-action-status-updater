@@ -705,6 +705,50 @@ export default class MyPlugin extends Plugin {
 			},
 		});
 
+		this.addGenerateChatGPTPrompt();
+		this.addCommand({
+			id: "generate-chatgpt-prompt",
+			name: "GP Generate ChatGPT Prompt",
+			icon: `generate-chatgpt-prompt`,
+			editorCallback: async (editor: Editor, view: MarkdownView) => {
+				let line = editor.lineCount();
+
+				let text = "";
+				let numLineFirstContent = 0
+				let frontMatterLineCount = 0
+				for (let i = 0; i < line; i++) {
+					if (frontMatterLineCount == 2) {
+						numLineFirstContent = i;
+						break;
+					}
+					if (editor.getLine(i) == "---") {
+						frontMatterLineCount++
+					}
+				}
+				for (let i = 0; i < line; i++) {
+					if (editor.getLine(numLineFirstContent).trim() == "") {
+						numLineFirstContent++;
+					} else {
+						break;
+					}
+				}
+
+				Array.from(Array(line - numLineFirstContent).keys()).forEach(i => {
+					const line = editor.getLine(i + numLineFirstContent);
+					text = text + line + "\n"
+				});
+				
+				text = text.replace(/## References\:([\n]*.*)*$/, "")
+				
+				navigator.clipboard.writeText(text).then(function () {
+					new Notice(`Copied content to clipboard for generating prompt!`);
+					window.open(`shortcuts://run-shortcut?name=Generate%20ChatGPT%20Prompt&x-cancel=obsidian://&x-error=obsidian://`);
+				}, function (error) {
+					new Notice(`error when copy to clipboard!`);
+				});
+			},
+		});
+
 		this.addGrepThreadsToClipboardIcon();
 		this.addCommand({
 			id: "threads-to-clipboard",
@@ -1611,6 +1655,11 @@ export default class MyPlugin extends Plugin {
 	addChatGPTPromptForGeneratingSummaryToClipboard() {
 		var obsidian = require('obsidian');
 		obsidian.addIcon(`chatgpt-prompt-for-generating-summary-to-clipboard`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>GS</text>`);
+	}
+
+	addGenerateChatGPTPrompt() {
+		var obsidian = require('obsidian');
+		obsidian.addIcon(`generate-chatgpt-prompt`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>GP</text>`);
 	}
 
 	addRemoveActionIcon() {
