@@ -227,14 +227,6 @@ export default class MyPlugin extends Plugin {
 			icon: "open-playground-icon",
 			callback: async () => {
 				new OpenPlaygroundModal(this.app).open()
-				/*
-				const { vault } = this.app;
-				const { workspace } = this.app;
-				const inboxMd = "I/Inbox.md"
-				const mode = (this.app.vault as any).getConfig("defaultViewMode");
-				const leaf = workspace.getLeaf(false);
-				await leaf.openFile(vault.getAbstractFileByPath(inboxMd) as TFile, { active : true});
-				*/
 			},
 			hotkeys: [
 				{
