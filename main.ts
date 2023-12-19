@@ -628,6 +628,13 @@ export default class MyPlugin extends Plugin {
 					new Notice(`Will not proceed. As there are unfinished action tag.`);
 					return;
 				}
+				if (!v.contains("<!--more-->")) {
+					navigator.clipboard.writeText("<!--more-->").then(function () {
+						new Notice(`Require "<!--more-->" as excerpt separator before posting.\n"<!--more-->" already in clipboard`);
+					}, function (error) {
+						new Notice(`Require "<!--more-->" as excerpt separator before posting.\n"<!--more-->" cannot be copieid to clipboard`);
+					});
+				}				
 
 				const path = view.file.path
 				let moment = require('moment');
