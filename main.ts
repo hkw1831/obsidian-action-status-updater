@@ -8,6 +8,7 @@ import { renameTag } from 'tagrenamer/renaming';
 import { ThreadsToImagesModal } from 'ThreadsToImagesModal';
 import { CopyOrMoveToNewNoteModal } from 'copyOrMoveToNewNoteModal';
 import { ClipboardPasteModal } from 'clipboardPasteModal';
+import { OpenPlaygroundModal } from 'openPlaygroundModal';
 
 // Remember to rename these classes and interfaces!
 
@@ -113,7 +114,7 @@ export default class MyPlugin extends Plugin {
 		//this.updateSchedulingIcon()
 		this.addCommand({
 			id: "open-recent-days-schedule-with-updated-schedule",
-			name: "Open Recent Days Updated Schedule",
+			name: "OR Open Recent Days Updated Schedule",
 			icon: "open-recent-day-schedule-icon",
 			callback: async () => {
 				// update scheduling part
@@ -207,7 +208,7 @@ export default class MyPlugin extends Plugin {
 		this.openInboxIcon()
 		this.addCommand({
 			id: "open-inbox",
-			name: "Open Inbox",
+			name: "OI Open Inbox",
 			icon: "open-inbox-icon",
 			callback: async () => {
 				const { vault } = this.app;
@@ -219,10 +220,38 @@ export default class MyPlugin extends Plugin {
 			},
 		})
 
+		this.openPlaygroundIcon()
+		this.addCommand({
+			id: "open-playground",
+			name: "OP Open Playground",
+			icon: "open-playground-icon",
+			callback: async () => {
+				new OpenPlaygroundModal(this.app).open()
+				/*
+				const { vault } = this.app;
+				const { workspace } = this.app;
+				const inboxMd = "I/Inbox.md"
+				const mode = (this.app.vault as any).getConfig("defaultViewMode");
+				const leaf = workspace.getLeaf(false);
+				await leaf.openFile(vault.getAbstractFileByPath(inboxMd) as TFile, { active : true});
+				*/
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `p`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `p`,
+				},
+			]
+		})
+
 		this.openBrainDumpIcon()
 		this.addCommand({
 			id: "open-braindump",
-			name: "Open BrainDump",
+			name: "OB Open BrainDump",
 			icon: "open-braindump-icon",
 			callback: async () => {
 				const { vault } = this.app;
@@ -1503,6 +1532,11 @@ export default class MyPlugin extends Plugin {
 	openInboxIcon() {
 		var obsidian = require('obsidian');
 		obsidian.addIcon(`open-inbox-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>OI</text>`);
+	}
+
+	openPlaygroundIcon() {
+		var obsidian = require('obsidian');
+		obsidian.addIcon(`open-playground-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>OP</text>`);
 	}
 
 	openBrainDumpIcon() {
