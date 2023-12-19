@@ -270,7 +270,14 @@ export default class MyPlugin extends Plugin {
 						if (modifiedLine == '---') {
 							metadataLineCount++
 							if (metadataLineCount > 2) {
-								modifiedLine = modifiedLine.replace('---', '## > ')
+								if (metadataLineCount == 3) {
+									modifiedLine = modifiedLine.replace('---', '')
+								} else if (metadataLineCount == 4) {
+									modifiedLine = modifiedLine.replace('---', '<!--more-->\n\n## > ')
+								} else {
+									modifiedLine = modifiedLine.replace('---', '## > ')
+								}
+								
 							}
 						}
 						if (metadataLineCount == 1 || metadataLineCount == 2) {
