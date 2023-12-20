@@ -294,9 +294,9 @@ export default class MyPlugin extends Plugin {
 								if (metadataLineCount == 3) {
 									modifiedLine = modifiedLine.replace('---', '')
 								} else if (metadataLineCount == 4) {
-									modifiedLine = modifiedLine.replace('---', '<!--more-->\n\n## > ')
+									modifiedLine = modifiedLine.replace('---', '<!--more-->\n\n**目錄：**\n\n* Table of Content\n{:toc}\n\n## .')
 								} else {
-									modifiedLine = modifiedLine.replace('---', '## > ')
+									modifiedLine = modifiedLine.replace('---', '## .')
 								}
 								
 							}
