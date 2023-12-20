@@ -652,9 +652,12 @@ export default class MyPlugin extends Plugin {
 				if (!v.contains("<!--more-->")) {
 					navigator.clipboard.writeText("<!--more-->").then(function () {
 						new Notice(`Require "<!--more-->" as excerpt separator before posting.\n"<!--more-->" already in clipboard`);
+						return;
 					}, function (error) {
 						new Notice(`Require "<!--more-->" as excerpt separator before posting.\n"<!--more-->" cannot be copieid to clipboard`);
+						return;
 					});
+					return;
 				}				
 
 				const path = view.file.path
@@ -723,9 +726,9 @@ export default class MyPlugin extends Plugin {
 				text = text.replace(/\n---\n\n#nd generate summary for meta description below:\n[^\n]*\n([^\n]*)\n[^\n]*\n---\n/, "\n<!-- Meta Summary -->\n<!--\n$1\n-->\n")
 				text = text.replace(/## References\:([\n]*.*)*$/, "")
 				
-				navigator.clipboard.writeText(text).then(function () {
-					let foundTagFromCBR = renameTag(view.file, beforeTagCBR, afterTag)
-					let foundTagFromCBD = renameTag(view.file, beforeTagCBD, afterTag)
+				navigator.clipboard.writeText(text).then(async function () {
+					let foundTagFromCBR = await renameTag(view.file, beforeTagCBR, afterTag)
+					let foundTagFromCBD = await renameTag(view.file, beforeTagCBD, afterTag)
 					if (foundTagFromCBR) {
 						new Notice(`Update notes type from tag="${beforeTagCBR}" to tag="${afterTag}!\nCopied blog content to clipboard!`);
 					} else if (foundTagFromCBD) {
