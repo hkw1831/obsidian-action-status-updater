@@ -1092,7 +1092,17 @@ export default class MyPlugin extends Plugin {
 				editor.setValue(newContent)
 				cursor.ch = cursor.line + 1
 				editor.setCursor(cursor)
-			}
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: "\\",
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: "\\",
+				},
+			]
 		})
 
 		this.addCommand({
