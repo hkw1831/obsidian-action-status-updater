@@ -1070,6 +1070,33 @@ export default class MyPlugin extends Plugin {
 		});
 
 		this.addCommand({
+			id: "editor-copy-line-to-clipboard",
+			name: "Editor Copy Line to Clipboard",
+			icon: `align-vertical-space-around`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const cursor = editor.getCursor()
+			    const line = editor.getLine(cursor.line)
+				const copyContent = line.replace(/^\t*- /, '').replace(/^\t*\d+\. /, '')
+				clipboardHistory.push(copyContent)
+				navigator.clipboard.writeText(copyContent).then(function () {
+					new Notice(`Copied content "${copyContent}" to clipboard!`);
+				}, function (error) {
+					new Notice(`error when copy to clipboard!`);
+				});
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: "/",
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: "/",
+				},
+			]
+		})
+
+		this.addCommand({
 			id: "editor-cut-line-to-clipboard",
 			name: "Editor Cut Line to Clipboard",
 			icon: `align-vertical-justify-center`,
