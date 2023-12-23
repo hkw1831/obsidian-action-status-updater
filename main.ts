@@ -662,39 +662,26 @@ export default class MyPlugin extends Plugin {
 
 				const path = view.file.path
 				let moment = require('moment');
-				//const dateMoment = moment().add(addDay, 'd');
 				const dateYYYYMMDD = moment().format('YYYYMMDD');
 				if (path.match(/^.\/Blog \d\d\d\d\d\d\d\d/)) {
-					//new Notice("no need to rename")
 				} else if (path.match(/^.\/blog \d\d\d\d\d\d\d\d/)) {
 					new Notice("start with blog with date, renaming blog to Blog")
 					const renamedPath = path.replace(/^(.\/)blog /, `$1Blog `)
-					//new Notice("renamedPath: " + renamedPath)
-					//this.app.fileManager.renameFile(view.file, renamedPath)
-					await this.renameFile(view.file, renamedPath);
+					this.renameFile(view.file, renamedPath);
 				} else if (path.match(/^.\/Blog /)) {
 					new Notice("starts with Blog but no date, adding date")
 					const renamedPath = path.replace(/^(.\/Blog )/, `$1${dateYYYYMMDD} `)
-					//new Notice("renamedPath: " + renamedPath)
-					// this.app.fileManager.renameFile(view.file, renamedPath)
-					await this.renameFile(view.file, renamedPath);
+					this.renameFile(view.file, renamedPath);
 				} else if (path.match(/^.\/blog /)) {
 					new Notice("starts with blog but no date, adding date")
 					const renamedPath = path.replace(/^(.\/)blog /, `$1Blog ${dateYYYYMMDD} `)
-					//new Notice("renamedPath: " + renamedPath)
-					// this.app.fileManager.renameFile(view.file, renamedPath)
-					await this.renameFile(view.file, renamedPath);
+					this.renameFile(view.file, renamedPath);
 				} else {
 					new Notice("starts without blog, adding Blog + date")
 					const renamedPath = path.replace(/^(.\/)/, `$1Blog ${dateYYYYMMDD} `)
-					//new Notice("renamedPath: " + renamedPath)
-					// this.app.fileManager.renameFile(view.file, renamedPath)
-					await this.renameFile(view.file, renamedPath);
+					this.renameFile(view.file, renamedPath);
 				}
-				
-
 				let line = editor.lineCount();
-
 				let text = "";
 				let numLineFirstContent = 0
 				let frontMatterLineCount = 0
@@ -725,7 +712,7 @@ export default class MyPlugin extends Plugin {
 
 				text = text.replace(/\n---\n\n#nd generate summary for meta description below:\n[^\n]*\n([^\n]*)\n[^\n]*\n---\n/, "\n<!-- Meta Summary -->\n<!--\n$1\n-->\n")
 				text = text.replace(/## References\:([\n]*.*)*$/, "")
-				
+
 				navigator.clipboard.writeText(text).then(async function () {
 					let foundTagFromCBR = await renameTag(view.file, beforeTagCBR, afterTag)
 					let foundTagFromCBD = await renameTag(view.file, beforeTagCBD, afterTag)
@@ -736,9 +723,10 @@ export default class MyPlugin extends Plugin {
 				    } else {
 						new Notice(`Tag "${beforeTagCBR}" not found\nCopied blog content to clipboard!`);
 					}
-					window.open(`shortcuts://run-shortcut?name=Jekyll%20blog&x-cancel=obsidian://&x-error=obsidian://`);
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);
+				}).then(function() {
+					window.open(`shortcuts://run-shortcut?name=Jekyll%20blog&x-cancel=obsidian://&x-error=obsidian://`);
 				});
 			},
 		});
@@ -1166,7 +1154,7 @@ export default class MyPlugin extends Plugin {
 	}
 
 	async renameFile(file : TAbstractFile, newPath: string) {
-		this.app.fileManager.renameFile(file, newPath)
+		await this.app.fileManager.renameFile(file, newPath)
 	}
 
 	convertChatGPTToTwitterFormat(editor: Editor) : boolean { // true means success
