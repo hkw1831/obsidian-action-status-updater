@@ -1,4 +1,4 @@
-import {App, Notice, TFile, parseFrontMatterAliases, parseFrontMatterTags} from "obsidian";
+import {App, MarkdownView, Notice, TAbstractFile, TFile, parseFrontMatterAliases, parseFrontMatterTags} from "obsidian";
 import {Tag, Replacement} from "./Tag";
 import {File} from "./File";
 
@@ -36,6 +36,35 @@ export async function findTargets(tag: Tag, file: TFile) {
         return new File(app, file.path, tags, fmtags.length + aliasTags.length);
     }
     return null;
+}
+
+export function renameBlogTitle(app : App, path: string, view: MarkdownView) : Promise<void> {
+    let moment = require('moment');
+    const dateYYYYMMDD = moment().format('YYYYMMDD');
+    let renamedPath = ""
+    if (path.match(/^.\/Blog \d\d\d\d\d\d\d\d/)) {
+        return Promise.resolve()
+    } else if (path.match(/^.\/blog \d\d\d\d\d\d\d\d/)) {
+        new Notice("start with blog with date, renaming blog to Blog")
+        renamedPath = path.replace(/^(.\/)blog /, `$1Blog `)
+        return renameFile(app, view.file, renamedPath);
+    } else if (path.match(/^.\/Blog /)) {
+        new Notice("starts with Blog but no date, adding date")
+        renamedPath = path.replace(/^(.\/Blog )/, `$1${dateYYYYMMDD} `)
+        return renameFile(app, view.file, renamedPath);
+    } else if (path.match(/^.\/blog /)) {
+        new Notice("starts with blog but no date, adding date")
+        renamedPath = path.replace(/^(.\/)blog /, `$1Blog ${dateYYYYMMDD} `)
+        return renameFile(app, view.file, renamedPath);
+    } else {
+        new Notice("starts without blog, adding Blog + date")
+        renamedPath = path.replace(/^(.\/)/, `$1Blog ${dateYYYYMMDD} `)
+        return renameFile(app, view.file, renamedPath);
+    }
+}
+
+async function renameFile(app : App, file : TAbstractFile, newPath: string) {
+    app.fileManager.renameFile(file, newPath)
 }
 
 

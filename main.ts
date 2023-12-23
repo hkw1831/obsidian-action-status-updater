@@ -4,7 +4,7 @@ import { AddFootnoteTagModal } from 'addCommentTagModal';
 import { OpenActionsModal } from 'openActions';
 import { Moment } from 'moment'
 import { AddTaskTagModal } from 'addTaskTagModal';
-import { renameTag } from 'tagrenamer/renaming';
+import { renameBlogTitle, renameTag } from 'tagrenamer/renaming';
 import { ThreadsToImagesModal } from 'ThreadsToImagesModal';
 import { CopyOrMoveToNewNoteModal } from 'copyOrMoveToNewNoteModal';
 import { ClipboardPasteModal } from 'clipboardPasteModal';
@@ -661,26 +661,6 @@ export default class MyPlugin extends Plugin {
 				}				
 
 				const path = view.file.path
-				let moment = require('moment');
-				const dateYYYYMMDD = moment().format('YYYYMMDD');
-				if (path.match(/^.\/Blog \d\d\d\d\d\d\d\d/)) {
-				} else if (path.match(/^.\/blog \d\d\d\d\d\d\d\d/)) {
-					new Notice("start with blog with date, renaming blog to Blog")
-					const renamedPath = path.replace(/^(.\/)blog /, `$1Blog `)
-					this.renameFile(view.file, renamedPath);
-				} else if (path.match(/^.\/Blog /)) {
-					new Notice("starts with Blog but no date, adding date")
-					const renamedPath = path.replace(/^(.\/Blog )/, `$1${dateYYYYMMDD} `)
-					this.renameFile(view.file, renamedPath);
-				} else if (path.match(/^.\/blog /)) {
-					new Notice("starts with blog but no date, adding date")
-					const renamedPath = path.replace(/^(.\/)blog /, `$1Blog ${dateYYYYMMDD} `)
-					this.renameFile(view.file, renamedPath);
-				} else {
-					new Notice("starts without blog, adding Blog + date")
-					const renamedPath = path.replace(/^(.\/)/, `$1Blog ${dateYYYYMMDD} `)
-					this.renameFile(view.file, renamedPath);
-				}
 				let line = editor.lineCount();
 				let text = "";
 				let numLineFirstContent = 0
@@ -706,26 +686,45 @@ export default class MyPlugin extends Plugin {
 					const line = editor.getLine(i + numLineFirstContent);
 					text = text + line + "\n"
 				});
-				const beforeTagCBR = "c/b/r"
-				const beforeTagCBD = "c/b/d"
-				const afterTag = "c/b/p"
-
 				text = text.replace(/\n---\n\n#nd generate summary for meta description below:\n[^\n]*\n([^\n]*)\n[^\n]*\n---\n/, "\n<!-- Meta Summary -->\n<!--\n$1\n-->\n")
 				text = text.replace(/## References\:([\n]*.*)*$/, "")
 
-				navigator.clipboard.writeText(text).then(async function () {
-					let foundTagFromCBR = await renameTag(view.file, beforeTagCBR, afterTag)
-					let foundTagFromCBD = await renameTag(view.file, beforeTagCBD, afterTag)
-					if (foundTagFromCBR) {
-						new Notice(`Update notes type from tag="${beforeTagCBR}" to tag="${afterTag}!\nCopied blog content to clipboard!`);
-					} else if (foundTagFromCBD) {
-						new Notice(`Update notes type from tag="${beforeTagCBD}" to tag="${afterTag}!\nCopied blog content to clipboard!`);
-				    } else {
-						new Notice(`Tag "${beforeTagCBR}" not found\nCopied blog content to clipboard!`);
-					}
+
+				const app = this.app;
+				const beforeTagCBR = "c/b/r"
+				const beforeTagCBD = "c/b/d"
+				const beforeTagCBI = "c/b/i"
+				const afterTag = "c/b/p"
+
+				Promise.resolve()
+				.then(function () {
+					return navigator.clipboard.writeText(text)
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);
-				}).then(function() {
+				})
+				.then(function () { // CBR to CBP
+					new Notice(`Copied blog content to clipboard!`);
+					return renameTag(view.file, beforeTagCBR, afterTag)
+				})
+				.then(function (foundTagFromCBR) { // CBI to CBP
+					if (foundTagFromCBR) {
+						new Notice(`Update notes type from tag="${beforeTagCBR}" to tag="${afterTag}!`);
+					}
+					return renameTag(view.file, beforeTagCBI, afterTag)
+				})
+				.then(function (foundTagFromCBI) { // CBD to CBP
+					if (foundTagFromCBI) {
+						new Notice(`Update notes type from tag="${foundTagFromCBI}" to tag="${afterTag}!`);
+					}
+					return renameTag(view.file, beforeTagCBD, afterTag)
+				})
+				.then(function (foundTagFromCBD) {
+					if (foundTagFromCBD) {
+						new Notice(`Update notes type from tag="${beforeTagCBD}" to tag="${afterTag}!`);
+					}
+					return renameBlogTitle(app, path, view)
+				})
+				.then(function() {
 					window.open(`shortcuts://run-shortcut?name=Jekyll%20blog&x-cancel=obsidian://&x-error=obsidian://`);
 				});
 			},
@@ -1151,10 +1150,6 @@ export default class MyPlugin extends Plugin {
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
-	}
-
-	async renameFile(file : TAbstractFile, newPath: string) {
-		await this.app.fileManager.renameFile(file, newPath)
 	}
 
 	convertChatGPTToTwitterFormat(editor: Editor) : boolean { // true means success
