@@ -31,17 +31,24 @@ export class OpenPlaygroundModal extends FuzzySuggestModal<string> {
     const choosenOption = selectedContent
 
     const { vault } = this.app;
-
-    if (vault.getAbstractFileByPath(this.playgroundMd) == null) {
-        await vault.create(this.playgroundMd, "");
-    }
-
-    if (this.removeExistingContent === choosenOption) {
-        vault.modify(vault.getAbstractFileByPath(this.playgroundMd) as TFile, "");
-    }
-    
     const { workspace } = this.app;
     const leaf = workspace.getLeaf(false);
-    await leaf.openFile(vault.getAbstractFileByPath(this.playgroundMd) as TFile, { active : true,/* mode */});
+
+    Promise.resolve()
+    .then(() => {
+      if (vault.getAbstractFileByPath(this.playgroundMd) == null) {
+        return vault.create(this.playgroundMd, "");
+      }
+      return vault.getAbstractFileByPath(this.playgroundMd)
+    })
+    .then((tFile) => {
+      if (this.removeExistingContent === choosenOption) {
+        return vault.modify(tFile as TFile, "");
+      }
+      return Promise.resolve()
+    })
+    .then(() => {
+      return leaf.openFile(vault.getAbstractFileByPath(this.playgroundMd) as TFile, { active : true});
+    })
   }
 }
