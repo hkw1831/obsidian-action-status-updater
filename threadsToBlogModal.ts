@@ -95,7 +95,7 @@ export class ThreadsToBlogModal extends FuzzySuggestModal<string> {
         return vault.create(newPath, text);
       })
       .then((tFile) => {
-        leaf.openFile(tFile, { active : true});
+        return leaf.openFile(tFile, { active : true});
       })
       /*
       await vault.create(newPath, text);
