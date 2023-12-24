@@ -9,6 +9,7 @@ import { ThreadsToImagesModal } from 'ThreadsToImagesModal';
 import { CopyOrMoveToNewNoteModal } from 'copyOrMoveToNewNoteModal';
 import { ClipboardPasteModal } from 'clipboardPasteModal';
 import { OpenPlaygroundModal } from 'openPlaygroundModal';
+import { ThreadsToBlogModal } from 'threadsToBlogModal';
 
 // Remember to rename these classes and interfaces!
 
@@ -280,49 +281,7 @@ export default class MyPlugin extends Plugin {
 			name: "TB Threads as pre Blog format to Clipboard",
 			icon: `threads-to-blog-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const lineCount = editor.lineCount();
-				let tagLineNumber = null;
-				let metadataLineCount = 0;
-				let text = ""
-				for (let i = 0; i < lineCount; i++) {
-					let line = editor.getLine(i);
-					if (!line.trim().startsWith("%%") || !line.trim().endsWith("%%")) {
-						let modifiedLine = line.replace('🧵 ', '# ').replace('【', '').replace('】', '').replace('👇', '')
-						if (modifiedLine == '---') {
-							metadataLineCount++
-							if (metadataLineCount > 2) {
-								if (metadataLineCount == 3) {
-									modifiedLine = modifiedLine.replace('---', '')
-								} else if (metadataLineCount == 4) {
-									modifiedLine = modifiedLine.replace('---', '<!--more-->\n\n**目錄：**\n\n* Table of Content\n{:toc}\n\n## .')
-								} else {
-									modifiedLine = modifiedLine.replace('---', '## .')
-								}
-								
-							}
-						}
-						if (metadataLineCount == 1 || metadataLineCount == 2) {
-							modifiedLine = modifiedLine.replace("c/t/p", "c/b/d")
-							modifiedLine = modifiedLine.replace("c/t/t", "c/b/d")
-							modifiedLine = modifiedLine.replace("c/t/r", "c/b/d")
-						}
-
-						if (/^!\[.*\]\(.*\)/.test(modifiedLine.trim())) {
-							if (!modifiedLine.contains("https://roulesophy.github.io")) {
-								modifiedLine = modifiedLine.replace(/!\[([^\[\]\(\)]+)\]\(([^\[\]\(\)]+)\)/g, "$2")
-							}
-						}
-						text = text + modifiedLine + "\n";
-					}
-				}
-				text += `\n\n---\n\n#nl generate summary for meta description below:\n\n\n\n`
-				text += `---\n\n## References:\n\n- Thread post 1: [[${view.file.basename}]]\n- Blog link: \n`
-
-				navigator.clipboard.writeText(text).then(function () {
-					new Notice(`Copied blog content to clipboard!`);
-				}, function (error) {
-					new Notice(`error when copy to clipboard!`);
-				});
+				new ThreadsToBlogModal(this.app, editor, view).open()
 			}
 		});
 
