@@ -571,9 +571,9 @@ export default class MyPlugin extends Plugin {
 		this.addThreadsToTwitterIcon();
 		this.addCommand({
 			id: "threads-to-twitter",
-			name: "TT Threads to Twitter",
+			name: "TT TX Threads to Twitter",
 			icon: `threads-to-twitter`,
-			editorCallback: async (editor: Editor, view: MarkdownView) => {
+			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const { vault } = this.app;
 				const v = editor.getValue()
 				const path = view.file.path
@@ -582,18 +582,23 @@ export default class MyPlugin extends Plugin {
 					return;
 				}
 				const newPath = path.replace(/(.\/)Threads /, "$1Twitter ")
-				const fileExists = await vault.adapter.exists(newPath);
-				if (fileExists) {
-					new Notice(`Will not proceed. Twitter post already exist.`);
-					return;
-				}
-				await vault.create(newPath, v);
-
 
 				const { workspace } = this.app;
-				const mode = (this.app.vault as any).getConfig("defaultViewMode");
 				const leaf = workspace.getLeaf(false);
-				await leaf.openFile(vault.getAbstractFileByPath(newPath) as TFile, { active : true,});
+				Promise.resolve()
+				.then(() => {
+					return vault.adapter.exists(newPath);
+				})
+				.then((fileExists) => {
+					if (fileExists) {
+						new Notice(`Will not proceed. Twitter post already exist.`);
+						return Promise.reject("Twitter post already exist")
+					}
+					return vault.create(newPath, v);
+				})
+				.then((tFile) => {
+					return leaf.openFile(tFile, { active : true});
+				}, reason => {})
 			}
 		})
 
