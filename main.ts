@@ -47,6 +47,7 @@ export default class MyPlugin extends Plugin {
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const content = editor.getSelection().toString()
 				clipboardHistory.push(content);
+				new Notice("```\n" + content + "\n```\nis copied to clipboard!")
 			},
 			hotkeys: [
 				{
@@ -65,6 +66,7 @@ export default class MyPlugin extends Plugin {
 				const content = editor.getSelection().toString()
 				editor.replaceSelection("")
 				clipboardHistory.push(content);
+				new Notice("```\n" + content + "\n```\nis cut to clipboard!")
 			},
 			hotkeys: [
 				{
