@@ -46,6 +46,10 @@ export default class MyPlugin extends Plugin {
 			icon: "obsidian-copy",
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const content = editor.getSelection().toString()
+				const index = clipboardHistory.indexOf(content, 0);
+				if (index > -1) {
+					clipboardHistory.splice(index, 1);
+				}
 				clipboardHistory.push(content);
 				new Notice("```\n" + content + "\n```\nis copied to clipboard!")
 			},
@@ -64,6 +68,10 @@ export default class MyPlugin extends Plugin {
 			icon: "obsidian-cut",
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const content = editor.getSelection().toString()
+				const index = clipboardHistory.indexOf(content, 0);
+				if (index > -1) {
+					clipboardHistory.splice(index, 1);
+				}
 				editor.replaceSelection("")
 				clipboardHistory.push(content);
 				new Notice("```\n" + content + "\n```\nis cut to clipboard!")
