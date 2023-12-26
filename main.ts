@@ -49,11 +49,7 @@ export default class MyPlugin extends Plugin {
 				if (content.length == 0) {
 					content = editor.getLine(editor.getCursor().line)
 				}
-				const index = clipboardHistory.indexOf(content, 0);
-				if (index > -1) {
-					clipboardHistory.splice(index, 1);
-				}
-				clipboardHistory.push(content);
+				this.addToClipboardHistory(content);
 				new Notice("```\n" + content + "\n```\nis copied to clipboard!")
 			},
 			hotkeys: [
@@ -74,12 +70,8 @@ export default class MyPlugin extends Plugin {
 				if (content.length == 0) {
 					content = editor.getLine(editor.getCursor().line)
 				}
-				const index = clipboardHistory.indexOf(content, 0);
-				if (index > -1) {
-					clipboardHistory.splice(index, 1);
-				}
+				this.addToClipboardHistory(content);
 				editor.replaceSelection("")
-				clipboardHistory.push(content);
 				new Notice("```\n" + content + "\n```\nis cut to clipboard!")
 			},
 			hotkeys: [
@@ -564,7 +556,7 @@ export default class MyPlugin extends Plugin {
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const title = view.file.basename;
 				const titleAsLink = `[[${title}]]`;
-				clipboardHistory.push(titleAsLink)
+				this.addToClipboardHistory(titleAsLink);
 				navigator.clipboard.writeText(titleAsLink).then(function () {
 					new Notice(`Copied title "${title}" as link to clipboard!`);
 				}, function (error) {
@@ -1044,7 +1036,7 @@ export default class MyPlugin extends Plugin {
 				const cursor = editor.getCursor()
 			    const line = editor.getLine(cursor.line)
 				const copyContent = line.replace(/^\t*- /, '').replace(/^\t*\d+\. /, '')
-				clipboardHistory.push(copyContent)
+				this.addToClipboardHistory(copyContent);
 				navigator.clipboard.writeText(copyContent).then(function () {
 					new Notice(`Copied content "${copyContent}" to clipboard!`);
 				}, function (error) {
@@ -1077,7 +1069,7 @@ export default class MyPlugin extends Plugin {
 						newContent = newContent + editor.getLine(i) + "\n"
 					}
 				}
-				clipboardHistory.push(copyContent)
+				this.addToClipboardHistory(copyContent);
 				navigator.clipboard.writeText(copyContent).then(function () {
 					new Notice(`Copied content "${copyContent}" to clipboard!`);
 				}, function (error) {
@@ -1839,6 +1831,14 @@ export default class MyPlugin extends Plugin {
 		} else {
 			return false
 		}
+	}
+
+	addToClipboardHistory(content: string) {
+		const index = clipboardHistory.indexOf(content, 0);
+		if (index > -1) {
+			clipboardHistory.splice(index, 1);
+		}
+		clipboardHistory.push(content);
 	}
 
 	onunload() {
