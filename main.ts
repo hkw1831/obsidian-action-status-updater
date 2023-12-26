@@ -45,7 +45,10 @@ export default class MyPlugin extends Plugin {
 			name: "Obsidian Copy",
 			icon: "obsidian-copy",
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const content = editor.getSelection().toString()
+				let content = editor.getSelection().toString()
+				if (content.length == 0) {
+					content = editor.getLine(editor.getCursor().line)
+				}
 				const index = clipboardHistory.indexOf(content, 0);
 				if (index > -1) {
 					clipboardHistory.splice(index, 1);
@@ -67,7 +70,10 @@ export default class MyPlugin extends Plugin {
 			name: "Obsidian Cut",
 			icon: "obsidian-cut",
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const content = editor.getSelection().toString()
+				let content = editor.getSelection().toString()
+				if (content.length == 0) {
+					content = editor.getLine(editor.getCursor().line)
+				}
 				const index = clipboardHistory.indexOf(content, 0);
 				if (index > -1) {
 					clipboardHistory.splice(index, 1);
