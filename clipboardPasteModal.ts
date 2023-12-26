@@ -29,6 +29,11 @@ export class ClipboardPasteModal extends FuzzySuggestModal<string> {
 
   // Perform action on the selected suggestion.
   onChooseItem(selectedContent: string, evt: MouseEvent | KeyboardEvent) {
+    const index = this.clipboardContent.indexOf(selectedContent, 0);
+    if (index > -1) {
+      this.clipboardContent.splice(index, 1);
+    }
+    this.clipboardContent.push(selectedContent);
     const selection = this.editor.getSelection()
     const replacedStr = selectedContent
     if (selection.length != 0) {
