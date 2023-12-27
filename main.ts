@@ -1061,6 +1061,8 @@ export default class MyPlugin extends Plugin {
 			icon: `align-vertical-justify-center`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const cursor = editor.getCursor()
+				const ch = cursor.ch
+				const l = cursor.line
 			    const line = editor.getLine(cursor.line)
 				const copyContent = line.replace(/^\t*- /, '').replace(/^\t*\d+\. /, '')
 				let newContent = ''
@@ -1076,7 +1078,9 @@ export default class MyPlugin extends Plugin {
 					new Notice(`error when copy to clipboard!`);
 				});
 				editor.setValue(newContent)
-				cursor.ch = cursor.line + 1
+				if (editor.getLine(cursor.line).length < ch) {
+					cursor.ch = editor.getLine(cursor.line).length
+				}
 				editor.setCursor(cursor)
 			},
 			hotkeys: [
