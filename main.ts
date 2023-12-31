@@ -1503,14 +1503,16 @@ export default class MyPlugin extends Plugin {
 			const line = editor.getLine(i + above)
 			if (!line.trim().startsWith("%%") || !line.trim().endsWith("%%")) {
 				let modifiedLine = editor.getLine(i + above)
-				modifiedLine = modifiedLine.replace(/^\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
-										   .replace(/[^!]\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
-										   .replace(/https[^\n]+\.jpeg/g, "")
-										   .replace(/？([^】」\n])/g, "？\n\n$1")
-										   .replace(/。([^】」\n])/g, "。\n\n$1")
-										   .replace(/！([^】」\n])/g, "！\n\n$1")
-										   .replace(/～([^】」\n])/g, "～\n\n$1")
-										   .replace(/^\s+$/, "")
+				if (!/\d+\/\d+ *【.*】/.test(modifiedLine)) {
+					modifiedLine = modifiedLine.replace(/^\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
+											.replace(/[^!]\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
+											.replace(/https[^\n]+\.jpeg/g, "")
+											.replace(/？([^】」\n])/g, "？\n\n$1")
+											.replace(/。([^】」\n])/g, "。\n\n$1")
+											.replace(/！([^】」\n])/g, "！\n\n$1")
+											.replace(/～([^】」\n])/g, "～\n\n$1")
+											.replace(/^\s+$/, "")
+				}
 				text = text + modifiedLine + "\n"
 			}
 		})
