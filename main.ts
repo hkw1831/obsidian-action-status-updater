@@ -29,6 +29,23 @@ export default class MyPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
+		if (navigator.clipboard) {
+			document.addEventListener('copy', (event: ClipboardEvent) => {
+				const copiedText = event.clipboardData?.getData('text/plain');
+				if (copiedText != null) {
+					this.addToClipboardHistory(copiedText)
+				}
+			});
+			document.addEventListener('cut', (event: ClipboardEvent) => {
+				const copiedText = event.clipboardData?.getData('text/plain');
+				if (copiedText != null) {
+					this.addToClipboardHistory(copiedText)
+				}
+			  });
+		  } else {
+			console.log('Clipboard API is not supported in this browser.');
+		  }
+
 		['n', 'l', 'w', 'd', 'a', 't', 'm', 'e', '1', '2', '3', '4', '5', '6', '7'].forEach(t => {
 			this.addIcon(t);
 			this.addActionCommand(t);
@@ -1097,29 +1114,61 @@ export default class MyPlugin extends Plugin {
 
 		this.addCommand({
 			id: "editor-indent-line",
-			name: "Editor Indent Line",
+			name: "Editor Indent Selection",
 			icon: `right-arrow-with-tail`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const cursor = editor.getCursor()
-			    const line = editor.getLine(cursor.line)
-				editor.setLine(cursor.line, line.replace(/^/, "\t"))
-				cursor.ch = cursor.ch + 1
-				editor.setCursor(cursor)
+				const listSelections : EditorSelection[] = editor.listSelections()
+				if (listSelections.length == 1) {
+					const listSelection = listSelections[0]
+					if (listSelection.anchor.ch == listSelection.head.ch && listSelection.anchor.line == listSelection.head.line) {
+						const cursor = editor.getCursor()
+						const line = editor.getLine(cursor.line)
+						editor.setLine(cursor.line, line.replace(/^/, "\t"))
+						cursor.ch = cursor.ch + 1
+						editor.setCursor(cursor)
+						return;
+					}
+				}
+				listSelections.forEach(listSelection => {
+					const a = listSelection.head.line
+					const b = listSelection.anchor.line
+					const fromLineNum = b > a ? a : b
+					const toLineNum = b > a ? b : a
+					for (let i = fromLineNum; i <= toLineNum; i++) {
+						const line = editor.getLine(i)
+						editor.setLine(i, line.replace(/^/, "\t"))
+					}
+				})
 			}
 		})
 
 		this.addCommand({
 			id: "editor-outdent-line",
-			name: "Editor Outdent Line",
+			name: "Editor Outdent Selection",
 			icon: `left-arrow-with-tail`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const cursor = editor.getCursor()
-			    const line = editor.getLine(cursor.line)
-				if (line.match(/^\t+.*/)) {
-					editor.setLine(cursor.line, line.replace(/^\t/, ""))
-					cursor.ch = cursor.ch - 1
-					editor.setCursor(cursor)
+				const listSelections : EditorSelection[] = editor.listSelections()
+				if (listSelections.length == 1) {
+					const listSelection = listSelections[0]
+					if (listSelection.anchor.ch == listSelection.head.ch && listSelection.anchor.line == listSelection.head.line) {
+						const cursor = editor.getCursor()
+						const line = editor.getLine(cursor.line)
+						editor.setLine(cursor.line, line.replace(/^\t/, ""))
+						cursor.ch = cursor.ch + 1
+						editor.setCursor(cursor)
+						return;
+					}
 				}
+				listSelections.forEach(listSelection => {
+					const a = listSelection.head.line
+					const b = listSelection.anchor.line
+					const fromLineNum = b > a ? a : b
+					const toLineNum = b > a ? b : a
+					for (let i = fromLineNum; i <= toLineNum; i++) {
+						const line = editor.getLine(i)
+						editor.setLine(i, line.replace(/^\t/, ""))
+					}
+				})
 			}
 		})
 
