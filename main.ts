@@ -1993,7 +1993,9 @@ export default class MyPlugin extends Plugin {
 		if (index > -1) {
 			clipboardHistory.splice(index, 1);
 		}
-		clipboardHistory.push(content);
+		if (content.length > 0) {
+			clipboardHistory.push(content);
+		}
 	}
 
 	onunload() {
