@@ -24,7 +24,8 @@ export class ClipboardPasteModal extends FuzzySuggestModal<string> {
   // Renders each suggestion item.
   renderSuggestion(i: FuzzyMatch<string>, el: HTMLElement) {
     const item = i.item
-    el.createEl("div", { text: item });
+    //el.createEl("div", { text: item });
+    el.createEl("div", { text: "• " + item.replace(/\n/gm, "").substring(0, 100) });
   }
 
   // Perform action on the selected suggestion.
