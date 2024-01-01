@@ -1023,6 +1023,7 @@ export default class MyPlugin extends Plugin {
 			icon: `segment-to-clipboard`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const threadSegment = this.getSegment(editor)
+				this.addToClipboardHistory(threadSegment)
 				navigator.clipboard.writeText(threadSegment)
 				.then(function () {
 					new Notice(`Copied\n\`\`\`\n${threadSegment}\`\`\`\nto clipboard!`);
