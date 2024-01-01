@@ -787,15 +787,18 @@ export default class MyPlugin extends Plugin {
 				const beforeTag = "c/t/r"
 				const afterTag = "c/t/t"
 			
-				navigator.clipboard.writeText(text).then(function () {
-					let foundTag = renameTag(view.file, beforeTag, afterTag)
+				navigator.clipboard.writeText(text)
+				.then(function () {
+					return renameTag(view.file, beforeTag, afterTag)
+				}, function (error) {
+					new Notice(`error when copy to clipboard!`);
+				})
+				.then((foundTag) => {
 					if (foundTag) {
 						new Notice(`Update notes type from tag="${beforeTag}" to tag="${afterTag}!\nCopied thread content to clipboard!`);
 					} else {
 						new Notice(`Tag "${beforeTag}" not found\nCopied thread content to clipboard!`);
 					}
-				}, function (error) {
-					new Notice(`error when copy to clipboard!`);
 				});
 			},
 		});
@@ -920,15 +923,18 @@ export default class MyPlugin extends Plugin {
 				const beforeTag = "c/t/t"
 				const afterTag = "c/t/p"
 			
-				navigator.clipboard.writeText(text).then(function () {
-					let foundTag = renameTag(view.file, beforeTag, afterTag)
+				navigator.clipboard.writeText(text)
+				.then(function () {
+					return renameTag(view.file, beforeTag, afterTag)
+				}, function (error) {
+					new Notice(`error when copy to clipboard!`);
+				})
+				.then((foundTag) => {
 					if (foundTag) {
 						new Notice(`Update notes type from tag="${beforeTag}" to tag="${afterTag}!\nCopied fb content to clipboard!`);
 					} else {
 						new Notice(`Tag "${beforeTag}" not found\nCopied fb content to clipboard!`);
 					}
-				}, function (error) {
-					new Notice(`error when copy to clipboard!`);
 				});
 			},
 		});
@@ -967,17 +973,20 @@ export default class MyPlugin extends Plugin {
 			icon: `threads-segment-to-clipboard`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const threadSegment = this.getThreadSegment(editor)
-				navigator.clipboard.writeText(threadSegment).then(function () {
-					const beforeTag = "c/x/r"
-					const afterTag = "c/x/p"
-					let foundTag = renameTag(view.file, beforeTag, afterTag)
+				const beforeTag = "c/x/r"
+				const afterTag = "c/x/p"
+				navigator.clipboard.writeText(threadSegment)
+				.then(function () {	
+					return renameTag(view.file, beforeTag, afterTag)
+				}, function (error) {
+					new Notice(`error when copy to clipboard!`);
+				})
+				.then((foundTag) => {
 					if (foundTag) {
 						new Notice(`Update notes type from tag="${beforeTag}" to tag="${afterTag}!\nCopied\n\`\`\`\n${threadSegment}\`\`\`\nto clipboard!`);
 					} else {
 						new Notice(`Tag "${beforeTag}" not found\nCopied\n\`\`\`\n${threadSegment}\`\`\`\nto clipboard!`);
 					}
-				}, function (error) {
-					new Notice(`error when copy to clipboard!`);
 				});
 			},
 		});
@@ -989,17 +998,20 @@ export default class MyPlugin extends Plugin {
 			icon: `twitter-segment-to-clipboard`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const threadSegment = this.getTwitterSegment(editor)
-				navigator.clipboard.writeText(threadSegment).then(function () {
-					const beforeTag = "c/x/r"
-					const afterTag = "c/x/p"
-					let foundTag = renameTag(view.file, beforeTag, afterTag)
+				const beforeTag = "c/x/r"
+				const afterTag = "c/x/p"
+				navigator.clipboard.writeText(threadSegment)
+				.then(function () {
+					return renameTag(view.file, beforeTag, afterTag)
+				}, function (error) {
+					new Notice(`error when copy to clipboard!`);
+				})
+				.then(foundTag => {
 					if (foundTag) {
 						new Notice(`Update notes type from tag="${beforeTag}" to tag="${afterTag}!\nCopied\n\`\`\`\n${threadSegment}\`\`\`\nto clipboard!`);
 					} else {
 						new Notice(`Tag "${beforeTag}" not found\nCopied\n\`\`\`\n${threadSegment}\`\`\`\nto clipboard!`);
 					}
-				}, function (error) {
-					new Notice(`error when copy to clipboard!`);
 				});
 			},
 		});
