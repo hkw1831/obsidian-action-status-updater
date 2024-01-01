@@ -10,6 +10,7 @@ import { CopyOrMoveToNewNoteModal } from 'copyOrMoveToNewNoteModal';
 import { ClipboardPasteModal } from 'clipboardPasteModal';
 import { OpenPlaygroundModal } from 'openPlaygroundModal';
 import { ThreadsToBlogModal } from 'threadsToBlogModal';
+import { ClipboardRemovalModal } from 'clipboardRemovalModal';
 
 // Remember to rename these classes and interfaces!
 
@@ -54,6 +55,15 @@ export default class MyPlugin extends Plugin {
 		['n', 'w'].forEach(t => {
 			this.addNewLaterActionIcon(t);
 			this.addNewLaterAction(t);
+		});
+
+		this.addCommand({
+			id: "obsidian-remove-clipboard-content",
+			name: "RC Obsidian Remove Clipboard Content",
+			icon: "obsidian-remove-clipboard-content",
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				new ClipboardRemovalModal(this.app, editor, clipboardHistory).open();		
+			}
 		});
 
 		this.addObsidianCopyIcon();
@@ -105,7 +115,7 @@ export default class MyPlugin extends Plugin {
 			name: "Obsidian Paste",
 			icon: "obsidian-paste",
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				new ClipboardPasteModal(this.app, editor, clipboardHistory).open();				
+				new ClipboardPasteModal(this.app, editor, clipboardHistory).open();		
 			},
 			hotkeys: [
 				{
