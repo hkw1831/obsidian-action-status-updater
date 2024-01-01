@@ -1016,6 +1016,22 @@ export default class MyPlugin extends Plugin {
 			},
 		});
 
+		this.addGrepSegmentToClipboard();
+		this.addCommand({
+			id: "segment-to-clipboard",
+			name: "SC Segment to clipboard",
+			icon: `segment-to-clipboard`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const threadSegment = this.getSegment(editor)
+				navigator.clipboard.writeText(threadSegment)
+				.then(function () {
+					new Notice(`Copied\n\`\`\`\n${threadSegment}\`\`\`\nto clipboard!`);
+				}, function (error) {
+					new Notice(`error when copy to clipboard!`);
+				})
+			},
+		});
+
 		this.addCommand({
 			id: "toggle-bullet-number-list",
 			name: "Toggle Bullet Number List",
@@ -1473,6 +1489,62 @@ export default class MyPlugin extends Plugin {
 		return text
 	}
 
+	getSegment(editor: Editor) : string {
+		let cursor = editor.getCursor();
+		let line = cursor.line;
+		let above = line;
+		let below = line;
+		// first get above
+		
+		while (above >= 0) {
+			let l = editor.getLine(above);
+			if (l == '---') {
+				break;
+			}
+			above--;
+		}
+		if (editor.getLine(above) == '---') {
+			above++;
+		}
+		while(true) {
+			if (editor.getLine(above) == '') {
+				above++;
+			} else {
+				break;
+			}
+		}
+
+		// then get below
+		while (below < editor.lineCount()) {
+			let l = editor.getLine(below);
+			if (l == '---') {
+				break;
+			}
+			below++;
+		}
+		if (editor.getLine(below) == '---') {
+			below--;
+		}
+
+		while(true) {
+			if (editor.getLine(below) == '') {
+				below--;
+			} else {
+				break;
+			}
+		}
+
+		// then put them to line
+
+		let text = "";
+		Array.from(Array(below - above + 1).keys()).forEach(i => {
+			const line = editor.getLine(i + above)
+			text = text + line + "\n"
+		})
+		text = text.replace(/\n+$/, "")
+		return text
+	}
+
 	getTwitterSegment(editor: Editor) : string {
 		let cursor = editor.getCursor();
 		let line = cursor.line;
@@ -1752,6 +1824,11 @@ export default class MyPlugin extends Plugin {
 	addGrepTwitterSegmentToClipboard() {
 		var obsidian = require('obsidian');
 		obsidian.addIcon(`twitter-segment-to-clipboard`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>XC</text>`);
+	}
+
+	addGrepSegmentToClipboard() {
+		var obsidian = require('obsidian');
+		obsidian.addIcon(`segment-to-clipboard`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>SC</text>`);
 	}
 
 	addChatGPTGenerateImageIcon() {
