@@ -634,6 +634,9 @@ export default class MyPlugin extends Plugin {
 				.then((tFile) => {
 					return leaf.openFile(tFile, { active : true});
 				}, reason => {})
+				.then(() => {
+					new Notice(`Created and opened Twitter notes!`);
+				});
 			}
 		})
 
