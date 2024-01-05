@@ -581,15 +581,16 @@ export default class MyPlugin extends Plugin {
 			id: "grep-title-as-link-to-clipboard",
 			name: "Grep Title as link to clipboard",
 			icon: `clipboard-list`,
-			editorCallback: (editor: Editor, view: MarkdownView) => {
+			editorCallback: async (editor: Editor, view: MarkdownView) => {
 				const title = view.file.basename;
 				const titleAsLink = `[[${title}]]`;
-				this.addToClipboardHistory(titleAsLink);
-				navigator.clipboard.writeText(titleAsLink).then(function () {
+				try {
+					this.addToClipboardHistory(titleAsLink);
+					await navigator.clipboard.writeText(titleAsLink);
 					new Notice(`Copied title "${title}" as link to clipboard!`);
-				}, function (error) {
-					new Notice(`error when copy to clipboard!`);
-				});
+				} catch (error) {
+					new Notice(`Error occurred when copying to clipboard: ${error}`);
+				}
 			},
 			hotkeys: [
 				{
