@@ -11,6 +11,7 @@ import { ClipboardPasteModal } from 'clipboardPasteModal';
 import { OpenPlaygroundModal } from 'openPlaygroundModal';
 import { ThreadsToBlogModal } from 'threadsToBlogModal';
 import { ClipboardRemovalModal } from 'clipboardRemovalModal';
+import { addIcon } from 'obsidian';
 
 // Remember to rename these classes and interfaces!
 
@@ -1654,36 +1655,6 @@ export default class MyPlugin extends Plugin {
 		vault.modify(vault.getAbstractFileByPath(nowActionNote) as TFile, nowActionNoteContent);
 	}
 
-	updateSchedulingIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`update-scheduling-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>US</text>`);
-	}
-
-	openDashboardIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`open-dashboard-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>OD</text>`);
-	}
-
-	openRecentDaysScheduleIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`open-recent-day-schedule-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>OR</text>`);
-	}
-
-	openInboxIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`open-inbox-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>OI</text>`);
-	}
-
-	openPlaygroundIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`open-playground-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>OP</text>`);
-	}
-
-	openBrainDumpIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`open-braindump-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>OB</text>`);
-	}
-
 	getQueryDateAndActionString(addDay: Number, excludeNotes: String[]): string {
 		let moment = require('moment');
 		const dateMoment = moment().add(addDay, 'd');
@@ -1775,134 +1746,138 @@ export default class MyPlugin extends Plugin {
 		return `tag:#${actionType}${dayOfWeek} OR `
 	}
 
+	updateSchedulingIcon() {
+		this.addObsidianIcon('update-scheduling-icon', 'US');
+	}
+	
+	openDashboardIcon() {
+		this.addObsidianIcon('open-dashboard-icon', 'OD');
+	}
+	
+	openRecentDaysScheduleIcon() {
+		this.addObsidianIcon('open-recent-day-schedule-icon', 'OR');
+	}
+	
+	openInboxIcon() {
+		this.addObsidianIcon('open-inbox-icon', 'OI');
+	}
+	
+	openPlaygroundIcon() {
+		this.addObsidianIcon('open-playground-icon', 'OP');
+	}
+	
+	openBrainDumpIcon() {
+		this.addObsidianIcon('open-braindump-icon', 'OB');
+	}
+
 	addActionTagCountIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`action-tag-count-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>CA</text>`);
+    	this.addObsidianIcon('action-tag-count-icon', 'CA');
 	}
 
 	addGrepThreadsToClipboardIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`threads-to-clipboard-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>TC</text>`);
+		this.addObsidianIcon('threads-to-clipboard-icon', 'TC');
 	}
 
 	addGrepThreadsAsFacebookPostToClipboardIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`threads-as-facebook-post-to-clipboard-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>FC</text>`);
+		this.addObsidianIcon('threads-as-facebook-post-to-clipboard-icon', 'FC');
 	}
-
+	  
 	addThreadsToTwitterIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`threads-to-twitter`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>TX</text>`);
+		this.addObsidianIcon('threads-to-twitter', 'TX');
 	}
-
+	  
 	addTwitterToChatGPTIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`twitter-to-chatgpt`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>XG</text>`);
+		this.addObsidianIcon('twitter-to-chatgpt', 'XG');
 	}
-
+	  
 	addChatGPTToTwitterIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`chatgpt-to-twitter`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>GX</text>`);
+		this.addObsidianIcon('chatgpt-to-twitter', 'GX');
 	}
-
+	  
 	addReverseTwitterNumberingIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`reverse-twitter-number-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>RT</text>`);
+		this.addObsidianIcon('reverse-twitter-number-icon', 'RT');
 	}
 
 	addEventToFantasticalIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`event-to-fantastical-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>FE</text>`);
+		this.addObsidianIcon('event-to-fantastical-icon', 'FE');
 	}
-
+	  
 	addGrepBlogToClipboardIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`blog-to-clipboard-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>BJ</text>`);
+		this.addObsidianIcon('blog-to-clipboard-icon', 'BJ');
 	}
-
+	  
 	addGrepThreadsBlockToImageIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`threads-block-to-image`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>TI</text>`);
+		this.addObsidianIcon('threads-block-to-image', 'TI');
 	}
-
+	  
 	addGrepTwitterSegmentToClipboard() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`twitter-segment-to-clipboard`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>XC</text>`);
+		this.addObsidianIcon('twitter-segment-to-clipboard', 'XC');
 	}
-
+	  
 	addGrepSegmentToClipboard() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`segment-to-clipboard`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>SC</text>`);
+		this.addObsidianIcon('segment-to-clipboard', 'SC');
 	}
 
 	addChatGPTGenerateImageIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`chatgpt-generate-image`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>GI</text>`);
+		this.addObsidianIcon('chatgpt-generate-image', 'GI');
 	}
-
+	  
 	addGrepThreadsSegmentToClipboard() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`threads-segment-to-clipboard`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>SC</text>`);
+		this.addObsidianIcon('threads-segment-to-clipboard', 'SC');
 	}
-
+	  
 	addChatGPTPromptForGeneratingSummaryToClipboard() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`chatgpt-prompt-for-generating-summary-to-clipboard`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>GS</text>`);
+		this.addObsidianIcon('chatgpt-prompt-for-generating-summary-to-clipboard', 'GS');
 	}
 
 	addGenerateChatGPTPrompt() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`generate-chatgpt-prompt`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>GP</text>`);
+		this.addObsidianIcon('generate-chatgpt-prompt', 'GP');
 	}
-
+	  
 	addRemoveActionIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`remove-action-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>-#</text>`);
+		this.addObsidianIcon('remove-action-icon', '-#');
 	}
-
+	  
 	addToggleNWTaskIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`toggle-n-w-task`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>#=</text>`);
+		this.addObsidianIcon('toggle-n-w-task', '#=');
 	}
-
+	  
 	addObsidianCopyIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`obsidian-copy`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>⌘C</text>`);
+		this.addObsidianIcon('obsidian-copy', '⌘C');
 	}
-
+	  
 	addObsidianCutIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`obsidian-cut`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>⌘X</text>`);
+		this.addObsidianIcon('obsidian-cut', '⌘X');
 	}
-
+	  
 	addObsidianPasteIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`obsidian-paste`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>⌘V</text>`);
+		this.addObsidianIcon('obsidian-paste', '⌘V');
 	}
-
+	  
 	addUpdateNoteTypeIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`update-note-type-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>NT</text>`);
+		this.addObsidianIcon('update-note-type-icon', 'NT');
 	}
-
+	  
 	addThreadsToBlogIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`threads-to-blog-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>TB</text>`);
+		this.addObsidianIcon('threads-to-blog-icon', 'TB');
 	}
 
 	addAddCommentTagIcon() {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`add-comment-tag-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>CT</text>`);
+		this.addObsidianIcon('add-comment-tag-icon', 'CT');
 	}
-
+	  
 	addNewLaterActionIcon(t: string) {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`${t}l-icon-new`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>${t}l</text>`);
+		this.addObsidianIcon(`${t}l-icon-new`, `${t}l`);
+	}
+	  
+	addActionIcon(t: string) {
+		this.addObsidianIcon(`${t}-icon`, `#${t}`);
 	}
 
-	addActionIcon(t: string) {
-		var obsidian = require('obsidian');
-		obsidian.addIcon(`${t}-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>#${t}</text>`);
+	addObsidianIcon(iconName: string, iconText: string) {
+		const svg = `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>${iconText}</text>`;
+		//var obsidian = require('obsidian');
+		addIcon(iconName, svg);
 	}
 
 	addNewLaterAction(t: string) {
