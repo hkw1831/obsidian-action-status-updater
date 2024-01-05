@@ -48,7 +48,7 @@ export default class MyPlugin extends Plugin {
 		  }
 
 		['n', 'l', 'w', 'd', 'a', 't', 'm', 'e', '1', '2', '3', '4', '5', '6', '7'].forEach(t => {
-			this.addIcon(t);
+			this.addActionIcon(t);
 			this.addActionCommand(t);
 		});
 
@@ -1900,7 +1900,7 @@ export default class MyPlugin extends Plugin {
 		obsidian.addIcon(`${t}l-icon-new`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>${t}l</text>`);
 	}
 
-	addIcon(t: string) {
+	addActionIcon(t: string) {
 		var obsidian = require('obsidian');
 		obsidian.addIcon(`${t}-icon`, `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>#${t}</text>`);
 	}
