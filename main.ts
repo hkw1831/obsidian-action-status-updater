@@ -647,34 +647,33 @@ export default class MyPlugin extends Plugin {
 			name: "BJ Blog content to clipboard",
 			icon: `blog-to-clipboard-icon`,
 			editorCallback: async (editor: Editor, view: MarkdownView) => {
-				const v = editor.getValue()
-				if (v.contains("#nn") || v.contains("#nl") || v.contains("#nw") || v.contains("#wn") || v.contains("#wl") || v.contains("#ww")) {
+				const v = editor.getValue();
+				if (v.includes("#nn") || v.includes("#nl") || v.includes("#nw") || v.includes("#wn") || v.includes("#wl") || v.includes("#ww")) {
 					new Notice(`Will not proceed. As there are unfinished action tag.`);
 					return;
 				}
-				if (!v.contains("<!--more-->")) {
-					navigator.clipboard.writeText("<!--more-->").then(function () {
+				if (!v.includes("<!--more-->")) {
+					try {
+						await navigator.clipboard.writeText("<!--more-->");
 						new Notice(`Require "<!--more-->" as excerpt separator before posting.\n"<!--more-->" already in clipboard`);
-						return;
-					}, function (error) {
-						new Notice(`Require "<!--more-->" as excerpt separator before posting.\n"<!--more-->" cannot be copieid to clipboard`);
-						return;
-					});
+					} catch (error) {
+						new Notice(`Require "<!--more-->" as excerpt separator before posting.\n"<!--more-->" cannot be copied to clipboard`);
+					}
 					return;
-				}				
+				}
 
-				const path = view.file.path
+				const path = view.file.path;
 				let line = editor.lineCount();
 				let text = "";
-				let numLineFirstContent = 0
-				let frontMatterLineCount = 0
+				let numLineFirstContent = 0;
+				let frontMatterLineCount = 0;
 				for (let i = 0; i < line; i++) {
 					if (frontMatterLineCount == 2) {
 						numLineFirstContent = i;
 						break;
 					}
 					if (editor.getLine(i) == "---") {
-						frontMatterLineCount++
+						frontMatterLineCount++;
 					}
 				}
 				for (let i = 0; i < line; i++) {
@@ -687,49 +686,37 @@ export default class MyPlugin extends Plugin {
 
 				Array.from(Array(line - numLineFirstContent).keys()).forEach(i => {
 					const line = editor.getLine(i + numLineFirstContent);
-					text = text + line + "\n"
+					text = text + line + "\n";
 				});
-				text = text.replace(/\n---\n\n#nd generate summary for meta description below:\n[^\n]*\n([^\n]*)\n[^\n]*\n---\n/, "\n<!-- Meta Summary -->\n<!--\n$1\n-->\n")
-				text = text.replace(/## References\:([\n]*.*)*$/, "")
-
+				text = text.replace(/\n---\n\n#nd generate summary for meta description below:\n[^\n]*\n([^\n]*)\n[^\n]*\n---\n/, "\n<!-- Meta Summary -->\n<!--\n$1\n-->\n");
+				text = text.replace(/## References\:([\n]*.*)*$/, "");
 
 				const app = this.app;
-				const beforeTagCBR = "c/b/r"
-				const beforeTagCBD = "c/b/d"
-				const beforeTagCBI = "c/b/i"
-				const afterTag = "c/b/p"
+				const beforeTagCBR = "c/b/r";
+				const beforeTagCBD = "c/b/d";
+				const beforeTagCBI = "c/b/i";
+				const afterTag = "c/b/p";
 
-				Promise.resolve()
-				.then(function () {
-					return navigator.clipboard.writeText(text)
-				}, function (error) {
-					new Notice(`error when copy to clipboard!`);
-				})
-				.then(function () { // CBR to CBP
+				try {
+					await navigator.clipboard.writeText(text);
 					new Notice(`Copied blog content to clipboard!`);
-					return renameTag(view.file, beforeTagCBR, afterTag)
-				})
-				.then(function (foundTagFromCBR) { // CBI to CBP
+					const foundTagFromCBR = await renameTag(view.file, beforeTagCBR, afterTag);
 					if (foundTagFromCBR) {
 						new Notice(`Update notes type from tag="${beforeTagCBR}" to tag="${afterTag}!`);
 					}
-					return renameTag(view.file, beforeTagCBI, afterTag)
-				})
-				.then(function (foundTagFromCBI) { // CBD to CBP
+					const foundTagFromCBI = await renameTag(view.file, beforeTagCBI, afterTag);
 					if (foundTagFromCBI) {
 						new Notice(`Update notes type from tag="${foundTagFromCBI}" to tag="${afterTag}!`);
 					}
-					return renameTag(view.file, beforeTagCBD, afterTag)
-				})
-				.then(function (foundTagFromCBD) {
+					const foundTagFromCBD = await renameTag(view.file, beforeTagCBD, afterTag);
 					if (foundTagFromCBD) {
 						new Notice(`Update notes type from tag="${beforeTagCBD}" to tag="${afterTag}!`);
 					}
-					return renameBlogTitle(app, path, view)
-				})
-				.then(function() {
+					await renameBlogTitle(app, path, view);
 					window.open(`shortcuts://run-shortcut?name=Jekyll%20blog&x-cancel=obsidian://&x-error=obsidian://`);
-				});
+				} catch (error) {
+					new Notice(`Error occurred during the operation: ${error}`);
+				}
 			},
 		});
 
