@@ -67,6 +67,7 @@ export default class MyPlugin extends Plugin {
 			}
 		});
 
+		/*
 		this.addObsidianCopyIcon();
 		this.addCommand({
 			id: "obsidian-copy",
@@ -87,7 +88,9 @@ export default class MyPlugin extends Plugin {
 				}
 			]
 		});
+		*/
 
+		/*
 		this.addObsidianCutIcon();
 		this.addCommand({
 			id: "obsidian-cut",
@@ -109,6 +112,7 @@ export default class MyPlugin extends Plugin {
 				}
 			]
 		});
+		*/
 
 		this.addObsidianPasteIcon();
 		this.addCommand({
@@ -212,6 +216,7 @@ export default class MyPlugin extends Plugin {
 			]
 		})
 
+		/*
 		this.openDashboardIcon()
 		this.addCommand({
 			id: "open-dashboard",
@@ -223,9 +228,10 @@ export default class MyPlugin extends Plugin {
 				const dashboardCanvas = "D/Dashboard.canvas"
 				const mode = (this.app.vault as any).getConfig("defaultViewMode");
 				const leaf = workspace.getLeaf(false);
-				await leaf.openFile(vault.getAbstractFileByPath(dashboardCanvas) as TFile, { active : true,/* mode */});
+				await leaf.openFile(vault.getAbstractFileByPath(dashboardCanvas) as TFile, { active : true});
 			},
 		})
+		*/
 
 		this.openRecentDaysScheduleIcon()
 		this.addCommand({
@@ -292,6 +298,7 @@ export default class MyPlugin extends Plugin {
 			},
 		})
 
+		/*
 		this.addCommand({
 			id: "open-actions",
 			name: "Open Actions",
@@ -310,6 +317,7 @@ export default class MyPlugin extends Plugin {
 				},
 			]
 		});
+		*/
 
 		this.addThreadsToBlogIcon();
 		this.addCommand({
@@ -321,6 +329,7 @@ export default class MyPlugin extends Plugin {
 			}
 		});
 
+		/*
 		this.addChatGPTPromptForGeneratingSummaryToClipboard();
 		this.addCommand({
 			id: "chatgpt-prompt-for-generating-summary-to-clipboard",
@@ -350,6 +359,7 @@ export default class MyPlugin extends Plugin {
 				});
 			}
 		});
+		*/
 
 		this.addAddCommentTagIcon();
 		this.addCommand({
@@ -453,6 +463,7 @@ export default class MyPlugin extends Plugin {
 			]
 		});
 
+		/*
 		this.addRemoveActionIcon();
 		this.addCommand({
 			id: "remove-action",
@@ -505,6 +516,7 @@ export default class MyPlugin extends Plugin {
 				}
 			]
 		});
+		*/
 
 		this.addCommand({
 			id: "cursor-go-to-start-of-line",
@@ -560,6 +572,7 @@ export default class MyPlugin extends Plugin {
 			}
 		});
 
+		/*
 		this.addCommand({
 			id: "remove-first-tab-from-selected-lines",
 			name: "Remove first tab from selected lines",
@@ -576,6 +589,7 @@ export default class MyPlugin extends Plugin {
 				})
 			},
 		});
+		*/
 
 		this.addCommand({
 			id: "grep-title-as-link-to-clipboard",
@@ -958,6 +972,7 @@ export default class MyPlugin extends Plugin {
 			},
 		});
 
+		/*
 		this.addGrepThreadsSegmentToClipboard();
 		this.addCommand({
 			id: "threads-segment-to-clipboard",
@@ -982,6 +997,7 @@ export default class MyPlugin extends Plugin {
 				});
 			},
 		});
+		*/
 
 		this.addGrepTwitterSegmentToClipboard();
 		this.addCommand({
