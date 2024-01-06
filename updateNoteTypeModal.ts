@@ -266,41 +266,6 @@ export class UpdateNoteTypeModal extends FuzzySuggestModal<NoteType> {
         // TODO add tags
         this.addTagAssumingHasFrontMatter(choosenNoteType.type)
       }
-    
-
-  // old solution
-  //   const selection = this.editor.getSelection()
-  //   const replacedStr = `---\ntag: ${choosenNoteType.type}\n---\n\n`
-  //   if (selection.length != 0) {
-  //       this.editor.replaceSelection(replacedStr);
-  //   } else {
-  //       const cursor = this.editor.getCursor();
-
-  //       const lineCount = this.editor.lineCount();
-  //       let tagLineNumber = null;
-  //       for (let i = 0; i < lineCount; i++) {
-  //         if (this.editor.getLine(i).startsWith('tag: ')) {
-  //           tagLineNumber = i;
-  //           break;
-  //         }
-  //       }
-
-  //       if (tagLineNumber != null) {
-  //         const line = this.editor.getLine(tagLineNumber);
-  //         if (this.containsType(line)) {
-  //           let replacedLine = line
-  //           ALL_TYPES.forEach((noteType) => replacedLine = replacedLine.replace(noteType.type, choosenNoteType.type))
-  //           this.editor.setLine(tagLineNumber, replacedLine);
-  //           this.editor.setCursor(cursor);	
-  //         }
-  //       } else {
-  //         const lineNumber = this.editor.getCursor().line;
-  //         const line = this.editor.getLine(lineNumber);
-  //         this.editor.replaceRange(replacedStr, cursor);
-  //         cursor.ch = cursor.ch + replacedStr.length;
-  //         this.editor.setCursor(cursor);
-  //       }
-  //   }
     }
   }
 }

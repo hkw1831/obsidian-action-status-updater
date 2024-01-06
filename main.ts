@@ -953,12 +953,6 @@ export default class MyPlugin extends Plugin {
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const threadSegment = this.getThreadSegment(editor)
 				new ThreadsToImagesModal(this.app, threadSegment).open()
-				// navigator.clipboard.writeText(threadSegment).then(function () {
-				// 	new Notice(`Copied\n\`\`\`\n${threadSegment}\`\`\`\nto clipboard!`);
-				// 	window.open('shortcuts://run-shortcut?name=Threads%20to%20image&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://');
-				// }, function (error) {
-				// 	new Notice(`error when copy to clipboard!`);
-				// });
 			},
 		});
 

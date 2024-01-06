@@ -43,22 +43,5 @@ export class ClipboardRemovalModal extends FuzzySuggestModal<string> {
         this.clipboardContent.splice(index, 1);
       }  
     }
-    /*
-    const index = this.clipboardContent.indexOf(selectedContent, 0);
-    if (index > -1) {
-      this.clipboardContent.splice(index, 1);
-    }
-    this.clipboardContent.push(selectedContent);
-    const selection = this.editor.getSelection()
-    const replacedStr = selectedContent
-    if (selection.length != 0) {
-        this.editor.replaceSelection(replacedStr);
-    } else {
-        const cursor = this.editor.getCursor();
-        this.editor.replaceRange(replacedStr, cursor);
-        cursor.ch = cursor.ch + replacedStr.length;
-        this.editor.setCursor(cursor);
-    }
-    */
   }
 }
