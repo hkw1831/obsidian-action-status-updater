@@ -251,12 +251,10 @@ export default class MyPlugin extends Plugin {
 			name: "OI Open Inbox",
 			icon: "open-inbox-icon",
 			callback: async () => {
-				const { vault } = this.app;
-				const { workspace } = this.app;
+				const { vault, workspace } = this.app;
 				const inboxMd = "I/Inbox.md"
-				const mode = (this.app.vault as any).getConfig("defaultViewMode");
 				const leaf = workspace.getLeaf(false);
-				await leaf.openFile(vault.getAbstractFileByPath(inboxMd) as TFile, { active : true,/* mode */});
+				await leaf.openFile(vault.getAbstractFileByPath(inboxMd) as TFile, { active : true });
 			},
 		})
 
@@ -286,12 +284,10 @@ export default class MyPlugin extends Plugin {
 			name: "OB Open BrainDump",
 			icon: "open-braindump-icon",
 			callback: async () => {
-				const { vault } = this.app;
-				const { workspace } = this.app;
+				const { vault, workspace } = this.app;
 				const inboxMd = "I/Brain Dump.md"
-				const mode = (this.app.vault as any).getConfig("defaultViewMode");
 				const leaf = workspace.getLeaf(false);
-				await leaf.openFile(vault.getAbstractFileByPath(inboxMd) as TFile, { active : true,/* mode */});
+				await leaf.openFile(vault.getAbstractFileByPath(inboxMd) as TFile, { active : true });
 			},
 		})
 
@@ -384,7 +380,6 @@ export default class MyPlugin extends Plugin {
 			name: "CA Count Action Tag",
 			icon: `action-tag-count-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const v = editor.getValue()
 				const tags = ["nn", "nl", "nw", "nm", "n1", "n2", "n3", "n4", "n5", "n6", "n7", "wn", "wl", "ww", "wm", "w1", "w2", "w3", "w4", "w5", "w6", "w7"];
 				const matches: string[] = [];
 				const lineNum = editor.lineCount();
