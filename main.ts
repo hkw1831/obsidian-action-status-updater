@@ -1,8 +1,6 @@
 import { UpdateNoteTypeModal } from 'updateNoteTypeModal';
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Command, TFile, Vault, EditorSelection, TAbstractFile } from 'obsidian';
+import { App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, Vault, EditorSelection } from 'obsidian';
 import { AddFootnoteTagModal } from 'addCommentTagModal';
-import { OpenActionsModal } from 'openActions';
-import { Moment } from 'moment'
 import { AddTaskTagModal } from 'addTaskTagModal';
 import { renameBlogTitle, renameTag } from 'tagrenamer/renaming';
 import { ThreadsToImagesModal } from 'ThreadsToImagesModal';
@@ -12,6 +10,7 @@ import { OpenPlaygroundModal } from 'openPlaygroundModal';
 import { ThreadsToBlogModal } from 'threadsToBlogModal';
 import { ClipboardRemovalModal } from 'clipboardRemovalModal';
 import { addIcon } from 'obsidian';
+import moment from 'moment';
 
 // Remember to rename these classes and interfaces!
 
@@ -1647,8 +1646,7 @@ export default class MyPlugin extends Plugin {
 		vault.modify(vault.getAbstractFileByPath(nowActionNote) as TFile, nowActionNoteContent);
 	}
 
-	getQueryDateAndActionString(addDay: Number, excludeNotes: String[]): string {
-		let moment = require('moment');
+	getQueryDateAndActionString(addDay: number, excludeNotes: String[]): string {
 		const dateMoment = moment().add(addDay, 'd');
 		const dateYYYYMMDD = dateMoment.format('YYYYMMDD');
 		const dateEachYYDD = '\\d\\d\\d\\d' + dateMoment.format('MMDD');
@@ -1660,13 +1658,12 @@ export default class MyPlugin extends Plugin {
 	}
 
 	getQueryActionsThisWeek(excludeNumDays: Number): string {
-		let excludes : Number[] = []
-		let includes : Number[] = [1, 2, 3, 4, 5, 6, 7]
+		let excludes : number[] = []
+		let includes : number[] = [1, 2, 3, 4, 5, 6, 7]
 		
 		Array.from(Array(excludeNumDays).keys()).forEach(i => {
-			let moment = require('moment');
 			const dateMoment = moment().add(i, 'd');
-			const dayOfWeek = dateMoment.format('E');
+			const dayOfWeek = parseInt(dateMoment.format('E'));
 			excludes.push(dayOfWeek)
 		})
 		let aaa = includes.filter(i => {
@@ -1686,7 +1683,6 @@ export default class MyPlugin extends Plugin {
 
 	getQueryFutureDaysThisWeek(header: String, from: number, to: number, excludeNotes: String[]): string {
 		let includes = []
-		let moment = require('moment');
 		for (let i = from; i <= to; i++) {
 			let dateMoment = moment().add(i, 'd');
 			includes.push(dateMoment)
@@ -1707,7 +1703,6 @@ export default class MyPlugin extends Plugin {
 	}
 
 	getQueryNext2MonthString(excludeNotes: String[]): string {
-		let moment = require('moment');
 		const currentMonthYYYYMM = moment().format('YYYYMM');
 		const dateMoment = moment().add(1, 'M');
 		const nextMonthYYYYMM = dateMoment.format('YYYYMM');
@@ -1715,8 +1710,7 @@ export default class MyPlugin extends Plugin {
 		return `## ${currentMonthYYYYMM} and ${nextMonthYYYYMM}\n\`\`\`query\n(${currentMonthYYYYMM}\\d\\d OR ${nextMonthYYYYMM}\\d\\d ${excludeNoteStr}-path:"D/Scheduling" -block:(query)\n\`\`\`\n\n`
 	}
 
-	getQueryDateString(addDay: Number, excludeNote: String): string {
-		let moment = require('moment');
+	getQueryDateString(addDay: number, excludeNote: String): string {
 		const dateMoment = moment().add(addDay, 'd');
 		const dateYYYYMMDD = dateMoment.format('YYYYMMDD');
 		const dateEachYYDD = '\\d\\d\\d\\d' + dateMoment.format('MMDD');
@@ -1724,15 +1718,13 @@ export default class MyPlugin extends Plugin {
 		return `${dateYYYYMMDD}\n\`\`\`query\n(${dateYYYYMMDD} OR ${dateEachYYDD} OR ${dateEachDD}) -path:"${excludeNote}" -block:(query)\n\`\`\`\n`
 	}
 
-	getQueryActionString(addDay: Number, actionType: String): string {
-		let moment = require('moment');
+	getQueryActionString(addDay: number, actionType: String): string {
 		const dateMoment = moment().add(addDay, 'd');
 		const dayOfWeek = dateMoment.format('E');
 		return `\`\`\`query\ntag:#${actionType}${dayOfWeek}\n\`\`\`\n`
 	}
 
-	getQueryWeekDay(addDay: Number, actionType: String): string {
-		let moment = require('moment');
+	getQueryWeekDay(addDay: number, actionType: String): string {
 		const dateMoment = moment().add(addDay, 'd');
 		const dayOfWeek = dateMoment.format('E');
 		return `tag:#${actionType}${dayOfWeek} OR `
@@ -1868,7 +1860,6 @@ export default class MyPlugin extends Plugin {
 
 	addObsidianIcon(iconName: string, iconText: string) {
 		const svg = `<text stroke='#000' transform='matrix(2.79167 0 0 2.12663 -34.0417 -25.2084)' xml:space='preserve' text-anchor='start' font-family='monospace' font-size='24' y='44' x='19' stroke-width='0' fill='currentColor'>${iconText}</text>`;
-		//var obsidian = require('obsidian');
 		addIcon(iconName, svg);
 	}
 
