@@ -238,12 +238,10 @@ export default class MyPlugin extends Plugin {
 			name: "Open Recent Days Schedule",
 			icon: "open-recent-day-schedule-icon",
 			callback: async () => {
-				const { vault } = this.app;
-				const { workspace } = this.app;
+				const { vault, workspace } = this.app;
 				const dashboardCanvas = "D/Query Schedule and Actions next 3 days.md"
-				const mode = (this.app.vault as any).getConfig("defaultViewMode");
 				const leaf = workspace.getLeaf(false);
-				await leaf.openFile(vault.getAbstractFileByPath(dashboardCanvas) as TFile, { active : true,/* mode */});
+				await leaf.openFile(vault.getAbstractFileByPath(dashboardCanvas) as TFile, { active : true });
 			},
 		})
 
