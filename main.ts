@@ -385,19 +385,14 @@ export default class MyPlugin extends Plugin {
 				const lineNum = editor.lineCount();
 				for (let i = 0; i < lineNum; i++) {
 					const line = editor.getLine(i)
-					let match = false
-					for (const tag of tags) {
-						if (new RegExp(`#${tag} `, "g").test(line) || new RegExp(` #${tag}`, "g").test(line)) {
-						  match = true
-						}
-					}
+					const match = tags.some(tag => new RegExp(`#${tag} `, "g").test(line) || new RegExp(` #${tag}`, "g").test(line));
 					if (match) {
 						matches.push(`Line ${i}:\n${line.trim()}`);
 					}
 				}
 				const trimmedAndJoinedString: string = matches.join("\n\n");
-				new Notice(`There are ${matches.length} outstanding actions in this notes\nTasks:\n\n${trimmedAndJoinedString}`);
-
+				const tasks = matches.length > 0 ? `\nTasks:\n\n${trimmedAndJoinedString}` : ``
+				new Notice(`There are ${matches.length} outstanding actions in this notes${tasks}`);
 			}
 		});
 
