@@ -388,30 +388,24 @@ export default class MyPlugin extends Plugin {
 			icon: `action-tag-count-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const v = editor.getValue()
-				let count = (v.match(/#nn/g) || []).length
-				+ (v.match(/#nl/g) || []).length
-				+ (v.match(/#nw/g) || []).length
-				+ (v.match(/#nm/g) || []).length
-				+ (v.match(/#n1/g) || []).length
-				+ (v.match(/#n2/g) || []).length
-				+ (v.match(/#n3/g) || []).length
-				+ (v.match(/#n4/g) || []).length
-				+ (v.match(/#n5/g) || []).length
-				+ (v.match(/#n6/g) || []).length
-				+ (v.match(/#n7/g) || []).length
-				+ (v.match(/#wn/g) || []).length
-				+ (v.match(/#wl/g) || []).length
-				+ (v.match(/#ww/g) || []).length
-				+ (v.match(/#wm/g) || []).length
-				+ (v.match(/#w1/g) || []).length
-				+ (v.match(/#w2/g) || []).length
-				+ (v.match(/#w3/g) || []).length
-				+ (v.match(/#w4/g) || []).length
-				+ (v.match(/#w5/g) || []).length
-				+ (v.match(/#w6/g) || []).length
-				+ (v.match(/#w7/g) || []).length
-				
-				new Notice(`There are ${count} outstanding actions in this notes`);
+				const tags = ["nn", "nl", "nw", "nm", "n1", "n2", "n3", "n4", "n5", "n6", "n7", "wn", "wl", "ww", "wm", "w1", "w2", "w3", "w4", "w5", "w6", "w7"];
+				const matches: string[] = [];
+				const lineNum = editor.lineCount();
+				for (let i = 0; i < lineNum; i++) {
+					const line = editor.getLine(i)
+					let match = false
+					for (const tag of tags) {
+						if (new RegExp(`#${tag} `, "g").test(line) || new RegExp(` #${tag}`, "g").test(line)) {
+						  match = true
+						}
+					}
+					if (match) {
+						matches.push(`Line ${i}:\n${line.trim()}`);
+					}
+				}
+				const trimmedAndJoinedString: string = matches.join("\n\n");
+				new Notice(`There are ${matches.length} outstanding actions in this notes\nTasks:\n\n${trimmedAndJoinedString}`);
+
 			}
 		});
 
