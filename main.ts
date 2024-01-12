@@ -724,7 +724,7 @@ export default class MyPlugin extends Plugin {
 			editorCallback: async (editor: Editor, view: MarkdownView) => {
 				let line = editor.lineCount();
 
-				let text = "";
+				let text = "【" + view.file.basename + "】\n\n";
 				let numLineFirstContent = 0
 				let frontMatterLineCount = 0
 				for (let i = 0; i < line; i++) {
