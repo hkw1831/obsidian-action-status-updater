@@ -746,7 +746,9 @@ export default class MyPlugin extends Plugin {
 
 				Array.from(Array(line - numLineFirstContent).keys()).forEach(i => {
 					const line = editor.getLine(i + numLineFirstContent);
-					text = text + line + "\n"
+					if (!line.startsWith("%%") && !line.endsWith("%%")) {
+						text = text + line + "\n"
+					}
 				});
 				
 				text = text.replace(/## References\:([\n]*.*)*$/, "")
@@ -1370,16 +1372,29 @@ export default class MyPlugin extends Plugin {
 		}
 
 		let text = "";
+		let newConsecutiveLineCount = 0;
 		Array.from(Array(line - numLineFirstContent).keys()).forEach(i => {
 			const line = editor.getLine(i + numLineFirstContent);
 			if (!line.trim().startsWith("%%") || !line.trim().endsWith("%%")) {
-				let modifiedLine = line == "---" ? "" : line
-				modifiedLine = modifiedLine.replace(/^		- /g, "　　　　• ").replace(/^	- /g, "　　• ").replace(/^- /, "• ");
-				modifiedLine = modifiedLine.replace(/^\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
-				                           .replace(/[^!]\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
-				modifiedLine = modifiedLine.replace(/!\[([^\[\]\(\)]+)\]\(([^\[\]\(\)]+)\)/g, "$2")
-				modifiedLine = modifiedLine.replace(/\*\*/gm, "")
-				text = text + modifiedLine + "\n"
+				if (line == "---") {
+					newConsecutiveLineCount = 0;
+				}
+				if (line == "") {
+					newConsecutiveLineCount++;
+				} else {
+					newConsecutiveLineCount = 0;
+				}
+				if (line == "" && newConsecutiveLineCount > 1) {
+					// do nothing
+				} else {
+					let modifiedLine = line == "---" ? "" : line
+					modifiedLine = modifiedLine.replace(/^		- /g, "　　　　• ").replace(/^	- /g, "　　• ").replace(/^- /, "• ");
+					modifiedLine = modifiedLine.replace(/^\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
+											.replace(/[^!]\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
+					modifiedLine = modifiedLine.replace(/!\[([^\[\]\(\)]+)\]\(([^\[\]\(\)]+)\)/g, "$2")
+					modifiedLine = modifiedLine.replace(/\*\*/gm, "")
+					text = text + modifiedLine + "\n"
+				}
 			}
 		});
 		
