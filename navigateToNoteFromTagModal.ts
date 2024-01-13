@@ -9,6 +9,12 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<string> {
   constructor(app: App)
   {
     super(app)
+    this.setInstructions([
+      {
+        command: "",
+        purpose: "Which notes with tags do you want to navigate to?"
+      }
+    ]);
   }
 
   getItems() : string[] {

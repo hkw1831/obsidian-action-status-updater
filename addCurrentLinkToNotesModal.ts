@@ -12,6 +12,12 @@ export class AddCurrentLinkToNotesModal extends FuzzySuggestModal<string> {
   {
     super(app)
     this.linkToAdd = linkToAdd
+    this.setInstructions([
+      {
+        command: "",
+        purpose: "Which notes with tags do you want to add the current note link to?"
+      }
+    ]);
   }
 
   getItems() : string[] {
