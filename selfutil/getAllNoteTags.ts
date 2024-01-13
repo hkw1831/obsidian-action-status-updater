@@ -13,12 +13,29 @@ export function getAllTagsWithFilter(app: App, filter?: (tag: string) => boolean
             continue;
         }
         getAllTags(cache)?.forEach((tag) => {
-            if (!items.includes(tag)) {
-                if (filter == null || filter(tag)) {
-                    items.push(tag);
+            const layerOfTag: string[] = getLayersOfTag(tag)
+            for (const layer of layerOfTag) {
+                if (!items.includes(layer)) {
+                    if (filter == null || filter(layer)) {
+                        items.push(layer);
+                    }
                 }
             }
         });
     }
     return items.sort((a: string, b: string) => a.localeCompare(b));
+}
+
+function getLayersOfTag(tag: string) : string[] {
+    // provide a tag with #zzz/bbb/ccc, return [#zzz, #zzz/bbb, #zzz/bbb/ccc]
+    // if tag without / (e.g. #zzz), return [#zzz]
+    const layers: string[] = []
+    const tagSplit = tag.split("/")
+    let tagLayer = tagSplit[0]
+    layers.push(tagLayer)
+    for (const tagPart of tagSplit.slice(1, tagSplit.length)) {
+        tagLayer += "/" + tagPart
+        layers.push(tagLayer)
+    }
+    return layers
 }
