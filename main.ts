@@ -67,7 +67,7 @@ export default class MyPlugin extends Plugin {
 		});
 
 		/*
-		this.addObsidianCopyIcon();
+		this.addObsidianIcon('obsidian-copy', '⌘C');
 		this.addCommand({
 			id: "obsidian-copy",
 			name: "Obsidian Copy",
@@ -90,7 +90,7 @@ export default class MyPlugin extends Plugin {
 		*/
 
 		/*
-		this.addObsidianCutIcon();
+		this.addObsidianIcon('obsidian-cut', '⌘X');
 		this.addCommand({
 			id: "obsidian-cut",
 			name: "Obsidian Cut",
@@ -113,7 +113,7 @@ export default class MyPlugin extends Plugin {
 		});
 		*/
 
-		this.addObsidianPasteIcon();
+		this.addObsidianIcon('obsidian-paste', '⌘V');
 		this.addCommand({
 			id: "obsidian-paste",
 			name: "Obsidian Paste",
@@ -129,7 +129,7 @@ export default class MyPlugin extends Plugin {
 			]
 		});
 
-		this.addUpdateNoteTypeIcon();
+		this.addObsidianIcon('update-note-type-icon', 'NT');
 		this.addCommand({
 			id: "update-note-type",
 			name: "Update Note Type",
@@ -182,7 +182,7 @@ export default class MyPlugin extends Plugin {
 			}
 		})
 
-		this.updateSchedulingIcon()
+		this.addObsidianIcon('update-scheduling-icon', 'US');
 		this.addCommand({
 			id: "update-scheduling",
 			name: "Update Scheduling",
@@ -216,7 +216,7 @@ export default class MyPlugin extends Plugin {
 		})
 
 		/*
-		this.openDashboardIcon()
+		this.addObsidianIcon('open-dashboard-icon', 'OD');
 		this.addCommand({
 			id: "open-dashboard",
 			name: "Open Dashboard",
@@ -232,7 +232,7 @@ export default class MyPlugin extends Plugin {
 		})
 		*/
 
-		this.openRecentDaysScheduleIcon()
+		this.addObsidianIcon('open-recent-day-schedule-icon', 'OR');
 		this.addCommand({
 			id: "open-recent-days-schedule",
 			name: "Open Recent Days Schedule",
@@ -245,7 +245,7 @@ export default class MyPlugin extends Plugin {
 			},
 		})
 
-		this.openInboxIcon()
+		this.addObsidianIcon('open-inbox-icon', 'OI');
 		this.addCommand({
 			id: "open-inbox",
 			name: "OI Open Inbox",
@@ -258,7 +258,7 @@ export default class MyPlugin extends Plugin {
 			},
 		})
 
-		this.openPlaygroundIcon()
+		this.addObsidianIcon('open-playground-icon', 'OP');
 		this.addCommand({
 			id: "open-playground",
 			name: "OP Open Playground",
@@ -278,7 +278,7 @@ export default class MyPlugin extends Plugin {
 			]
 		})
 
-		this.openBrainDumpIcon()
+		this.addObsidianIcon('open-braindump-icon', 'OB');
 		this.addCommand({
 			id: "open-braindump",
 			name: "OB Open BrainDump",
@@ -312,7 +312,7 @@ export default class MyPlugin extends Plugin {
 		});
 		*/
 
-		this.addThreadsToBlogIcon();
+		this.addObsidianIcon('threads-to-blog-icon', 'TB');
 		this.addCommand({
 			id: "threads-to-blog",
 			name: "TB Threads as pre Blog format to Clipboard",
@@ -323,7 +323,7 @@ export default class MyPlugin extends Plugin {
 		});
 
 		/*
-		this.addChatGPTPromptForGeneratingSummaryToClipboard();
+		this.addObsidianIcon('chatgpt-prompt-for-generating-summary-to-clipboard', 'GS');
 		this.addCommand({
 			id: "chatgpt-prompt-for-generating-summary-to-clipboard",
 			name: "GS ChatGPT prompt for generating summary to clipboard",
@@ -354,7 +354,7 @@ export default class MyPlugin extends Plugin {
 		});
 		*/
 
-		this.addAddCommentTagIcon();
+		this.addObsidianIcon('add-comment-tag-icon', 'CT');
 		this.addCommand({
 			id: "add-comment-tag",
 			name: "CT Add Comment Tag",
@@ -374,7 +374,7 @@ export default class MyPlugin extends Plugin {
 			]
 		});
 
-		this.addActionTagCountIcon();
+		this.addObsidianIcon('action-tag-count-icon', 'CA');
 		this.addCommand({
 			id: "action-tag-count-icon",
 			name: "CA Count Action Tag",
@@ -396,7 +396,7 @@ export default class MyPlugin extends Plugin {
 			}
 		});
 
-		this.addToggleNWTaskIcon();
+		this.addObsidianIcon('toggle-n-w-task', '#=');
 		this.addCommand({
 			id: `toggle-n-w-task`,
 			name: `Toggle N W Task`,
@@ -445,7 +445,7 @@ export default class MyPlugin extends Plugin {
 		});
 
 		/*
-		this.addRemoveActionIcon();
+		this.addObsidianIcon('remove-action-icon', '-#');
 		this.addCommand({
 			id: "remove-action",
 			name: "Remove action",
@@ -524,7 +524,7 @@ export default class MyPlugin extends Plugin {
 			},
 		});
 
-		this.addEventToFantasticalIcon();
+		this.addObsidianIcon('event-to-fantastical-icon', 'FE');
 		this.addCommand({
 			id: "add-fantastical-event",
 			name: "FE Add Fantastical Event",
@@ -628,7 +628,7 @@ export default class MyPlugin extends Plugin {
 			}
 		})
 
-		this.addThreadsToTwitterIcon();
+		this.addObsidianIcon('threads-to-twitter', 'TX');
 		this.addCommand({
 			id: "threads-to-twitter",
 			name: "TT TX Threads to Twitter",
@@ -665,7 +665,7 @@ export default class MyPlugin extends Plugin {
 			}
 		})
 
-		this.addGrepBlogToClipboardIcon();
+		this.addObsidianIcon('blog-to-clipboard-icon', 'BJ');
 		this.addCommand({
 			id: "blog-to-clipboard",
 			name: "BJ Blog content to clipboard",
@@ -744,7 +744,7 @@ export default class MyPlugin extends Plugin {
 			},
 		});
 
-		this.addGenerateChatGPTPrompt();
+		this.addObsidianIcon('generate-chatgpt-prompt', 'GP');
 		this.addCommand({
 			id: "generate-chatgpt-prompt",
 			name: "GP Generate ChatGPT Prompt",
@@ -790,7 +790,7 @@ export default class MyPlugin extends Plugin {
 			},
 		});
 
-		this.addGrepThreadsToClipboardIcon();
+		this.addObsidianIcon('threads-to-clipboard-icon', 'TC');
 		this.addCommand({
 			id: "threads-to-clipboard",
 			name: "TC Threads content to clipboard",
@@ -820,7 +820,7 @@ export default class MyPlugin extends Plugin {
 			},
 		});
 
-		this.addTwitterToChatGPTIcon();
+		this.addObsidianIcon('twitter-to-chatgpt', 'XG');
 		this.addCommand({
 			id: "twitter-to-chatgpt",
 			name: "XG Twitter to ChatGPT",
@@ -890,8 +890,7 @@ export default class MyPlugin extends Plugin {
 			},
 		});
 
-
-		this.addChatGPTToTwitterIcon();
+		this.addObsidianIcon('chatgpt-to-twitter', 'GX');
 		this.addCommand({
 			id: "chatgpt-to-twitter",
 			name: "GX ChatGPT to Twitter",
@@ -909,7 +908,7 @@ export default class MyPlugin extends Plugin {
 			},
 		});
 
-		this.addReverseTwitterNumberingIcon();
+		this.addObsidianIcon('reverse-twitter-number-icon', 'RT');
 		this.addCommand({
 			id: "reverse-twitter-numbering",
 			name: "RT Reverse Twitter Numbering",
@@ -925,7 +924,7 @@ export default class MyPlugin extends Plugin {
 			},
 		});
 
-		this.addGrepThreadsAsFacebookPostToClipboardIcon();
+		this.addObsidianIcon('threads-as-facebook-post-to-clipboard-icon', 'FC');
 		this.addCommand({
 			id: "threads-as-facebook-post-to-clipboard",
 			name: "FC Threads as Facebook post format to Clipboard",
@@ -956,7 +955,7 @@ export default class MyPlugin extends Plugin {
 			},
 		});
 
-		this.addGrepThreadsBlockToImageIcon();
+		this.addObsidianIcon('threads-block-to-image', 'TI');
 		this.addCommand({
 			id: "threads-block-to-image",
 			name: "TI Threads segment to image",
@@ -967,7 +966,7 @@ export default class MyPlugin extends Plugin {
 			},
 		});
 
-		this.addChatGPTGenerateImageIcon();
+		this.addObsidianIcon('chatgpt-generate-image', 'GI');
 		this.addCommand({
 			id: "chatgpt-generate-image",
 			name: "GI ChatGPT image",
@@ -978,7 +977,7 @@ export default class MyPlugin extends Plugin {
 		});
 
 		/*
-		this.addGrepThreadsSegmentToClipboard();
+		this.addObsidianIcon('threads-segment-to-clipboard', 'SC');
 		this.addCommand({
 			id: "threads-segment-to-clipboard",
 			name: "Threads segment to clipboard",
@@ -1004,7 +1003,7 @@ export default class MyPlugin extends Plugin {
 		});
 		*/
 
-		this.addGrepTwitterSegmentToClipboard();
+		this.addObsidianIcon('twitter-segment-to-clipboard', 'XC');
 		this.addCommand({
 			id: "twitter-segment-to-clipboard",
 			name: "XC Twitter segment to clipboard",
@@ -1029,7 +1028,7 @@ export default class MyPlugin extends Plugin {
 			},
 		});
 
-		this.addGrepSegmentToClipboard();
+		this.addObsidianIcon('segment-to-clipboard', 'SC');
 		this.addCommand({
 			id: "segment-to-clipboard",
 			name: "SC Segment to clipboard",
@@ -1759,126 +1758,6 @@ export default class MyPlugin extends Plugin {
 		const dateMoment = moment().add(addDay, 'd');
 		const dayOfWeek = dateMoment.format('E');
 		return `tag:#${actionType}${dayOfWeek} OR `
-	}
-
-	updateSchedulingIcon() {
-		this.addObsidianIcon('update-scheduling-icon', 'US');
-	}
-	
-	openDashboardIcon() {
-		this.addObsidianIcon('open-dashboard-icon', 'OD');
-	}
-	
-	openRecentDaysScheduleIcon() {
-		this.addObsidianIcon('open-recent-day-schedule-icon', 'OR');
-	}
-	
-	openInboxIcon() {
-		this.addObsidianIcon('open-inbox-icon', 'OI');
-	}
-	
-	openPlaygroundIcon() {
-		this.addObsidianIcon('open-playground-icon', 'OP');
-	}
-	
-	openBrainDumpIcon() {
-		this.addObsidianIcon('open-braindump-icon', 'OB');
-	}
-
-	addActionTagCountIcon() {
-    	this.addObsidianIcon('action-tag-count-icon', 'CA');
-	}
-
-	addGrepThreadsToClipboardIcon() {
-		this.addObsidianIcon('threads-to-clipboard-icon', 'TC');
-	}
-
-	addGrepThreadsAsFacebookPostToClipboardIcon() {
-		this.addObsidianIcon('threads-as-facebook-post-to-clipboard-icon', 'FC');
-	}
-	  
-	addThreadsToTwitterIcon() {
-		this.addObsidianIcon('threads-to-twitter', 'TX');
-	}
-	  
-	addTwitterToChatGPTIcon() {
-		this.addObsidianIcon('twitter-to-chatgpt', 'XG');
-	}
-	  
-	addChatGPTToTwitterIcon() {
-		this.addObsidianIcon('chatgpt-to-twitter', 'GX');
-	}
-	  
-	addReverseTwitterNumberingIcon() {
-		this.addObsidianIcon('reverse-twitter-number-icon', 'RT');
-	}
-
-	addEventToFantasticalIcon() {
-		this.addObsidianIcon('event-to-fantastical-icon', 'FE');
-	}
-	  
-	addGrepBlogToClipboardIcon() {
-		this.addObsidianIcon('blog-to-clipboard-icon', 'BJ');
-	}
-	  
-	addGrepThreadsBlockToImageIcon() {
-		this.addObsidianIcon('threads-block-to-image', 'TI');
-	}
-	  
-	addGrepTwitterSegmentToClipboard() {
-		this.addObsidianIcon('twitter-segment-to-clipboard', 'XC');
-	}
-	  
-	addGrepSegmentToClipboard() {
-		this.addObsidianIcon('segment-to-clipboard', 'SC');
-	}
-
-	addChatGPTGenerateImageIcon() {
-		this.addObsidianIcon('chatgpt-generate-image', 'GI');
-	}
-	  
-	addGrepThreadsSegmentToClipboard() {
-		this.addObsidianIcon('threads-segment-to-clipboard', 'SC');
-	}
-	  
-	addChatGPTPromptForGeneratingSummaryToClipboard() {
-		this.addObsidianIcon('chatgpt-prompt-for-generating-summary-to-clipboard', 'GS');
-	}
-
-	addGenerateChatGPTPrompt() {
-		this.addObsidianIcon('generate-chatgpt-prompt', 'GP');
-	}
-	  
-	addRemoveActionIcon() {
-		this.addObsidianIcon('remove-action-icon', '-#');
-	}
-	  
-	addToggleNWTaskIcon() {
-		this.addObsidianIcon('toggle-n-w-task', '#=');
-	}
-	  
-	addObsidianCopyIcon() {
-		this.addObsidianIcon('obsidian-copy', '⌘C');
-	}
-	  
-	addObsidianCutIcon() {
-		this.addObsidianIcon('obsidian-cut', '⌘X');
-	}
-	  
-	addObsidianPasteIcon() {
-		this.addObsidianIcon('obsidian-paste', '⌘V');
-	}
-	  
-	addUpdateNoteTypeIcon() {
-		this.addObsidianIcon('update-note-type-icon', 'NT');
-	}
-	  
-	addThreadsToBlogIcon() {
-		this.addObsidianIcon('threads-to-blog-icon', 'TB');
-	}
-
-	addAddCommentTagIcon() {
-		this.addObsidianIcon('add-comment-tag-icon', 'CT');
 	}
 	  
 	addNewLaterActionIcon(t: string) {
