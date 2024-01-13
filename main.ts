@@ -11,6 +11,9 @@ import { ThreadsToBlogModal } from 'threadsToBlogModal';
 import { ClipboardRemovalModal } from 'clipboardRemovalModal';
 import { addIcon } from 'obsidian';
 import moment from 'moment';
+import { AddCurrentLinkToNotesFromTagModal as AddCurrentLinkToNotesFromTagModal } from 'addCurrentLinkToNotesFromTagModal';
+import { addLinkToEndOfNotes } from 'selfutil/addlinktonotes';
+import { AddCurrentLinkToNotesModal } from 'addCurrentLinkToNotesModal';
 
 // Remember to rename these classes and interfaces!
 
@@ -599,33 +602,25 @@ export default class MyPlugin extends Plugin {
 			]
 		});
 
-		this.addObsidianIcon('add-current-link-to-inbox', 'LI');
+		this.addObsidianIcon('add-current-link-to-notes', 'AL');
 		this.addCommand({
-			id: "add-current-link-to-inbox",
-			name: "LI Add current link to inbox",
-			icon: `add-current-link-to-inbox`,
+			id: "add-current-link-to-notes",
+			name: "AL Add current link to notes",
+			icon: `add-current-link-to-notes`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const link = view.file.basename;
-
-				const { vault, workspace } = this.app;
-				const inboxMd = "I/Inbox.md"
-				const inboxFile : TFile = vault.getAbstractFileByPath(inboxMd) as TFile
-				Promise.resolve()
-				.then(() => {
-					return vault.read(inboxFile)
-				}, reason => {new Notice("Error occurred when reading inbox file")})
-				.then((value) => {
-					const newValue = value + "\n- [[" + link + "]]"
-					vault.modify(inboxFile, newValue)
-				})
-				.then((value) => {
-					const leaf = workspace.getLeaf(false);
-					leaf.openFile(vault.getAbstractFileByPath(inboxMd) as TFile, { active : true });
-				})
-				.then((value) => {
-					new Notice(`Added link to inbox!`);
-				})
-			}
+				new AddCurrentLinkToNotesModal(this.app, link).open()
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `;`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `;`,
+				},
+			]
 		})
 
 		this.addObsidianIcon('threads-to-twitter', 'TX');
