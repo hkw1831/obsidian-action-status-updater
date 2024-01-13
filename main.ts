@@ -11,9 +11,8 @@ import { ThreadsToBlogModal } from 'threadsToBlogModal';
 import { ClipboardRemovalModal } from 'clipboardRemovalModal';
 import { addIcon } from 'obsidian';
 import moment from 'moment';
-import { AddCurrentLinkToNotesFromTagModal as AddCurrentLinkToNotesFromTagModal } from 'addCurrentLinkToNotesFromTagModal';
-import { addLinkToEndOfNotes } from 'selfutil/addlinktonotes';
 import { AddCurrentLinkToNotesModal } from 'addCurrentLinkToNotesModal';
+import { NavigateToNoteFromTagModal } from 'navigateToNoteFromTagModal';
 
 // Remember to rename these classes and interfaces!
 
@@ -619,6 +618,25 @@ export default class MyPlugin extends Plugin {
 				{
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
 					key: `;`,
+				},
+			]
+		})
+
+		this.addCommand({
+			id: "quick-navigate-to-notes",
+			name: "Quick Navigate to Notes",
+			icon: `aperture`,
+			callback: async () => {
+				new NavigateToNoteFromTagModal(this.app).open()
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `.`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `.`,
 				},
 			]
 		})
@@ -1782,11 +1800,11 @@ export default class MyPlugin extends Plugin {
 			hotkeys: [
 				{
 					modifiers: [`Ctrl`, `Meta`, `Shift`],
-					key: t == 'n' ? ',' : '.'
+					key: t == 'n' ? '[' : ']'
 				},
 				{
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
-					key: t == 'n' ? ',' : '.'
+					key: t == 'n' ? '[' : ']'
 				}
 			]
 		});
