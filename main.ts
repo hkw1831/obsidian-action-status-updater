@@ -113,7 +113,7 @@ export default class MyPlugin extends Plugin {
 				}
 			]
 		});
-		*/
+	*/
 
 		this.addObsidianIcon('obsidian-paste', '⌘V');
 		this.addCommand({
@@ -601,11 +601,10 @@ export default class MyPlugin extends Plugin {
 			]
 		});
 
-		this.addObsidianIcon('add-current-link-to-notes', 'AL');
 		this.addCommand({
 			id: "add-current-link-to-notes",
 			name: "AL Add current link to notes",
-			icon: `add-current-link-to-notes`,
+			icon: `align-vertical-justify-end`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const link = view.file.basename;
 				new AddCurrentLinkToNotesModal(this.app, link).open()
