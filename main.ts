@@ -345,6 +345,82 @@ export default class MyPlugin extends Plugin {
 		});
 		*/
 
+		// TODO remove after TW migrate finish
+		this.addObsidianIcon('tiddlywiki-migrate', 'TM');
+		this.addCommand({
+			id: "tiddlywiki-migrate",
+			name: "TM TiddlyWiki Migrate",
+			icon: `tiddlywiki-migrate`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const lineCount = editor.lineCount()
+				let text = "- "
+				let h3Count = 0;
+				let actionTag = ""
+				for (let i = 0; i < lineCount; i++) {
+					const line = editor.getLine(i)
+					if (h3Count == 1) {
+						//if (line.startsWith("title: ")) {
+						//	text += line.replace("title: ", "")
+						//}
+						if (line.startsWith("tagsss: ")) {
+							if (/ N /.test(line) || / N$/.test(line)) {
+								actionTag = "n"
+							}
+							if (/ W /.test(line) || / W$/.test(line)) {
+								actionTag = "w"
+							}
+							if (/ now /.test(line) || / now$/.test(line)) {
+								actionTag += "n"
+							}
+							if (/ later /.test(line) || / later$/.test(line)) {
+								actionTag += "l"
+							}
+							if (/ waiting /.test(line) || / waiting$/.test(line)) {
+								actionTag += "w"
+							}
+							if (/ done /.test(line) || / done$/.test(line)) {
+								actionTag += "d"
+							}
+							if (/ archive /.test(line) || / archine$/.test(line)) {
+								actionTag += "w"
+							}
+							if (actionTag.length == 2) {
+								actionTag = "#" + actionTag + " "
+							} else if (actionTag.length == 1) {
+								new Notice("error on setting action tag")
+							}
+						}
+					}
+					if (h3Count >= 2 && line.trim().length != 0) {
+						let modifiedLine = /    - /.test(line) ? ("    " + line) : ("    - " + line)
+						modifiedLine = line === "---" ? "---" : modifiedLine
+						text += "\n" + modifiedLine
+					}
+					if (line === "---") {
+						let beforeH3 = h3Count
+						h3Count++;
+						if (beforeH3 == 1 && h3Count == 2) {
+							text += actionTag + view.file.basename
+						}
+					}
+				}
+				if (h3Count < 2) { // no frontmatter
+					text += view.file.basename
+				} 
+				editor.setValue(text)
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `0`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `0`,
+				},
+			]
+		});
+
 		this.addObsidianIcon('threads-to-blog-icon', 'TB');
 		this.addCommand({
 			id: "threads-to-blog",
