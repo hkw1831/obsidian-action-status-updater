@@ -1922,7 +1922,7 @@ export default class MyPlugin extends Plugin {
 				editor.replaceRange(`#${t}l `, cursor);
 				cursor.ch = cursor.ch + 4;
 				editor.setCursor(cursor);
-			},
+			}/*,
 			hotkeys: [
 				{
 					modifiers: [`Ctrl`, `Meta`, `Shift`],
@@ -1932,7 +1932,7 @@ export default class MyPlugin extends Plugin {
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
 					key: t == 'n' ? ',' : '.'
 				}
-			]
+			]*/
 		});
 	}
 
