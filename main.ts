@@ -1677,6 +1677,7 @@ export default class MyPlugin extends Plugin {
 
 		text2 = text2.replace("\n\n\n\n", "") // remove empty line
 		text2 = text2.replace("\nᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳ\n\n\n", "") // remove empty line
+		text2 = text2.replace(/\n+$/, "")
 
 		return text2
 	}
