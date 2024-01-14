@@ -13,10 +13,10 @@ export function getAllTagsWithFilter(app: App, filter?: (tag: string) => boolean
             continue;
         }
         getAllTags(cache)?.forEach((tag) => {
-            const layerOfTag: string[] = getLayersOfTag(tag)
-            for (const layer of layerOfTag) {
-                if (!items.includes(layer)) {
-                    if (filter == null || filter(layer)) {
+            if (filter == null || filter(tag)) {
+                const layerOfTag: string[] = getLayersOfTag(tag)
+                for (const layer of layerOfTag) {
+                    if (!items.includes(layer)) {
                         items.push(layer);
                     }
                 }
@@ -26,7 +26,7 @@ export function getAllTagsWithFilter(app: App, filter?: (tag: string) => boolean
     return items.sort((a: string, b: string) => a.localeCompare(b));
 }
 
-function getLayersOfTag(tag: string) : string[] {
+function getLayersOfTag(tag: string): string[] {
     // provide a tag with #zzz/bbb/ccc, return [#zzz, #zzz/bbb, #zzz/bbb/ccc]
     // if tag without / (e.g. #zzz), return [#zzz]
     const layers: string[] = []
