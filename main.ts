@@ -347,68 +347,92 @@ export default class MyPlugin extends Plugin {
 		*/
 
 		// TODO remove after TW migrate finish
-		this.addObsidianIcon('tiddlywiki-migrate', 'TM');
+		this.addObsidianIcon('note-to-tree-list', 'NT');
 		this.addCommand({
-			id: "tiddlywiki-migrate",
-			name: "TM TiddlyWiki Migrate",
-			icon: `tiddlywiki-migrate`,
+			id: "note-to-tree-list",
+			name: "NT Note to Tree List",
+			icon: `note-to-tree-list`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const lineCount = editor.lineCount()
-				let text = "- "
-				let h3Count = 0;
-				let actionTag = ""
-				for (let i = 0; i < lineCount; i++) {
-					const line = editor.getLine(i)
-					if (h3Count == 1) {
-						//if (line.startsWith("title: ")) {
-						//	text += line.replace("title: ", "")
-						//}
-						if (line.startsWith("tagsss: ")) {
-							if (/ N /.test(line) || / N$/.test(line)) {
-								actionTag = "n"
+				if (editor.getValue().startsWith("- " + view.file.basename + "\n")) {
+					// already tidy once, here only should remove empty line
+					let text = ""
+					for (let i = 0; i < lineCount; i++) {
+						const line = editor.getLine(i)
+						if (line.trim().length != 0) {
+							text += line + "\n"
+						}
+					}
+					editor.setValue(text.replace(/\n$/m, ""))
+				} else {
+					let text = "- "
+					let h3Count = 0;
+					let actionTag = ""
+					let content = ""
+					for (let i = 0; i < lineCount; i++) {
+						const line = editor.getLine(i)
+						if (h3Count == 0) {
+							if (line.trim().length != 0 && line != "---") {
+								content += "\n" + (/^ *- /.test(line) ? "    " + line : "    - " + line)
 							}
-							if (/ W /.test(line) || / W$/.test(line)) {
-								actionTag = "w"
+						} else if (h3Count == 1) {
+							if (line === "---" || line.startsWith("title: ") || line.startsWith("chronicledate: ") || line.startsWith("eventdate: ")) {
+							//	text += line.replace("title: ", "")
+							} else if (line.startsWith("tagsss: ")) {
+								if (/ N /.test(line) || / N$/.test(line)) {
+									actionTag = "n"
+								}
+								if (/ W /.test(line) || / W$/.test(line)) {
+									actionTag = "w"
+								}
+								if (/ now /.test(line) || / now$/.test(line)) {
+									actionTag += "n"
+								}
+								if (/ later /.test(line) || / later$/.test(line)) {
+									actionTag += "l"
+								}
+								if (/ waiting /.test(line) || / waiting$/.test(line)) {
+									actionTag += "w"
+								}
+								if (/ done /.test(line) || / done$/.test(line)) {
+									actionTag += "d"
+								}
+								if (/ archive /.test(line) || / archine$/.test(line)) {
+									actionTag += "w"
+								}
+								if (actionTag.length == 2) {
+									actionTag = "#" + actionTag + " "
+								} else if (actionTag.length == 1) {
+									new Notice("error on setting action tag")
+								}
+							} else {
+								if (line.trim().length != 0) {
+									content += "\n" + (/^ *- /.test(line) ? "    " + line : "    - " + line)
+								}
 							}
-							if (/ now /.test(line) || / now$/.test(line)) {
-								actionTag += "n"
+						}
+						if (h3Count >= 2 && line.trim().length != 0) {
+							let modifiedLine = (line === "[ ] ") ? "" : line
+							if (modifiedLine.trim().length != 0) {
+								modifiedLine = /^ *- /.test(line) ? ("    " + line) : ("    - " + line)
+								// modifiedLine = line === "---" ? "---" : modifiedLine
+								text += "\n" + modifiedLine
 							}
-							if (/ later /.test(line) || / later$/.test(line)) {
-								actionTag += "l"
-							}
-							if (/ waiting /.test(line) || / waiting$/.test(line)) {
-								actionTag += "w"
-							}
-							if (/ done /.test(line) || / done$/.test(line)) {
-								actionTag += "d"
-							}
-							if (/ archive /.test(line) || / archine$/.test(line)) {
-								actionTag += "w"
-							}
-							if (actionTag.length == 2) {
-								actionTag = "#" + actionTag + " "
-							} else if (actionTag.length == 1) {
-								new Notice("error on setting action tag")
+						}
+						if (line === "---") {
+							let beforeH3 = h3Count
+							h3Count++;
+							if (beforeH3 == 1 && h3Count == 2) {
+								text += actionTag + view.file.basename
 							}
 						}
 					}
-					if (h3Count >= 2 && line.trim().length != 0) {
-						let modifiedLine = /    - /.test(line) ? ("    " + line) : ("    - " + line)
-						modifiedLine = line === "---" ? "---" : modifiedLine
-						text += "\n" + modifiedLine
-					}
-					if (line === "---") {
-						let beforeH3 = h3Count
-						h3Count++;
-						if (beforeH3 == 1 && h3Count == 2) {
-							text += actionTag + view.file.basename
-						}
-					}
+					if (h3Count < 2) { // no frontmatter
+						text += view.file.basename
+					} 
+					text += content
+					editor.setValue(text)
 				}
-				if (h3Count < 2) { // no frontmatter
-					text += view.file.basename
-				} 
-				editor.setValue(text)
 			},
 			hotkeys: [
 				{
