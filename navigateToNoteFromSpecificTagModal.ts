@@ -1,5 +1,8 @@
+import { NavigateToNoteFromTagModal } from "navigateToNoteFromTagModal"
 import { App, FuzzySuggestModal, FuzzyMatch, Notice, CachedMetadata, parseFrontMatterTags, parseFrontMatterAliases, TFile } from "obsidian"
 import { filesWhereTagIsUsed } from "selfutil/findNotesFromTag"
+
+const BACK_TO_SELECT_TAG = "Back to select tag"
 
 export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<string> {
 
@@ -19,7 +22,7 @@ export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<string
 
 
   getItems(): string[] {
-    return filesWhereTagIsUsed(this.tagToFind);
+    return [...[BACK_TO_SELECT_TAG], ...filesWhereTagIsUsed(this.tagToFind)];
   }
 
   getItemText(path: string): string {
@@ -34,11 +37,15 @@ export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<string
 
   // Perform action on the selected suggestion.
   onChooseItem(path: string, evt: MouseEvent | KeyboardEvent) {
-    const { vault, workspace } = this.app;
-    const leaf = workspace.getLeaf(false);
-    Promise.resolve()
-    .then(() => {
-        return leaf.openFile(vault.getAbstractFileByPath(path) as TFile, { active : true });
-    })
+    if (BACK_TO_SELECT_TAG == path) {
+      new NavigateToNoteFromTagModal(this.app).open()
+    } else {
+      const { vault, workspace } = this.app;
+      const leaf = workspace.getLeaf(false);
+      Promise.resolve()
+      .then(() => {
+          return leaf.openFile(vault.getAbstractFileByPath(path) as TFile, { active : true });
+      })
+  }
   }
 }

@@ -1,6 +1,9 @@
+import { AddCurrentLinkToNotesModal } from "addCurrentLinkToNotesModal"
 import { App, FuzzySuggestModal, FuzzyMatch } from "obsidian"
 import { addLinkToNotes } from "selfutil/addlinktonotes"
 import { filesWhereTagIsUsed } from "selfutil/findNotesFromTag"
+
+const BACK_TO_SELECT_TAG = "Back to select tag"
 
 export class AddCurrentLinkToNotesFromSpecificTagModal extends FuzzySuggestModal<string> {
 
@@ -24,9 +27,8 @@ export class AddCurrentLinkToNotesFromSpecificTagModal extends FuzzySuggestModal
     ]);
   }
 
-
   getItems(): string[] {
-    return filesWhereTagIsUsed(this.tagToFind);
+    return [...[BACK_TO_SELECT_TAG], ...filesWhereTagIsUsed(this.tagToFind)];
   }
 
   getItemText(path: string): string {
@@ -41,6 +43,10 @@ export class AddCurrentLinkToNotesFromSpecificTagModal extends FuzzySuggestModal
 
   // Perform action on the selected suggestion.
   onChooseItem(path: string, evt: MouseEvent | KeyboardEvent) {
-    addLinkToNotes(this.linkToAdd, path, this.app, this.insertFromBeginning)
+    if (BACK_TO_SELECT_TAG == path) {
+      new AddCurrentLinkToNotesModal(this.app, this.linkToAdd, this.insertFromBeginning).open()
+    } else {
+      addLinkToNotes(this.linkToAdd, path, this.app, this.insertFromBeginning)
+    }
   }
 }
