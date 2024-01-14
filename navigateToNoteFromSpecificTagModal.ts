@@ -1,5 +1,4 @@
 import { App, FuzzySuggestModal, FuzzyMatch, Notice, CachedMetadata, parseFrontMatterTags, parseFrontMatterAliases, TFile } from "obsidian"
-import { addLinkToEndOfNotes } from "selfutil/addlinktonotes"
 import { filesWhereTagIsUsed } from "selfutil/findNotesFromTag"
 
 export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<string> {

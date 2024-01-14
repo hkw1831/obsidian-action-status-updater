@@ -1,17 +1,19 @@
 import { AddCurrentLinkToNotesFromSpecificTagModal } from "addCurrentLinkToNotesFromSpecificTagModal";
 import { App, Editor, FuzzySuggestModal, FuzzyMatch, getAllTags } from "obsidian";
-import { addLinkToEndOfNotes } from "selfutil/addlinktonotes";
+import { addLinkToNotes } from "selfutil/addlinktonotes";
 import { getAllNoteTags } from "selfutil/getAllNoteTags";
 
 export class AddCurrentLinkToNotesModal extends FuzzySuggestModal<string> {
 
   linkToAdd: string
   taskType: String
+  insertFromBeginning: boolean
 
-  constructor(app: App, linkToAdd: string)
+  constructor(app: App, linkToAdd: string, insertFromBeginning: boolean)
   {
     super(app)
     this.linkToAdd = linkToAdd
+    this.insertFromBeginning = insertFromBeginning
     this.setInstructions([
       {
         command: "",
@@ -37,10 +39,10 @@ export class AddCurrentLinkToNotesModal extends FuzzySuggestModal<string> {
   // Perform action on the selected suggestion.
   async onChooseItem(choosenValue: string, evt: MouseEvent | KeyboardEvent) {
     if (choosenValue.startsWith("#")) {
-      new AddCurrentLinkToNotesFromSpecificTagModal(this.app, this.linkToAdd, choosenValue).open()
+      new AddCurrentLinkToNotesFromSpecificTagModal(this.app, this.linkToAdd, choosenValue, this.insertFromBeginning).open()
     } else if (choosenValue == "Inbox") {
       const inboxMd = "I/Inbox.md"
-      addLinkToEndOfNotes(this.linkToAdd, inboxMd, this.app)
+      addLinkToNotes(this.linkToAdd, inboxMd, this.app, this.insertFromBeginning)
     }
   }
 }

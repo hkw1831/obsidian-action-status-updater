@@ -1,5 +1,5 @@
 import { App, FuzzySuggestModal, FuzzyMatch } from "obsidian"
-import { addLinkToEndOfNotes } from "selfutil/addlinktonotes"
+import { addLinkToNotes } from "selfutil/addlinktonotes"
 import { filesWhereTagIsUsed } from "selfutil/findNotesFromTag"
 
 export class AddCurrentLinkToNotesFromSpecificTagModal extends FuzzySuggestModal<string> {
@@ -8,11 +8,14 @@ export class AddCurrentLinkToNotesFromSpecificTagModal extends FuzzySuggestModal
 
   tagToFind: string
 
-  constructor(app: App, linkToAdd: string, tagToFind: string)
+  insertFromBeginning: boolean
+
+  constructor(app: App, linkToAdd: string, tagToFind: string, insertFromBeginning: boolean)
   {
     super(app)
     this.linkToAdd = linkToAdd
     this.tagToFind = tagToFind
+    this.insertFromBeginning = insertFromBeginning
     this.setInstructions([
       {
         command: "",
@@ -38,6 +41,6 @@ export class AddCurrentLinkToNotesFromSpecificTagModal extends FuzzySuggestModal
 
   // Perform action on the selected suggestion.
   onChooseItem(path: string, evt: MouseEvent | KeyboardEvent) {
-    addLinkToEndOfNotes(this.linkToAdd, path, this.app)
+    addLinkToNotes(this.linkToAdd, path, this.app, this.insertFromBeginning)
   }
 }

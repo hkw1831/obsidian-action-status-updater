@@ -633,28 +633,48 @@ export default class MyPlugin extends Plugin {
 		});
 
 		this.addCommand({
-			id: "add-current-link-to-notes",
-			name: "AL Add current link to notes",
-			icon: `align-vertical-justify-end`,
+			id: "add-current-link-to-beginning-of-notes",
+			name: "LB Add current link to beginning of notes",
+			icon: `align-vertical-justify-start`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const link = view.file.basename;
-				new AddCurrentLinkToNotesModal(this.app, link).open()
+				new AddCurrentLinkToNotesModal(this.app, link, true).open()
 			},
 			hotkeys: [
 				{
 					modifiers: [`Ctrl`, `Meta`, `Shift`],
-					key: `;`,
+					key: `[`,
 				},
 				{
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
-					key: `;`,
+					key: `[`,
+				},
+			]
+		})
+
+		this.addCommand({
+			id: "add-current-link-to-end-of-notes",
+			name: "LE Add current link to end-of-notes",
+			icon: `align-vertical-justify-end`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const link = view.file.basename;
+				new AddCurrentLinkToNotesModal(this.app, link, false).open()
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `]`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `]`,
 				},
 			]
 		})
 
 		this.addCommand({
 			id: "quick-navigate-to-notes",
-			name: "Quick Navigate to Notes",
+			name: "NN Quick Navigate to Notes",
 			icon: `aperture`,
 			callback: async () => {
 				new NavigateToNoteFromTagModal(this.app).open()
@@ -662,11 +682,11 @@ export default class MyPlugin extends Plugin {
 			hotkeys: [
 				{
 					modifiers: [`Ctrl`, `Meta`, `Shift`],
-					key: `.`,
+					key: `;`,
 				},
 				{
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
-					key: `.`,
+					key: `;`,
 				},
 			]
 		})
@@ -1830,11 +1850,11 @@ export default class MyPlugin extends Plugin {
 			hotkeys: [
 				{
 					modifiers: [`Ctrl`, `Meta`, `Shift`],
-					key: t == 'n' ? '[' : ']'
+					key: t == 'n' ? ',' : '.'
 				},
 				{
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
-					key: t == 'n' ? '[' : ']'
+					key: t == 'n' ? ',' : '.'
 				}
 			]
 		});
