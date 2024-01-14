@@ -1,23 +1,25 @@
-import { AddCurrentLinkToNotesFromSpecificTagModal } from "addCurrentLinkToNotesFromSpecificTagModal";
+import { AddTextToNotesFromSpecificTagModal } from "addTextToNotesFromSpecificTagModal";
 import { App, Editor, FuzzySuggestModal, FuzzyMatch, getAllTags } from "obsidian";
-import { addLinkToNotes } from "selfutil/addlinktonotes";
+import { addTextToNotes } from "selfutil/addlinktonotes";
 import { getAllNoteTags } from "selfutil/getAllNoteTags";
 
-export class AddCurrentLinkToNotesModal extends FuzzySuggestModal<string> {
+export class AddTextToNotesModal extends FuzzySuggestModal<string> {
 
   linkToAdd: string
   taskType: String
+  description: string
   insertFromBeginning: boolean
 
-  constructor(app: App, linkToAdd: string, insertFromBeginning: boolean)
+  constructor(app: App, linkToAdd: string, description: string, insertFromBeginning: boolean)
   {
     super(app)
     this.linkToAdd = linkToAdd
+    this.description = description
     this.insertFromBeginning = insertFromBeginning
     this.setInstructions([
       {
         command: "",
-        purpose: "Which notes with tags do you want to add the current note link to?"
+        purpose: `Which notes with tags do you want to add the ${description} to?`
       }
     ]);
   }
@@ -39,10 +41,10 @@ export class AddCurrentLinkToNotesModal extends FuzzySuggestModal<string> {
   // Perform action on the selected suggestion.
   async onChooseItem(choosenValue: string, evt: MouseEvent | KeyboardEvent) {
     if (choosenValue.startsWith("#")) {
-      new AddCurrentLinkToNotesFromSpecificTagModal(this.app, this.linkToAdd, choosenValue, this.insertFromBeginning).open()
+      new AddTextToNotesFromSpecificTagModal(this.app, this.linkToAdd, choosenValue, this.description, this.insertFromBeginning).open()
     } else if (choosenValue == "Inbox") {
       const inboxMd = "I/Inbox.md"
-      addLinkToNotes(this.linkToAdd, inboxMd, this.app, this.insertFromBeginning)
+      addTextToNotes(this.linkToAdd, inboxMd, this.app, this.insertFromBeginning)
     }
   }
 }

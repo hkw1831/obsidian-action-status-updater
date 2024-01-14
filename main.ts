@@ -12,8 +12,9 @@ import { ClipboardRemovalModal } from 'clipboardRemovalModal';
 import { TagSearchModal } from 'tagSearchModal';
 import { addIcon } from 'obsidian';
 import moment from 'moment';
-import { AddCurrentLinkToNotesModal } from 'addCurrentLinkToNotesModal';
+import { AddTextToNotesModal } from 'addTextToNotesModal';
 import { NavigateToNoteFromTagModal } from 'navigateToNoteFromTagModal';
+import { exportCurrentSelection } from 'selfutil/extractSelection';
 
 // Remember to rename these classes and interfaces!
 
@@ -709,12 +710,75 @@ export default class MyPlugin extends Plugin {
 		});
 
 		this.addCommand({
+			id: "add-current-selection-to-beginning-of-notes",
+			name: "SB Add current selection to beginning of notes",
+			icon: `align-start-horizontal`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				let selection = exportCurrentSelection(editor)
+				if (/^    +- /m.test(selection)
+				  || /^- /m.test(selection)
+				  || /^# /m.test(selection)
+				  || /^` /m.test(selection)
+				  || /^> /m.test(selection)
+				  || /^\d+\. /m.test(selection)
+				  ) {
+					// do nothing
+				  } else {
+					selection = "- " + selection
+				  }
+				new AddTextToNotesModal(this.app, selection, "selected text", true).open()
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `,`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `,`,
+				},
+			]
+		})
+
+
+		this.addCommand({
+			id: "add-current-selection-to-end-of-notes",
+			name: "SE Add current selection to end of notes",
+			icon: `align-end-horizontal`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				let selection = exportCurrentSelection(editor)
+				if (/^    +- /m.test(selection)
+				  || /^- /m.test(selection)
+				  || /^# /m.test(selection)
+				  || /^` /m.test(selection)
+				  || /^> /m.test(selection)
+				  || /^\d+\. /m.test(selection)
+				  ) {
+					// do nothing
+				  } else {
+					selection = "- " + selection
+				  }
+				new AddTextToNotesModal(this.app, selection, "selected text", false).open()
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `.`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `.`,
+				},
+			]
+		})
+
+		this.addCommand({
 			id: "add-current-link-to-beginning-of-notes",
 			name: "LB Add current link to beginning of notes",
 			icon: `align-vertical-justify-start`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const link = view.file.basename;
-				new AddCurrentLinkToNotesModal(this.app, link, true).open()
+				const link = "- [[" + view.file.basename + "]]";
+				new AddTextToNotesModal(this.app, link, "current note link", true).open()
 			},
 			hotkeys: [
 				{
@@ -733,8 +797,8 @@ export default class MyPlugin extends Plugin {
 			name: "LE Add current link to end-of-notes",
 			icon: `align-vertical-justify-end`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const link = view.file.basename;
-				new AddCurrentLinkToNotesModal(this.app, link, false).open()
+				const link = "- [[" + view.file.basename + "]]";
+				new AddTextToNotesModal(this.app, link, "current note link", false).open()
 			},
 			hotkeys: [
 				{

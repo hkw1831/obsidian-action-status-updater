@@ -1,11 +1,11 @@
 import { App, Notice, TFile, TextFileView, Vault, Workspace } from "obsidian"
 
-export function addLinkToNotes(linkToAdd: string, toPath: string, app: App, insertFromBeginning: boolean) {
+export function addTextToNotes(textToAdd: string, toPath: string, app: App, insertFromBeginning: boolean) {
     const vault: Vault = this.app.vault;
     const workspace: Workspace = this.app.workspace
     const leaf = workspace.getLeaf(false);
     const tFile: TFile = vault.getAbstractFileByPath(toPath) as TFile
-    const link = "[[" + linkToAdd + "]]"
+    const link = textToAdd
     Promise.resolve()
     .then(() => {
         return leaf.openFile(tFile, { active: true });
@@ -23,8 +23,8 @@ export function addLinkToNotes(linkToAdd: string, toPath: string, app: App, inse
             new Notice(errorReason)
         } else {
             const newValue = insertFromBeginning ? 
-            getNoteValueInsertingNoteLinkFromStartOfNotes(value, link) : 
-            getNoteValueInsertingNoteLinkFromEndOfNotes(value, link)
+            getNoteValueInsertingTextFromStartOfNotes(value, link) : 
+            getNoteValueInsertingTextFromEndOfNotes(value, link)
             editor.setViewData(newValue, false)
             new Notice(`Added link to ${insertFromBeginning ? "beginning" : "end"} of ${toPath}!`);
         }
@@ -60,16 +60,16 @@ export function addLinkToNotes(linkToAdd: string, toPath: string, app: App, inse
         */
 }
 
-function getNoteValueInsertingNoteLinkFromStartOfNotes(value: string, link: string) {
+function getNoteValueInsertingTextFromStartOfNotes(value: string, text: string) {
     const frontMatterRegex = /^(---\n[\s\S]*?\n---\n)/gm
     // /^---\n(.*)*\n---\n/
     if (frontMatterRegex.test(value)) {
-        return value.replace(frontMatterRegex, "$1- " + link + "\n")
+        return value.replace(frontMatterRegex, "$1" + text + "\n")
     } else {
-        return "- " + link + "\n" + value
+        return text + "\n" + value
     }
 }
 
-function getNoteValueInsertingNoteLinkFromEndOfNotes(value: string, link: string) {
-    return value + "\n- " + link
+function getNoteValueInsertingTextFromEndOfNotes(value: string, text: string) {
+    return value + "\n" + text
 }
