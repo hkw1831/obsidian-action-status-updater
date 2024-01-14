@@ -14,7 +14,7 @@ import { addIcon } from 'obsidian';
 import moment from 'moment';
 import { AddTextToNotesModal } from 'addTextToNotesModal';
 import { NavigateToNoteFromTagModal } from 'navigateToNoteFromTagModal';
-import { exportCurrentSelection } from 'selfutil/extractSelection';
+import { SelectionRange, exportCurrentSelection, getCurrentSelectionLineNumber } from 'selfutil/extractSelection';
 
 // Remember to rename these classes and interfaces!
 
@@ -1328,12 +1328,13 @@ export default class MyPlugin extends Plugin {
 			name: "Editor Copy Line to Clipboard",
 			icon: `align-vertical-space-around`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const cursor = editor.getCursor()
-			    const line = editor.getLine(cursor.line)
-				const copyContent = line.replace(/^\t*- /, '').replace(/^\t*\d+\. /, '')
+				const selection = exportCurrentSelection(editor);
+				const copyContent = selection.contains("\n")
+									? selection
+									: selection.replace(/^\t*- /, '').replace(/^\t*\d+\. /, '')
 				this.addToClipboardHistory(copyContent);
 				navigator.clipboard.writeText(copyContent).then(function () {
-					new Notice(`Copied content "${copyContent}" to clipboard!`);
+					new Notice(`Copied content\n\`\`\`\n${copyContent}\n\`\`\`\nto clipboard!`);
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);
 				});
@@ -1355,26 +1356,28 @@ export default class MyPlugin extends Plugin {
 			name: "Editor Cut Line to Clipboard",
 			icon: `align-vertical-justify-center`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const selection = exportCurrentSelection(editor);
 				const cursor = editor.getCursor()
-				const ch = cursor.ch
-				const l = cursor.line
-			    const line = editor.getLine(cursor.line)
-				const copyContent = line.replace(/^\t*- /, '').replace(/^\t*\d+\. /, '')
+				const copyContent = selection.contains("\n")
+									? selection
+									: selection.replace(/^\t*- /, '').replace(/^\t*\d+\. /, '')
 				let newContent = ''
+				const selectionRange: SelectionRange = getCurrentSelectionLineNumber(editor)
 				for (let i = 0; i < editor.lineCount(); i++) {
-					if (i != cursor.line) {
+					if (i < selectionRange.fromLineNum || i > selectionRange.toLineNum) {
 						newContent = newContent + editor.getLine(i) + "\n"
 					}
 				}
 				this.addToClipboardHistory(copyContent);
 				navigator.clipboard.writeText(copyContent).then(function () {
-					new Notice(`Copied content "${copyContent}" to clipboard!`);
+					new Notice(`Copied content\n\`\`\`\n${copyContent}\n\`\`\`\nto clipboard!`);
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);
 				});
 				editor.setValue(newContent)
-				if (editor.getLine(cursor.line).length < ch) {
-					cursor.ch = editor.getLine(cursor.line).length
+				cursor.line = selectionRange.fromLineNum
+				if (editor.getLine(selectionRange.fromLineNum).length < selectionRange.fromCh) {
+					cursor.ch = editor.getLine(selectionRange.fromLineNum).length
 				}
 				editor.setCursor(cursor)
 			},
