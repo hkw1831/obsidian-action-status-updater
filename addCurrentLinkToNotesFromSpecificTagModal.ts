@@ -19,7 +19,7 @@ export class AddCurrentLinkToNotesFromSpecificTagModal extends FuzzySuggestModal
     this.setInstructions([
       {
         command: "",
-        purpose: "Which notes do you want to add the current note link to?"
+        purpose: `Which notes with tag ${tagToFind} do you want to add the current note link to?`
       }
     ]);
   }
