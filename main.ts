@@ -1399,17 +1399,6 @@ export default class MyPlugin extends Plugin {
 			icon: `right-arrow-with-tail`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const listSelections : EditorSelection[] = editor.listSelections()
-				if (listSelections.length == 1) {
-					const listSelection = listSelections[0]
-					if (listSelection.anchor.ch == listSelection.head.ch && listSelection.anchor.line == listSelection.head.line) {
-						const cursor = editor.getCursor()
-						const line = editor.getLine(cursor.line)
-						editor.setLine(cursor.line, line.replace(/^/, "\t"))
-						cursor.ch = cursor.ch + 1
-						editor.setCursor(cursor)
-						return;
-					}
-				}
 				listSelections.forEach(listSelection => {
 					const a = listSelection.head.line
 					const b = listSelection.anchor.line
@@ -1420,6 +1409,16 @@ export default class MyPlugin extends Plugin {
 						editor.setLine(i, line.replace(/^/, "\t"))
 					}
 				})
+				let lss : EditorSelection[] = []
+				listSelections.forEach(ls => {
+					const head = ls.head
+					head.ch = head.ch + 1
+					const anchor = ls.anchor
+					anchor.ch = anchor.ch + 1
+					const newLs: EditorSelection = {anchor, head}
+					lss.push(newLs)
+				})
+				editor.setSelections(lss)
 			}
 		})
 
@@ -1429,17 +1428,6 @@ export default class MyPlugin extends Plugin {
 			icon: `left-arrow-with-tail`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const listSelections : EditorSelection[] = editor.listSelections()
-				if (listSelections.length == 1) {
-					const listSelection = listSelections[0]
-					if (listSelection.anchor.ch == listSelection.head.ch && listSelection.anchor.line == listSelection.head.line) {
-						const cursor = editor.getCursor()
-						const line = editor.getLine(cursor.line)
-						editor.setLine(cursor.line, line.replace(/^\t/, ""))
-						cursor.ch = cursor.ch + 1
-						editor.setCursor(cursor)
-						return;
-					}
-				}
 				listSelections.forEach(listSelection => {
 					const a = listSelection.head.line
 					const b = listSelection.anchor.line
@@ -1450,6 +1438,16 @@ export default class MyPlugin extends Plugin {
 						editor.setLine(i, line.replace(/^\t/, ""))
 					}
 				})
+				let lss : EditorSelection[] = []
+				listSelections.forEach(ls => {
+					const head = ls.head
+					head.ch = head.ch + 1
+					const anchor = ls.anchor
+					anchor.ch = anchor.ch + 1
+					const newLs: EditorSelection = {anchor, head}
+					lss.push(newLs)
+				})
+				editor.setSelections(lss)
 			}
 		})
 
