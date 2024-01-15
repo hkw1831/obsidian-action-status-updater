@@ -736,7 +736,7 @@ export default class MyPlugin extends Plugin {
 		this.addObsidianIcon('move-current-selection-to-beginning-of-notes', '<<');
 		this.addCommand({
 			id: "move-current-selection-to-beginning-of-notes",
-			name: "MB Move current selection to beginning of notes",
+			name: "MB << Move current selection to beginning of notes",
 			icon: `move-current-selection-to-beginning-of-notes`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				let selection = exportCurrentSelection(editor)
@@ -777,7 +777,7 @@ export default class MyPlugin extends Plugin {
 		this.addObsidianIcon('move-current-selection-to-end-of-notes', '>>');
 		this.addCommand({
 			id: "move-current-selection-to-end-of-notes",
-			name: "ME Move current selection to beginning of notes",
+			name: "ME >> Move current selection to beginning of notes",
 			icon: `move-current-selection-to-end-of-notes`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				let selection = exportCurrentSelection(editor)
@@ -818,7 +818,7 @@ export default class MyPlugin extends Plugin {
 		this.addObsidianIcon('add-current-selection-to-beginning-of-notes', '((');
 		this.addCommand({
 			id: "add-current-selection-to-beginning-of-notes",
-			name: "SB Add current selection to beginning of notes",
+			name: "SB (( Add current selection to beginning of notes",
 			icon: `add-current-selection-to-beginning-of-notes`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				let selection = exportCurrentSelection(editor)
@@ -850,7 +850,7 @@ export default class MyPlugin extends Plugin {
 		this.addObsidianIcon('add-current-selection-to-end-of-notes', '))');
 		this.addCommand({
 			id: "add-current-selection-to-end-of-notes",
-			name: "SE Add current selection to end of notes",
+			name: "SE )) Add current selection to end of notes",
 			icon: `add-current-selection-to-end-of-notes`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				let selection = exportCurrentSelection(editor)
@@ -882,7 +882,7 @@ export default class MyPlugin extends Plugin {
 		this.addObsidianIcon('add-current-link-to-beginning-of-notes', '[[');
 		this.addCommand({
 			id: "add-current-link-to-beginning-of-notes",
-			name: "LB Add current link to beginning of notes",
+			name: "LB [[ Add current link to beginning of notes",
 			icon: `add-current-link-to-beginning-of-notes`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const link = "- [[" + view.file.basename + "]]";
@@ -903,7 +903,7 @@ export default class MyPlugin extends Plugin {
 		this.addObsidianIcon('add-current-link-to-end-of-notes', ']]');
 		this.addCommand({
 			id: "add-current-link-to-end-of-notes",
-			name: "LE Add current link to end-of-notes",
+			name: "LE ]] Add current link to end-of-notes",
 			icon: `add-current-link-to-end-of-notes`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const link = "- [[" + view.file.basename + "]]";
