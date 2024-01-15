@@ -373,7 +373,7 @@ export default class MyPlugin extends Plugin {
 						const line = editor.getLine(i)
 						if (h3Count == 0) {
 							if (line.trim().length != 0 && line != "---") {
-								content += "\n" + (/^ *- /.test(line) ? "    " + line : "    - " + line)
+								content += "\n" + (/^ *- /.test(line) ? "\t" + line : "\t- " + line)
 							}
 						} else if (h3Count == 1) {
 							if (line === "---" || line.startsWith("title: ") || line.startsWith("chronicledate: ") || line.startsWith("eventdate: ")) {
@@ -407,14 +407,14 @@ export default class MyPlugin extends Plugin {
 								}
 							} else {
 								if (line.trim().length != 0) {
-									content += "\n" + (/^ *- /.test(line) ? "    " + line : "    - " + line)
+									content += "\n" + (/^ *- /.test(line) ? "\t" + line : "\t- " + line)
 								}
 							}
 						}
 						if (h3Count >= 2 && line.trim().length != 0) {
 							let modifiedLine = (line === "[ ] ") ? "" : line
 							if (modifiedLine.trim().length != 0) {
-								modifiedLine = /^ *- /.test(line) ? ("    " + line) : ("    - " + line)
+								modifiedLine = /^ *- /.test(line) ? ("\t" + line) : ("\t- " + line)
 								// modifiedLine = line === "---" ? "---" : modifiedLine
 								text += "\n" + modifiedLine
 							}
