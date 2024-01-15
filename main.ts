@@ -2018,11 +2018,11 @@ export default class MyPlugin extends Plugin {
 			hotkeys: [
 				{
 					modifiers: [`Ctrl`, `Meta`, `Shift`],
-					key: t == 'n' ? 'j' : 'k'
+					key: t == 'n' ? '6' : '7'
 				},
 				{
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
-					key: t == 'n' ? 'j' : 'k'
+					key: t == 'n' ? '6' : '7'
 				}
 			]
 		});
