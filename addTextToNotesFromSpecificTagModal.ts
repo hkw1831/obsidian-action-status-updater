@@ -1,5 +1,4 @@
 import { AddTextToNotesModal } from "addTextToNotesModal"
-import { kMaxLength } from "buffer"
 import { App, FuzzySuggestModal, FuzzyMatch } from "obsidian"
 import { addTextToNotes } from "selfutil/addlinktonotes"
 import { filesWhereTagIsUsed } from "selfutil/findNotesFromTag"
@@ -16,17 +15,20 @@ export class AddTextToNotesFromSpecificTagModal extends FuzzySuggestModal<string
 
   insertFromBeginning: boolean
 
-  constructor(app: App, linkToAdd: string, tagToFind: string, description: string, insertFromBeginning: boolean)
+  postAction: () => void
+
+  constructor(app: App, linkToAdd: string, tagToFind: string, description: string, insertFromBeginning: boolean, postAction: () => void)
   {
     super(app)
     this.linkToAdd = linkToAdd
     this.tagToFind = tagToFind
     this.insertFromBeginning = insertFromBeginning
     this.description = description
+    this.postAction = postAction
     this.setInstructions([
       {
         command: "",
-        purpose: `Which notes with tag ${tagToFind} do you want to add the ${description} to?`
+        purpose: `Which notes with tag ${tagToFind} do you want to ${description} to?`
       }
     ]);
   }
@@ -48,9 +50,10 @@ export class AddTextToNotesFromSpecificTagModal extends FuzzySuggestModal<string
   // Perform action on the selected suggestion.
   onChooseItem(path: string, evt: MouseEvent | KeyboardEvent) {
     if (BACK_TO_SELECT_TAG == path) {
-      new AddTextToNotesModal(this.app, this.linkToAdd, this.description, this.insertFromBeginning).open()
+      new AddTextToNotesModal(this.app, this.linkToAdd, this.description, this.insertFromBeginning, this.postAction).open()
     } else {
       addTextToNotes(this.linkToAdd, path, this.app, this.insertFromBeginning)
+      this.postAction()
     }
   }
 }

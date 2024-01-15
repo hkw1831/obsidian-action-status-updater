@@ -734,6 +734,86 @@ export default class MyPlugin extends Plugin {
 		});
 
 		this.addCommand({
+			id: "move-current-selection-to-beginning-of-notes",
+			name: "MB Move current selection to beginning of notes",
+			icon: `align-vertical-distriute-start`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				let selection = exportCurrentSelection(editor)
+				if (/^    +- /m.test(selection)
+				  || /^- /m.test(selection)
+				  || /^# /m.test(selection)
+				  || /^` /m.test(selection)
+				  || /^> /m.test(selection)
+				  || /^\d+\. /m.test(selection)
+				  )
+				{
+				// do nothing
+				} else {
+					selection = "- " + selection
+				}
+				let newContent = ''
+				const selectionRange: SelectionRange = getCurrentSelectionLineNumber(editor)
+				for (let i = 0; i < editor.lineCount(); i++) {
+					if (i < selectionRange.fromLineNum || i > selectionRange.toLineNum) {
+						newContent = newContent + editor.getLine(i) + "\n"
+					}
+				}
+				
+				new AddTextToNotesModal(this.app, selection, "move the selected text", true, () => editor.setValue(newContent.replace(/\n$/m, ""))).open()
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `,`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `,`,
+				},
+			]
+		})
+
+		this.addCommand({
+			id: "move-current-selection-to-end-of-notes",
+			name: "ME Move current selection to beginning of notes",
+			icon: `align-vertical-distriute-end`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				let selection = exportCurrentSelection(editor)
+				if (/^    +- /m.test(selection)
+				  || /^- /m.test(selection)
+				  || /^# /m.test(selection)
+				  || /^` /m.test(selection)
+				  || /^> /m.test(selection)
+				  || /^\d+\. /m.test(selection)
+				  )
+				{
+				// do nothing
+				} else {
+					selection = "- " + selection
+				}
+				let newContent = ''
+				const selectionRange: SelectionRange = getCurrentSelectionLineNumber(editor)
+				for (let i = 0; i < editor.lineCount(); i++) {
+					if (i < selectionRange.fromLineNum || i > selectionRange.toLineNum) {
+						newContent = newContent + editor.getLine(i) + "\n"
+					}
+				}
+				
+				new AddTextToNotesModal(this.app, selection, "move the selected text", false, () => editor.setValue(newContent.replace(/\n$/m, ""))).open()
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `.`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `.`,
+				},
+			]
+		})
+
+		this.addCommand({
 			id: "add-current-selection-to-beginning-of-notes",
 			name: "SB Add current selection to beginning of notes",
 			icon: `align-start-horizontal`,
@@ -750,16 +830,16 @@ export default class MyPlugin extends Plugin {
 				  } else {
 					selection = "- " + selection
 				  }
-				new AddTextToNotesModal(this.app, selection, "selected text", true).open()
+				new AddTextToNotesModal(this.app, selection, "add the selected text", true, () => {}).open()
 			},
 			hotkeys: [
 				{
 					modifiers: [`Ctrl`, `Meta`, `Shift`],
-					key: `,`,
+					key: `9`,
 				},
 				{
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
-					key: `,`,
+					key: `9`,
 				},
 			]
 		})
@@ -782,16 +862,16 @@ export default class MyPlugin extends Plugin {
 				  } else {
 					selection = "- " + selection
 				  }
-				new AddTextToNotesModal(this.app, selection, "selected text", false).open()
+				new AddTextToNotesModal(this.app, selection, "add the selected text", false, () => {}).open()
 			},
 			hotkeys: [
 				{
 					modifiers: [`Ctrl`, `Meta`, `Shift`],
-					key: `.`,
+					key: `0`,
 				},
 				{
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
-					key: `.`,
+					key: `0`,
 				},
 			]
 		})
@@ -802,7 +882,7 @@ export default class MyPlugin extends Plugin {
 			icon: `align-vertical-justify-start`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const link = "- [[" + view.file.basename + "]]";
-				new AddTextToNotesModal(this.app, link, "current note link", true).open()
+				new AddTextToNotesModal(this.app, link, "add the current note link", true, () => {}).open()
 			},
 			hotkeys: [
 				{
@@ -822,7 +902,7 @@ export default class MyPlugin extends Plugin {
 			icon: `align-vertical-justify-end`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const link = "- [[" + view.file.basename + "]]";
-				new AddTextToNotesModal(this.app, link, "current note link", false).open()
+				new AddTextToNotesModal(this.app, link, "add the current note link", false, () => {}).open()
 			},
 			hotkeys: [
 				{

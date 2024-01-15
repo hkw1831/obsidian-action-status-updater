@@ -9,17 +9,19 @@ export class AddTextToNotesModal extends FuzzySuggestModal<string> {
   taskType: String
   description: string
   insertFromBeginning: boolean
+  postAction: () => void
 
-  constructor(app: App, linkToAdd: string, description: string, insertFromBeginning: boolean)
+  constructor(app: App, linkToAdd: string, description: string, insertFromBeginning: boolean, postAction: () => void)
   {
     super(app)
     this.linkToAdd = linkToAdd
     this.description = description
     this.insertFromBeginning = insertFromBeginning
+    this.postAction = postAction
     this.setInstructions([
       {
         command: "",
-        purpose: `Which notes with tags do you want to add the ${description} to?`
+        purpose: `Which notes with tags do you want to ${description} to?`
       }
     ]);
   }
@@ -41,10 +43,11 @@ export class AddTextToNotesModal extends FuzzySuggestModal<string> {
   // Perform action on the selected suggestion.
   async onChooseItem(choosenValue: string, evt: MouseEvent | KeyboardEvent) {
     if (choosenValue.startsWith("#")) {
-      new AddTextToNotesFromSpecificTagModal(this.app, this.linkToAdd, choosenValue, this.description, this.insertFromBeginning).open()
+      new AddTextToNotesFromSpecificTagModal(this.app, this.linkToAdd, choosenValue, this.description, this.insertFromBeginning, this.postAction).open()
     } else if (choosenValue == "Inbox") {
       const inboxMd = "I/Inbox.md"
       addTextToNotes(this.linkToAdd, inboxMd, this.app, this.insertFromBeginning)
+      this.postAction()
     }
   }
 }
