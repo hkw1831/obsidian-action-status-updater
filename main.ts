@@ -347,7 +347,7 @@ export default class MyPlugin extends Plugin {
 		*/
 
 		// TODO remove after TW migrate finish
-		this.addObsidianIcon('note-to-tree-list', 'NT');
+		this.addObsidianIcon('note-to-tree-list', '**');
 		this.addCommand({
 			id: "note-to-tree-list",
 			name: "NT Note to Tree List",
