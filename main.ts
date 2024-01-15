@@ -437,11 +437,11 @@ export default class MyPlugin extends Plugin {
 			hotkeys: [
 				{
 					modifiers: [`Ctrl`, `Meta`, `Shift`],
-					key: `0`,
+					key: `8`,
 				},
 				{
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
-					key: `0`,
+					key: `8`,
 				},
 			]
 		});
