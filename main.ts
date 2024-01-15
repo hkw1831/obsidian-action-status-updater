@@ -236,7 +236,7 @@ export default class MyPlugin extends Plugin {
 				this.addActionNoteContent(vault, "D", "Query N now actions", "Weekly Schedule N", "n")
 				this.add3DaysActionNoteContent(vault);
 				new Notice("Updated schedule");
-			},
+			}/*,
 			hotkeys: [
 				{
 					modifiers: [`Ctrl`, `Meta`, `Shift`],
@@ -246,7 +246,7 @@ export default class MyPlugin extends Plugin {
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
 					key: `u`,
 				},
-			]
+			]*/
 		})
 
 		/*
