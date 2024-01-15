@@ -1,6 +1,7 @@
 import { NavigateToNoteFromSpecificTagModal } from "navigateToNoteFromSpecificTagModal";
-import { App, FuzzySuggestModal, FuzzyMatch, getAllTags } from "obsidian";
+import { App, FuzzySuggestModal, FuzzyMatch, getAllTags, TFile } from "obsidian";
 import { getAllTagsWithFilter } from "selfutil/getAllNoteTags";
+import { getRecentNotes } from "selfutil/getRecentNotes";
 
 export class NavigateToNoteFromTagModal extends FuzzySuggestModal<string> {
 
@@ -18,7 +19,7 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<string> {
   }
 
   getItems() : string[] {
-		return getAllTagsWithFilter(this.app);
+		return [...getRecentNotes(this.app, 7), ...getAllTagsWithFilter(this.app)];
   }
 
   getItemText(value: string): string {
@@ -35,6 +36,13 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<string> {
   async onChooseItem(choosenValue: string, evt: MouseEvent | KeyboardEvent) {
     if (choosenValue.startsWith("#")) {
       new NavigateToNoteFromSpecificTagModal(this.app, choosenValue).open()
+    } else {
+      const { vault, workspace } = this.app;
+      const leaf = workspace.getLeaf(false);
+      Promise.resolve()
+      .then(() => {
+          return leaf.openFile(vault.getAbstractFileByPath(choosenValue) as TFile, { active : true });
+      })
     }
   }
 }

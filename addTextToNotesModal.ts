@@ -1,7 +1,8 @@
 import { AddTextToNotesFromSpecificTagModal } from "addTextToNotesFromSpecificTagModal";
-import { App, Editor, FuzzySuggestModal, FuzzyMatch, getAllTags } from "obsidian";
+import { App, FuzzySuggestModal, FuzzyMatch, getAllTags } from "obsidian";
 import { addTextToNotes } from "selfutil/addlinktonotes";
 import { getAllNoteTags } from "selfutil/getAllNoteTags";
+import { getRecentNotes } from "selfutil/getRecentNotes";
 
 export class AddTextToNotesModal extends FuzzySuggestModal<string> {
 
@@ -27,7 +28,7 @@ export class AddTextToNotesModal extends FuzzySuggestModal<string> {
   }
 
   getItems() : string[] {
-		return [...['Inbox'], ...getAllNoteTags(this.app)];
+		return [...['I/Inbox.md'], ...getRecentNotes(this.app, 7), ...getAllNoteTags(this.app)];
   }
 
   getItemText(value: string): string {
@@ -44,9 +45,8 @@ export class AddTextToNotesModal extends FuzzySuggestModal<string> {
   async onChooseItem(choosenValue: string, evt: MouseEvent | KeyboardEvent) {
     if (choosenValue.startsWith("#")) {
       new AddTextToNotesFromSpecificTagModal(this.app, this.linkToAdd, choosenValue, this.description, this.insertFromBeginning, this.postAction).open()
-    } else if (choosenValue == "Inbox") {
-      const inboxMd = "I/Inbox.md"
-      addTextToNotes(this.linkToAdd, inboxMd, this.app, this.insertFromBeginning)
+    } else {
+      addTextToNotes(this.linkToAdd, choosenValue, this.app, this.insertFromBeginning)
       this.postAction()
     }
   }
