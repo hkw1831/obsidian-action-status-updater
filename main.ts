@@ -2014,17 +2014,17 @@ export default class MyPlugin extends Plugin {
 				editor.replaceRange(`#${t}l `, cursor);
 				cursor.ch = cursor.ch + 4;
 				editor.setCursor(cursor);
-			}/*,
+			},
 			hotkeys: [
 				{
 					modifiers: [`Ctrl`, `Meta`, `Shift`],
-					key: t == 'n' ? ',' : '.'
+					key: t == 'n' ? 'j' : 'k'
 				},
 				{
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
-					key: t == 'n' ? ',' : '.'
+					key: t == 'n' ? 'j' : 'k'
 				}
-			]*/
+			]
 		});
 	}
 
