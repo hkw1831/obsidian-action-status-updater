@@ -733,10 +733,11 @@ export default class MyPlugin extends Plugin {
 			]
 		});
 
+		this.addObsidianIcon('move-current-selection-to-beginning-of-notes', '<<');
 		this.addCommand({
 			id: "move-current-selection-to-beginning-of-notes",
 			name: "MB Move current selection to beginning of notes",
-			icon: `align-vertical-distriute-start`,
+			icon: `move-current-selection-to-beginning-of-notes`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				let selection = exportCurrentSelection(editor)
 				if (/^    +- /m.test(selection)
@@ -773,10 +774,11 @@ export default class MyPlugin extends Plugin {
 			]
 		})
 
+		this.addObsidianIcon('move-current-selection-to-end-of-notes', '>>');
 		this.addCommand({
 			id: "move-current-selection-to-end-of-notes",
 			name: "ME Move current selection to beginning of notes",
-			icon: `align-vertical-distriute-end`,
+			icon: `move-current-selection-to-end-of-notes`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				let selection = exportCurrentSelection(editor)
 				if (/^    +- /m.test(selection)
@@ -813,10 +815,11 @@ export default class MyPlugin extends Plugin {
 			]
 		})
 
+		this.addObsidianIcon('add-current-selection-to-beginning-of-notes', '((');
 		this.addCommand({
 			id: "add-current-selection-to-beginning-of-notes",
 			name: "SB Add current selection to beginning of notes",
-			icon: `align-start-horizontal`,
+			icon: `add-current-selection-to-beginning-of-notes`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				let selection = exportCurrentSelection(editor)
 				if (/^    +- /m.test(selection)
@@ -844,11 +847,11 @@ export default class MyPlugin extends Plugin {
 			]
 		})
 
-
+		this.addObsidianIcon('add-current-selection-to-end-of-notes', '))');
 		this.addCommand({
 			id: "add-current-selection-to-end-of-notes",
 			name: "SE Add current selection to end of notes",
-			icon: `align-end-horizontal`,
+			icon: `add-current-selection-to-end-of-notes`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				let selection = exportCurrentSelection(editor)
 				if (/^    +- /m.test(selection)
@@ -876,10 +879,11 @@ export default class MyPlugin extends Plugin {
 			]
 		})
 
+		this.addObsidianIcon('add-current-link-to-beginning-of-notes', '[[');
 		this.addCommand({
 			id: "add-current-link-to-beginning-of-notes",
 			name: "LB Add current link to beginning of notes",
-			icon: `align-vertical-justify-start`,
+			icon: `add-current-link-to-beginning-of-notes`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const link = "- [[" + view.file.basename + "]]";
 				new AddTextToNotesModal(this.app, link, "add the current note link", true, () => {}).open()
@@ -896,10 +900,11 @@ export default class MyPlugin extends Plugin {
 			]
 		})
 
+		this.addObsidianIcon('add-current-link-to-end-of-notes', ']]');
 		this.addCommand({
 			id: "add-current-link-to-end-of-notes",
 			name: "LE Add current link to end-of-notes",
-			icon: `align-vertical-justify-end`,
+			icon: `add-current-link-to-end-of-notes`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const link = "- [[" + view.file.basename + "]]";
 				new AddTextToNotesModal(this.app, link, "add the current note link", false, () => {}).open()
