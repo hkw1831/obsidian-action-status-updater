@@ -30,9 +30,56 @@ const clipboardHistory: string[] = []
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
+	view: MarkdownView;
 
 	async onload() {
 		await this.loadSettings();
+
+		/*
+		//function displayNoteInLeftView(app: App, notePath: string) {
+			console.log("===1")
+			//const view = new MarkdownView(this.app.workspace.getLeaf());
+			//console.log("===2")
+			//view.setEphemeralState({ path: "I/Inbox.md" });
+			//console.log("===3")
+			//app.workspace.getLeaf().setViewState({ type: "markdown", state: view.getState() });
+			//console.log("===4")
+
+			
+			this.registerView(
+				"inbox",
+				(leaf) => {
+					this.view = new MarkdownView(leaf)
+					this.view.setEphemeralState({ path: "I/Inbox.md" });
+					const state = this.view.getState()
+					state.pinned = true
+					leaf.setViewState({ type: "markdown", state: state });
+					return this.view
+				},
+			  );
+		  //}
+
+		  console.log("===2")
+
+		  this.addCommand({
+			id: 'recent-files-open',
+			name: 'Open XXX',
+			callback: async () => {
+			  let [leaf] = this.app.workspace.getLeavesOfType(
+				"inbox",
+			  );
+			  if (!leaf) {
+				leaf = this.app.workspace.getLeftLeaf(false);
+				await leaf.setViewState({ type: "inbox" });
+			  }
+	  
+			  this.app.workspace.revealLeaf(leaf);
+			},
+		  });
+
+		  console.log("===3")
+		  */
+		  
 
 		if (navigator.clipboard) {
 			document.addEventListener('copy', (event: ClipboardEvent) => {
