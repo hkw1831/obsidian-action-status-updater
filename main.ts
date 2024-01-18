@@ -98,9 +98,14 @@ export default class MyPlugin extends Plugin {
 			console.log('Clipboard API is not supported in this browser.');
 		  }
 
-		['n', 'l', 'w', 'd', 'a', 't', 'm', 'e', '1', '2', '3', '4', '5', '6', '7'].forEach(t => {
+		['n', 'l', 'w', 'd', 'a', '1', '2', '3', '4', '5', '6', '7'].forEach(t => {
 			this.addActionIcon(t);
 			this.addActionCommand(t);
+		});
+
+		['t', 'm', 'e'].forEach(t => {
+			this.addActionIcon(t);
+			this.addFollowUpCommand(t);
 		});
 
 		['n', 'w'].forEach(t => {
@@ -2190,6 +2195,22 @@ export default class MyPlugin extends Plugin {
 					const newCh = cursor.ch <= index ? cursor.ch : (cursor.ch >= index + 4 ? cursor.ch - 4 : index)
 					cursor.ch = newCh
 					editor.setCursor(cursor);
+				} else if (line.contains(` #n${t}`) || line.contains(` #w${t}`)) {
+					const nt = `#n${t} `
+					const wt = `#w${t} `
+					
+					const replaceLineToRemoveTag = line.replace(` #n${t}`, ``).replace(` #w${t}`, ``)
+					editor.setLine(lineNumber, replaceLineToRemoveTag);
+					// lets say "#nt " is at 3 (char for #)
+					// if ch <= 3 no need to update
+					// if ch >= 7 then need to -4
+					// else ch == 3
+					const ntIndex = line.indexOf(nt)
+					const wtIndex = line.indexOf(wt)
+					const index = ntIndex == -1 ? wtIndex : ntIndex
+					const newCh = cursor.ch <= index ? cursor.ch : (cursor.ch >= index + 4 ? cursor.ch - 4 : index)
+					cursor.ch = newCh
+					editor.setCursor(cursor);
 				} else if (line.contains(` a/n/${t}`) || line.contains(` a/w/${t}`)) {
 					// do nothing
 				} else if (replacedLine == line) { // no tag, to add tag
@@ -2211,6 +2232,79 @@ export default class MyPlugin extends Plugin {
 			]
 		});
 	}
+
+	addFollowUpCommand(t: string) {
+		let name = ""
+		if (t === 't') {
+			name = 'To Try'
+		} else if (t === 'e') {
+			name = 'To Explore'
+		} else if (t === 'm') {
+			name = 'To Move'
+		}
+		this.addCommand({
+			id: `to-t${t}`,
+			name: `To t${t} ${name}`,
+			icon: `${t}-icon`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				console.log(editor.getSelection());
+				const cursor = editor.getCursor();
+				const lineNumber = editor.getCursor().line;
+				const line = editor.getLine(lineNumber);
+				const replacedLine = line.replace(/#t. /, `#t${t} `)
+										 .replace(/#t.$/, `#t${t}`)
+				if (line.contains(`#t${t} `)) {
+					const tt = `#t${t} `
+					
+					const replaceLineToRemoveTag = line.replace(`#t${t} `, ``)
+					editor.setLine(lineNumber, replaceLineToRemoveTag);
+					// lets say "#tt " is at 3 (char for #)
+					// if ch <= 3 no need to update
+					// if ch >= 7 then need to -4
+					// else ch == 3
+					const ttIndex = line.indexOf(tt)
+					const index = ttIndex
+					const newCh = cursor.ch <= index ? cursor.ch : (cursor.ch >= index + 4 ? cursor.ch - 4 : index)
+					cursor.ch = newCh
+					editor.setCursor(cursor);
+				} else if (line.contains(` #t${t}`)) {
+					const tt = `#t${t} `
+					
+					const replaceLineToRemoveTag = line.replace(` #t${t}`, ``)
+					editor.setLine(lineNumber, replaceLineToRemoveTag);
+					// lets say "#tt " is at 3 (char for #)
+					// if ch <= 3 no need to update
+					// if ch >= 7 then need to -4
+					// else ch == 3
+					const ttIndex = line.indexOf(tt)
+					const index = ttIndex
+					const newCh = cursor.ch <= index ? cursor.ch : (cursor.ch >= index + 4 ? cursor.ch - 4 : index)
+					cursor.ch = newCh
+					editor.setCursor(cursor);
+				} else if (replacedLine == line) { // no tag, to add tag
+					const cursor = editor.getCursor()
+					const line = editor.getLine(cursor.line);
+					editor.replaceRange(`${line.charAt(cursor.ch - 1) != ' ' ? ' ' : ""}#t${t} `, cursor);  
+					cursor.ch = cursor.ch + 4 + (line.charAt(cursor.ch - 1) != ' ' ? 1 : 0);
+					editor.setCursor(cursor);
+				} else {			 
+					editor.setLine(lineNumber, replacedLine);
+					editor.setCursor(cursor);
+				}
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `${t}`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `${t}`,
+				}
+			]
+		});
+	}
+
 
 	is1To7(t: string) : boolean {
 		if (t == "1" || t == "2" || t == "3" || t == "4" || t == "5" || t == "6" || t == "7") {
