@@ -566,7 +566,7 @@ export default class MyPlugin extends Plugin {
 			name: "CA Count Action Tag",
 			icon: `action-tag-count-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const tags = ["nn", "nl", "nw", "nm", "n1", "n2", "n3", "n4", "n5", "n6", "n7", "wn", "wl", "ww", "wm", "w1", "w2", "w3", "w4", "w5", "w6", "w7"];
+				const tags = ["nn", "nl", "nw", "n1", "n2", "n3", "n4", "n5", "n6", "n7", "wn", "wl", "ww", "w1", "w2", "w3", "w4", "w5", "w6", "w7"];
 				const matches: string[] = [];
 				const lineNum = editor.lineCount();
 				for (let i = 0; i < lineNum; i++) {
@@ -646,7 +646,6 @@ export default class MyPlugin extends Plugin {
 										 .replace('#nd ', '')
 										 .replace('#na ', '')
 										 .replace('#nt ', '')
-										 .replace('#nm ', '')
 										 .replace('#n1 ', '')
 										 .replace('#n2 ', '')
 										 .replace('#n3 ', '')
@@ -660,7 +659,6 @@ export default class MyPlugin extends Plugin {
 										 .replace('#wd ', '')
 										 .replace('#wa ', '')
 										 .replace('#wt ', '')
-										 .replace('#wm ', '')
 										 .replace('#w1 ', '')
 										 .replace('#w2 ', '')
 										 .replace('#w3 ', '')
@@ -726,7 +724,7 @@ export default class MyPlugin extends Plugin {
 					for (let i = fromLineNum; i <= toLineNum; i++) {
 						const line = editor.getLine(i)
 						if (/^- \d\d\d\d-\d\d-\d\d \d\d:\d\d /.test(line)) {
-							const modifiedLine = line.replace(/^- /, `- #nm `)
+							const modifiedLine = line.replace(/^- /, `- #tm `)
 							editor.setLine(i, modifiedLine);
 							text += line + "\n"
 						}
@@ -1161,9 +1159,9 @@ export default class MyPlugin extends Plugin {
 			icon: `threads-to-clipboard-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const value = editor.getValue()
-				if (!value.contains("%% #nm to zk %%") && !value.contains("%% #nd to zk %%")) {
-					this.addTaskToPutIntoCardInThreadsContent(editor)
-				}
+				//if (!value.contains("%% #tm to zk %%") && !value.contains("%% #nd to zk %%")) {
+				//	this.addTaskToPutIntoCardInThreadsContent(editor)
+				//}
 				const text = this.convertThreadsContentToFormatForThreadsApp(editor)
 				const beforeTag = "c/t/r"
 				const afterTag = "c/t/t"
@@ -1295,9 +1293,9 @@ export default class MyPlugin extends Plugin {
 			icon: `threads-as-facebook-post-to-clipboard-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const value = editor.getValue()
-				if (!value.contains("%% #nm to zk %%") && !value.contains("%% #nd to zk %%")) {
-					this.addTaskToPutIntoCardInThreadsContent(editor)
-				}
+				//if (!value.contains("%% #nm to zk %%") && !value.contains("%% #nd to zk %%")) {
+				//	this.addTaskToPutIntoCardInThreadsContent(editor)
+				//}
 				const text = this.convertThreadsContentToFormatForFacebookApp(editor)
 			
 				const beforeTag = "c/t/t"
@@ -1720,6 +1718,7 @@ export default class MyPlugin extends Plugin {
 		return this.convertThreadsContentToLightPostFormat(editor, "", "\n\nᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳ\n\n", (a) => a.replace("👇", ""))
 	}
 
+/*
 	addTaskToPutIntoCardInThreadsContent(editor: Editor) {
 		let line = editor.lineCount();
 
@@ -1731,15 +1730,15 @@ export default class MyPlugin extends Plugin {
 			}
 			const line = editor.getLine(i);
 			
-			if (frontMatterLineCount > 2 && line == "---") {
-				text = text + "%% #nm to zk %%\n\n"
-			}
+			//if (frontMatterLineCount > 2 && line == "---") {
+			//	text = text + "%% #nm to zk %%\n\n"
+			//}
 			text = text + line + "\n"
 		}
 
 		editor.setValue(text);
 	}
-
+*/
 	convertThreadsContentToLightPostFormat(editor: Editor, headerIcon: string, paragraphSeparator: string
 		, additionReplaceFn: (a: string) => string = (a) => a) : string {
 		let line = editor.lineCount();
@@ -2016,7 +2015,7 @@ export default class MyPlugin extends Plugin {
 		const excludeNotes = [scheduleNoteWithoutMd, "D/Scheduling"];
 		Array.from(Array(3).keys()).forEach(i => noteContent += this.getQueryDateAndActionString(i, excludeNotes));
 		const otherDays = this.getQueryActionsThisWeek(3);
-		noteContent = noteContent + `## nn / wn\n\`\`\`query\ntag:#nn OR tag:#wn${otherDays}\n\`\`\`\n\n## nt / wt\n\`\`\`query\ntag:#nt OR tag:#wt\n\`\`\`\n\n`
+		noteContent = noteContent + `## nn / wn\n\`\`\`query\ntag:#nn OR tag:#wn${otherDays}\n\`\`\`\n\n## tt\n\`\`\`query\ntag:#tt\n\`\`\`\n\n`
 		noteContent = noteContent + this.getQueryFutureDaysThisWeek("Future Dates", 3, 6, excludeNotes)
 		noteContent = noteContent + this.getQueryNext2MonthString(excludeNotes)
 		noteContent = noteContent + this.getQueryFutureDaysThisWeek("Past Dates", -7, -1, excludeNotes)
