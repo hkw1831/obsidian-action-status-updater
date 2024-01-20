@@ -1982,7 +1982,9 @@ export default class MyPlugin extends Plugin {
 				} else if (line.startsWith("title: ")) {
 					const modifiedLine = line.replace(/:/g, "_").replace(/^title_ /, "title: ")
 					fm += (modifiedLine + "\n")
-				} else if (line.startsWith("tagsss: ")) {
+				} else if (line === "tags: [excalidraw]"){
+					fm += (line + "\n")
+				} else if (line.startsWith("tagsss: ") || line.startsWith("tags: ")) {
 					const bracketPattern = /\[\[.*?\]\]/g;
 
 					// Find all bracketed items
@@ -2005,7 +2007,7 @@ export default class MyPlugin extends Plugin {
 						tag = tag.trim()
 						// [[event n]] / [[event w]] / regex of [[20220717 Journal (Week 28 Sun)]]: put in skips
 						// [[20220721 Journal (Week 29 Thu)]]
-						if (tag === "[[.Header Shortcut]]" || tag === "[[.Current Project]]" || tag === "concept" || tag === "space" || tag === "problem" || tag === "tagsss:" || tag === "[[event n]]" || tag === "[[event w]]"
+						if (tag === "[[.Header Shortcut]]" || tag === "[[.Current Project]]" || tag === "concept" || tag === "space" || tag === "problem" || tag === "tagsss:" || tag === "tags:" || tag === "[[event n]]" || tag === "[[event w]]"
 							|| /\[\[\d{8} Journal \(Week \d+ [A-Za-z]{3}\)\]\]/.test(tag)) {
 							skips.push(tag)
 						} else if (tag === "permtask" || 	tag === "N" || tag === "W" || tag === "now" || tag === "later" || tag === "waiting" || tag === "done" || tag === "archive" || tag === "action" || tag === "task") {
@@ -2026,9 +2028,9 @@ export default class MyPlugin extends Plugin {
 						const uniqueParent = Array.from(new Set(parent));
 						uniqueParent.forEach(p => {
 							if (p.startsWith("[[") && p.endsWith("]]")) {
-								modifiedLine += "parent" + parentCount + ": \"" + p + "\"\n"
+								modifiedLine += "parent" + parentCount + ": \"" + p.replace(":", "_") + "\"\n"
 							} else {
-								modifiedLine += "parent" + parentCount + ": \"[[" + p + "]]\"\n"
+								modifiedLine += "parent" + parentCount + ": \"[[" + p.replace(":", "_") + "]]\"\n"
 							}
 							parentCount++
 						})
