@@ -28,6 +28,50 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 
 const clipboardHistory: string[] = []
 
+const skipFrontMatterField: string[] = [
+	"freetimetask: ",
+	"expectedtime: ",
+	"mode: ",
+	"days: ",
+	"showheaderfooter: ",
+	"showstate: ",
+	"sortsubpagefilter: ",
+	"throughttree: ",
+	"urgent: ",
+	"displayas: ",
+	"startdate: ",
+	"readwritemode: ",
+	"showChandlerNow: ",
+	"deepwork: ",
+	"expectedtime: ",
+	"parsedate: ",
+	"tidscope: ",
+	"inserttodoaction: ",
+	"optional: ",
+	"replaceto: ",
+	"backuptiddler: ",
+	"deadline: ",
+	"caption: ",
+	"collection: ",
+	"library: ",
+	"library_version: ",
+	"dummy: ",
+	"tidName: ",
+	"chronicledate: ",
+	"eventdate: ",
+	"dailyhighlight: ",
+	"displaycardmode: ",
+	"displaymode: ",
+	"numcol: ",
+	"dateyyyymmdd: ",
+	"graphdisplaymode: ",
+	"maxdepth: ",
+	"journaldate: ",
+	"thisBillDate: ",
+	"lastBillDate: ",
+	"roottiddler: "
+]
+
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
 	view: MarkdownView;
@@ -399,6 +443,109 @@ export default class MyPlugin extends Plugin {
 		*/
 
 		// TODO remove after TW migrate finish
+		this.addObsidianIcon('tw-frontmatter', 'FM');
+		this.addCommand({
+			id: "tw-frontmatter",
+			name: "FM TW FrontMatter",
+			icon: `tw-frontmatter`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const lineCount = editor.lineCount()
+
+				let fm = ""
+				let c = ""
+				let text = ""
+				let h3Count = 0;
+				let content = ""
+				for (let i = 0; i < lineCount; i++) {
+					const line = editor.getLine(i)
+					if (h3Count == 0) {
+						content += (line + "\n")
+					} else if (h3Count == 1) {
+						if (this.shouldSkipFrontMatter(line)) {
+							// do nothing
+						} else if (line.startsWith("title: ")) {
+							const modifiedLine = line.replace(/:/g, "_").replace(/^title_ /, "title: ")
+							fm += (modifiedLine + "\n")
+						} else if (line.startsWith("tagsss: ")) {
+							const bracketPattern = /\[\[.*?\]\]/g;
+
+							// Find all bracketed items
+							const bracketedItems = line.match(bracketPattern) || [];
+							
+							// Remove bracketed items from the input string to deal with the remaining
+							const remainingString = line.replace(bracketPattern, '').trim();
+							
+							// Split the remaining string by spaces to get the individual words
+							const remainingItems = remainingString.split(/\s+/).filter(item => item);
+							
+							// Combine the bracketed items and the individual words into one array
+							const fmtagsss = [...bracketedItems, ...remainingItems];
+
+							let parent : string[] = []
+							let tagsss : string[] = []
+							let skips : string[]= []
+							
+							fmtagsss.forEach(tag => {
+								tag = tag.trim()
+								// [[event n]] / [[event w]] / regex of [[20220717 Journal (Week 28 Sun)]]: put in skips
+								// [[20220721 Journal (Week 29 Thu)]]
+								if (tag === "[[.Header Shortcut]]" || tag === "[[.Current Project]]" || tag === "concept" || tag === "space" || tag === "problem" || tag === "tagsss:" || tag === "[[event n]]" || tag === "[[event w]]"
+								   || /\[\[\d{8} Journal \(Week \d+ [A-Za-z]{3}\)\]\]/.test(tag)) {
+									skips.push(tag)
+								} else if (tag === "permtask" || 	tag === "N" || tag === "W" || tag === "now" || tag === "later" || tag === "waiting" || tag === "done" || tag === "archive" || tag === "action" || tag === "task") {
+									tagsss.push(tag.replace("[[", "").replace("]]", ""))
+								} else if (tag === "preblog" || tag === "prepreblog") {
+									parent.push("[[Blog _ Post]]")
+								} else {
+									parent.push(tag)
+								}
+							})
+							//new Notice(skips.join("\n"))
+							let modifiedLine = ""
+							if (tagsss.length > 0) {
+								modifiedLine += "tagsss: " + tagsss.join(" ") + "\n"
+							}
+							let parentCount = 1
+							if (parent.length > 0) {
+								const uniqueParent = Array.from(new Set(parent));
+								uniqueParent.forEach(p => {
+									modifiedLine += "parent" + parentCount + ": " + p + "\n"
+									parentCount++
+								})
+							}
+							fm += modifiedLine
+						} else {
+							fm += (line + "\n")
+						}
+					}
+					if (h3Count >= 2) {
+						c += (line + "\n")
+					}
+					if (line === "---") {
+						h3Count++;
+					}
+				} 
+				text += content
+				if (fm.length > 0) {
+					text += fm
+				}
+				text += c
+				
+				editor.setValue(text.replace(/^---\n---\n/m, "").replace(/\n$/, ""))
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `6`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `6`,
+				},
+			]
+		});
+
+		// TODO remove after TW migrate finish
 		this.addObsidianIcon('tw-checkbox', '[]');
 		this.addCommand({
 			id: "tw-checkbox",
@@ -416,7 +563,7 @@ export default class MyPlugin extends Plugin {
 				for (let i = 0; i < lineCount; i++) {
 					const line = editor.getLine(i)
 					if (h3Count == 0) {
-						content += line + "\n"
+						content += (line + "\n")
 					} else if (h3Count == 1) {
 						if (line.startsWith("checkboxbytime_")) {
 							const keyValueArray = line.split(":").map(item => item.trim());
@@ -430,7 +577,7 @@ export default class MyPlugin extends Plugin {
 								checkboxMap.set(modifiedKey, value === "open" ? "[x]" : "[ ]");
 							}
 						} else {
-							fm += line + "\n"
+							fm += (line + "\n")
 						}
 					}
 					if (h3Count >= 2) {
@@ -441,7 +588,7 @@ export default class MyPlugin extends Plugin {
 						}
 						modifiedLine = modifiedLine.replace(/<<checkboxByTime "[A-Za-z0-9_]+">>/g, "[ ]")
 
-						c += modifiedLine + "\n"
+						c += (modifiedLine + "\n")
 					}
 					if (line === "---") {
 						h3Count++;
@@ -454,7 +601,7 @@ export default class MyPlugin extends Plugin {
 				}
 				text += c
 				
-				editor.setValue(text.replace(/\n$/m, ""))
+				editor.setValue(text.replace(/\n$/, ""))
 			},
 			hotkeys: [
 				{
@@ -513,7 +660,7 @@ export default class MyPlugin extends Plugin {
 								content += "\n" + modifiedLine
 							}
 						} else if (h3Count == 1) {
-							if (line === "---" || line.startsWith("title: ") || line.startsWith("chronicledate: ") || line.startsWith("eventdate: ")) {
+							if (line === "---" || this.shouldSkipFrontMatter(line)) {
 							//	text += line.replace("title: ", "")
 							} else if (line.startsWith("tagsss: ")) {
 								if (/ N /.test(line) || / N$/.test(line)) {
@@ -580,7 +727,7 @@ export default class MyPlugin extends Plugin {
 								}
 								modifiedLine = modifiedLine.replace(/<<checkboxByTime "[A-Za-z0-9_]+">>/g, "[ ]")
 
-								text += "\n" + modifiedLine
+								text += ("\n" + modifiedLine)
 							}
 						}
 						if (line === "---") {
@@ -1851,6 +1998,16 @@ export default class MyPlugin extends Plugin {
 		editor.setValue(text);
 	}
 */
+
+	shouldSkipFrontMatter(line: string) : boolean {
+		for (let i = 0; i < skipFrontMatterField.length; i++) {
+			if (line.startsWith(skipFrontMatterField[i])) {
+				return true
+			}
+		}
+		return false
+	}
+
 	convertThreadsContentToLightPostFormat(editor: Editor, headerIcon: string, paragraphSeparator: string
 		, additionReplaceFn: (a: string) => string = (a) => a) : string {
 		let line = editor.lineCount();
