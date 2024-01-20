@@ -646,7 +646,7 @@ export default class MyPlugin extends Plugin {
 								content += "\n" + modifiedLine
 							}
 						} else if (h3Count == 1) {
-							if (line === "---" || this.shouldSkipFrontMatter(line)) {
+							if (line === "---" || this.shouldSkipFrontMatter(line) || line.startsWith("title: ")) {
 							//	text += line.replace("title: ", "")
 							} else if (line.startsWith("tagsss: ")) {
 								if (/ N /.test(line) || / N$/.test(line)) {
