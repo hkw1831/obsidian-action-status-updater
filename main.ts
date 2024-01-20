@@ -399,6 +399,77 @@ export default class MyPlugin extends Plugin {
 		*/
 
 		// TODO remove after TW migrate finish
+		this.addObsidianIcon('tw-checkbox', '[]');
+		this.addCommand({
+			id: "tw-checkbox",
+			name: "CB TW Checkbox",
+			icon: `tw-checkbox`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const checkboxMap = new Map<string, string>();
+				const lineCount = editor.lineCount()
+
+				let fm = ""
+				let c = ""
+				let text = ""
+				let h3Count = 0;
+				let content = ""
+				for (let i = 0; i < lineCount; i++) {
+					const line = editor.getLine(i)
+					if (h3Count == 0) {
+						content += line + "\n"
+					} else if (h3Count == 1) {
+						if (line.startsWith("checkboxbytime_")) {
+							const keyValueArray = line.split(":").map(item => item.trim());
+							if (keyValueArray.length === 2) {
+								const key = keyValueArray[0];
+								const value = keyValueArray[1];
+
+								const splitArray = key.split("_");
+								const modifiedKey = `<<checkboxByTime "${splitArray[1]}">>`;
+
+								checkboxMap.set(modifiedKey, value === "open" ? "[x]" : "[ ]");
+							}
+						} else {
+							fm += line + "\n"
+						}
+					}
+					if (h3Count >= 2) {
+						let modifiedLine = line
+
+						for (const [key, value] of checkboxMap) {
+							modifiedLine = modifiedLine.replace(new RegExp(key, "g"), value);
+						}
+						modifiedLine = modifiedLine.replace(/<<checkboxByTime "[A-Za-z0-9_]+">>/g, "[ ]")
+
+						c += modifiedLine + "\n"
+					}
+					if (line === "---") {
+						h3Count++;
+					}
+				} 
+				text += content
+				if (fm.length > 0) {
+					text += fm
+					//text += "---\n" + fm + "---\n"
+				}
+				text += c
+				
+				editor.setValue(text.replace(/\n$/m, ""))
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `7`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `7`,
+				},
+			]
+		});
+
+
+		// TODO remove after TW migrate finish
 		this.addObsidianIcon('note-to-tree-list', '**');
 		this.addCommand({
 			id: "note-to-tree-list",
@@ -415,7 +486,11 @@ export default class MyPlugin extends Plugin {
 						const line = editor.getLine(i)
 						if (line.trim().length != 0) {
 							if (!/^\t*- $/.test(line) && !/^\t*\d+\. $/.test(line)) { // empty list item
-								text += line.replace(`${filename} _ `, "") + "\n"
+								let modLine = line.replace(`${filename} _ `, "")
+								if (line !== `- ${view.file.basename}` && /^- /.test(line)){
+									modLine = "\t" + modLine
+								}
+								text += modLine + "\n"
 							}
 						}
 					}
@@ -476,7 +551,7 @@ export default class MyPlugin extends Plugin {
 									const splitArray = key.split("_");
 									const modifiedKey = `<<checkboxByTime "${splitArray[1]}">>`;
 
-									checkboxMap.set(modifiedKey, value === "open" ? "[ ]" : "[x]");
+									checkboxMap.set(modifiedKey, value === "open" ? "[x]" : "[ ]");
 								}
 							} else {
 								if (line.trim().length != 0) {
@@ -503,6 +578,7 @@ export default class MyPlugin extends Plugin {
 								for (const [key, value] of checkboxMap) {
 									modifiedLine = modifiedLine.replace(new RegExp(key, "g"), value);
 								}
+								modifiedLine = modifiedLine.replace(/<<checkboxByTime "[A-Za-z0-9_]+">>/g, "[ ]")
 
 								text += "\n" + modifiedLine
 							}
@@ -2190,11 +2266,11 @@ export default class MyPlugin extends Plugin {
 			hotkeys: [
 				{
 					modifiers: [`Ctrl`, `Meta`, `Shift`],
-					key: t == 'n' ? '6' : '7'
+					key: t == 'n' ? '1' : '2'
 				},
 				{
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
-					key: t == 'n' ? '6' : '7'
+					key: t == 'n' ? '1' : '2'
 				}
 			]
 		});
