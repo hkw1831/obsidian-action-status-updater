@@ -69,7 +69,32 @@ const skipFrontMatterField: string[] = [
 	"journaldate: ",
 	"thisBillDate: ",
 	"lastBillDate: ",
-	"roottiddler: "
+	"roottiddler: ",
+	"year: ",
+	"to: ",
+	"tidtemplate: ",
+	"tiddlername: ",
+	"theme: ",
+	"tagvalue: ",
+	"subtasknum: ",
+	"removetagvalue: ",
+	"recurringeventstartdate: ",
+	"recurringeventenddate: ",
+	"pluginname: ",
+	"pid: ",
+	"macroname: ",
+	"limit: ",
+	"keyword: ",
+	"keywordtmp: ",
+	"from: ",
+	"deprecatereason: ",
+	"deepwo: ",
+	"color: ",
+	"row: ",
+	"col: ",
+	"bookmarked: ",
+	"blockingreminderdate: ",
+	"backup: "
 ]
 
 export default class MyPlugin extends Plugin {
@@ -455,6 +480,7 @@ export default class MyPlugin extends Plugin {
 				let finishedCount = 0
 				const files = vault.getMarkdownFiles()
 				new Notice("all=" + files.length)
+				console.log("all=" + files.length)
 				for (const file of files) {
 					// note that still async
 					console.log("s: " + startCount)
@@ -465,6 +491,7 @@ export default class MyPlugin extends Plugin {
 						console.log("f: " + finishedCount)
 						finishedCount++
 						if (finishedCount == files.length) {
+							console.log("finished")
 							new Notice("finished")
 						}
 					})
