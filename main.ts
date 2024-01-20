@@ -531,6 +531,99 @@ export default class MyPlugin extends Plugin {
 			]
 		});
 
+
+// TODO remove after TW migrate finish
+this.addObsidianIcon('tw-task', '--');
+this.addCommand({
+	id: "tw-task",
+	name: "TT TW Task",
+	icon: `tw-task`,
+	editorCallback: (editor: Editor, view: MarkdownView) => {
+		const checkboxMap = new Map<string, string>();
+		const lineCount = editor.lineCount()
+
+		let fm = ""
+		let c = ""
+		let text = ""
+		let h3Count = 0;
+		let content = ""
+		let taskTag = ""
+		let parent = ""
+		for (let i = 0; i < lineCount; i++) {
+			const line = editor.getLine(i)
+			if (h3Count == 0) {
+				content += (line + "\n")
+			} else if (h3Count == 1) {
+				if (line.startsWith("title: ")) {
+					// do nothing
+				} else if (/^parent\d+: /.test(line)) {
+					parent += (line.replace(/^parent\d+: /, "") + " / ")
+				} else if (line.startsWith("tagsss: ")) {
+					taskTag = "a/"
+					if (/ N /.test(line) || / N$/.test(line)) {
+						taskTag += "n/"
+					}
+					if (/ W /.test(line) || / W$/.test(line)) {
+						taskTag += "w/"
+					}
+					if (/ now /.test(line) || / now$/.test(line)) {
+						taskTag += "n"
+					}
+					if (/ later /.test(line) || / later$/.test(line)) {
+						taskTag += "l"
+					}
+					if (/ waiting /.test(line) || / waiting$/.test(line)) {
+						taskTag += "w"
+					}
+					if (/ done /.test(line) || / done$/.test(line)) {
+						taskTag += "d"
+					}
+					if (/ archive /.test(line) || / archine$/.test(line)) {
+						taskTag += "a"
+					}
+					if (taskTag.length == 5) {
+						fm += ("tag: " + taskTag + "\n")
+					} else {
+						new Notice("error on setting action tag")
+						fm += (line + "\n")
+					}	
+				} else {
+					fm += (line + "\n")
+				}
+			}
+			if (h3Count >= 2) {
+				let modifiedLine = line
+				c += (modifiedLine + "\n")
+			}
+			if (line === "---") {
+				h3Count++;
+			}
+		} 
+		text += content
+		if (fm.length > 0) {
+			text += fm
+		}
+		if (parent.length > 0) {
+			text += "\nParent link: " + parent + "\n"
+		}
+		text += c
+		text = text.replace(/^---\n---\n/m, "").replace(/\n$/, "")
+		editor.setValue(text)
+	},
+	hotkeys: [
+		{
+			modifiers: [`Ctrl`, `Meta`, `Shift`],
+			key: `7`,
+		},
+		{
+			modifiers: [`Ctrl`, `Alt`, `Shift`],
+			key: `7`,
+		},
+	]
+});
+
+
+/*
 		// TODO remove after TW migrate finish
 		this.addObsidianIcon('tw-checkbox', '[]');
 		this.addCommand({
@@ -600,7 +693,7 @@ export default class MyPlugin extends Plugin {
 				},
 			]
 		});
-
+*/
 
 		// TODO remove after TW migrate finish
 		this.addObsidianIcon('note-to-tree-list', '**');
@@ -633,6 +726,7 @@ export default class MyPlugin extends Plugin {
 					let h3Count = 0;
 					let actionTag = ""
 					let content = ""
+					//let parent = ""
 					for (let i = 0; i < lineCount; i++) {
 						const line = editor.getLine(i)
 						if (h3Count == 0) {
@@ -648,6 +742,8 @@ export default class MyPlugin extends Plugin {
 						} else if (h3Count == 1) {
 							if (line === "---" || this.shouldSkipFrontMatter(line) || line.startsWith("title: ")) {
 							//	text += line.replace("title: ", "")
+							//} else if (/^parent\d+: /.test(line)) {
+							//	parent += (line.replace(/^parent\d+: /, "") + " / ")
 							} else if (line.startsWith("tagsss: ")) {
 								if (/ N /.test(line) || / N$/.test(line)) {
 									actionTag = "n"
