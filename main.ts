@@ -407,12 +407,13 @@ export default class MyPlugin extends Plugin {
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const lineCount = editor.lineCount()
 				if (editor.getValue().startsWith("- " + view.file.basename + "\n")) {
-					// already tidy once, here only should remove empty line
+					// already tidy once, here only should remove empty line and remove duplicate list name (tw hierarchy)
+					const filename = view.file.basename
 					let text = ""
 					for (let i = 0; i < lineCount; i++) {
 						const line = editor.getLine(i)
 						if (line.trim().length != 0) {
-							text += line + "\n"
+							text += line.replace(`${filename} _ `, "") + "\n"
 						}
 					}
 					editor.setValue(text.replace(/\n$/m, ""))
@@ -425,7 +426,13 @@ export default class MyPlugin extends Plugin {
 						const line = editor.getLine(i)
 						if (h3Count == 0) {
 							if (line.trim().length != 0 && line != "---") {
-								content += "\n" + (/^\t*- /.test(line) ? "\t" + line : "\t- " + line)
+								let modifiedLine = line
+								for (let i = 0; i < 9; i++) {
+									modifiedLine = modifiedLine.replace(/^    /, "\t")
+								}
+								modifiedLine = modifiedLine.replace(/^(\t*)\*\s/, "$1- ")
+								modifiedLine = /^\t*- /.test(modifiedLine) ? ("\t" + modifiedLine) : ("\t- " + modifiedLine)
+								content += "\n" + modifiedLine
 							}
 						} else if (h3Count == 1) {
 							if (line === "---" || line.startsWith("title: ") || line.startsWith("chronicledate: ") || line.startsWith("eventdate: ")) {
@@ -459,14 +466,24 @@ export default class MyPlugin extends Plugin {
 								}
 							} else {
 								if (line.trim().length != 0) {
-									content += "\n" + (/^\t*- /.test(line) ? "\t" + line : "\t- " + line)
+									let modifiedLine = line
+									for (let i = 0; i < 9; i++) {
+										modifiedLine = modifiedLine.replace(/^    /, "\t")
+									}
+									modifiedLine = modifiedLine.replace(/^(\t*)\*\s/, "$1- ")
+									modifiedLine = /^\t*- /.test(modifiedLine) ? ("\t" + modifiedLine) : ("\t- " + modifiedLine)
+									content += "\n" + modifiedLine
 								}
 							}
 						}
 						if (h3Count >= 2 && line.trim().length != 0) {
 							let modifiedLine = (line === "[ ] ") ? "" : line
 							if (modifiedLine.trim().length != 0) {
-								modifiedLine = /^\t*- /.test(line) ? ("\t" + line) : ("\t- " + line)
+								for (let i = 0; i < 9; i++) {
+									modifiedLine = modifiedLine.replace(/^    /, "\t")
+								}
+								modifiedLine = modifiedLine.replace(/^(\t*)\*\s/, "$1- ")
+								modifiedLine = /^\t*- /.test(modifiedLine) ? ("\t" + modifiedLine) : ("\t- " + modifiedLine)
 								// modifiedLine = line === "---" ? "---" : modifiedLine
 								text += "\n" + modifiedLine
 							}
