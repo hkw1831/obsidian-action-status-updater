@@ -1,5 +1,5 @@
 import { UpdateNoteTypeModal } from 'updateNoteTypeModal';
-import { App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, Vault, EditorSelection } from 'obsidian';
+import { App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, Vault, EditorSelection, Workspace } from 'obsidian';
 import { AddFootnoteTagModal } from 'addCommentTagModal';
 import { AddTaskTagModal } from 'addTaskTagModal';
 import { renameBlogTitle, renameTag } from 'tagrenamer/renaming';
@@ -443,95 +443,50 @@ export default class MyPlugin extends Plugin {
 		*/
 
 		// TODO remove after TW migrate finish
-		this.addObsidianIcon('tw-frontmatter', 'FM');
+		this.addObsidianIcon('format-all-notes-custom', 'FA');
 		this.addCommand({
-			id: "tw-frontmatter",
-			name: "FM TW FrontMatter",
-			icon: `tw-frontmatter`,
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const lineCount = editor.lineCount()
-
-				let fm = ""
-				let c = ""
-				let text = ""
-				let h3Count = 0;
-				let content = ""
-				for (let i = 0; i < lineCount; i++) {
-					const line = editor.getLine(i)
-					if (h3Count == 0) {
-						content += (line + "\n")
-					} else if (h3Count == 1) {
-						if (this.shouldSkipFrontMatter(line)) {
-							// do nothing
-						} else if (line.startsWith("title: ")) {
-							const modifiedLine = line.replace(/:/g, "_").replace(/^title_ /, "title: ")
-							fm += (modifiedLine + "\n")
-						} else if (line.startsWith("tagsss: ")) {
-							const bracketPattern = /\[\[.*?\]\]/g;
-
-							// Find all bracketed items
-							const bracketedItems = line.match(bracketPattern) || [];
-							
-							// Remove bracketed items from the input string to deal with the remaining
-							const remainingString = line.replace(bracketPattern, '').trim();
-							
-							// Split the remaining string by spaces to get the individual words
-							const remainingItems = remainingString.split(/\s+/).filter(item => item);
-							
-							// Combine the bracketed items and the individual words into one array
-							const fmtagsss = [...bracketedItems, ...remainingItems];
-
-							let parent : string[] = []
-							let tagsss : string[] = []
-							let skips : string[]= []
-							
-							fmtagsss.forEach(tag => {
-								tag = tag.trim()
-								// [[event n]] / [[event w]] / regex of [[20220717 Journal (Week 28 Sun)]]: put in skips
-								// [[20220721 Journal (Week 29 Thu)]]
-								if (tag === "[[.Header Shortcut]]" || tag === "[[.Current Project]]" || tag === "concept" || tag === "space" || tag === "problem" || tag === "tagsss:" || tag === "[[event n]]" || tag === "[[event w]]"
-								   || /\[\[\d{8} Journal \(Week \d+ [A-Za-z]{3}\)\]\]/.test(tag)) {
-									skips.push(tag)
-								} else if (tag === "permtask" || 	tag === "N" || tag === "W" || tag === "now" || tag === "later" || tag === "waiting" || tag === "done" || tag === "archive" || tag === "action" || tag === "task") {
-									tagsss.push(tag.replace("[[", "").replace("]]", ""))
-								} else if (tag === "preblog" || tag === "prepreblog") {
-									parent.push("[[Blog _ Post]]")
-								} else {
-									parent.push(tag)
-								}
-							})
-							//new Notice(skips.join("\n"))
-							let modifiedLine = ""
-							if (tagsss.length > 0) {
-								modifiedLine += "tagsss: " + tagsss.join(" ") + "\n"
-							}
-							let parentCount = 1
-							if (parent.length > 0) {
-								const uniqueParent = Array.from(new Set(parent));
-								uniqueParent.forEach(p => {
-									modifiedLine += "parent" + parentCount + ": " + p + "\n"
-									parentCount++
-								})
-							}
-							fm += modifiedLine
-						} else {
-							fm += (line + "\n")
-						}
-					}
-					if (h3Count >= 2) {
-						c += (line + "\n")
-					}
-					if (line === "---") {
-						h3Count++;
-					}
-				} 
-				text += content
-				if (fm.length > 0) {
-					text += fm
-				}
-				text += c
+			id: "format-all-notes-custom",
+			name: "FA Format All Notes (Custom usage)",
+			icon: `format-all-notes-custom`,
+			callback: async () => {
+				const vault: Vault = this.app.vault;
 				
-				editor.setValue(text.replace(/^---\n---\n/m, "").replace(/\n$/, ""))
+				let count = 0
+				const files = vault.getMarkdownFiles()
+				new Notice("all=" + files.length)
+				for (const file of files) {
+					// note that still async
+					console.log("s: " + count)
+					vault.read(file).then((content) => {
+						const modifiedValue = this.tidyUpFrontMatterOnValue(content)
+						return vault.modify(file, modifiedValue);
+					}).then(() => {
+						console.log("f: " + count)
+					})
+					count++
+				}
+				new Notice("Done")
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `5`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `5`,
+				},
+			]
+		});
+
+		// TODO remove after TW migrate finish
+		this.addObsidianIcon('format-notes-custom', 'FN');
+		this.addCommand({
+			id: "format-notes-custom",
+			name: "FN Format Notes (Custom usage)",
+			icon: `format-notes-custom`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				this.tidyUpFrontMatteronEditor(editor)
 			},
 			hotkeys: [
 				{
@@ -1998,6 +1953,102 @@ export default class MyPlugin extends Plugin {
 		editor.setValue(text);
 	}
 */
+	tidyUpFrontMatteronEditor(editor: Editor) {
+		const value = editor.getValue()
+		const modifiedValue = this.tidyUpFrontMatterOnValue(value)
+		editor.setValue(modifiedValue)
+	}
+
+	tidyUpFrontMatterOnValue(value: String) {
+		const values: string[] = value.split("\n")
+		const lineCount = values.length
+
+		let fm = ""
+		let c = ""
+		let text = ""
+		let h3Count = 0;
+		let content = ""
+		for (let i = 0; i < lineCount; i++) {
+			const line = values[i]
+			if (h3Count == 0) {
+				content += (line + "\n")
+			} else if (h3Count == 1) {
+				if (this.shouldSkipFrontMatter(line)) {
+					// do nothing
+				} else if (line.startsWith("title: ")) {
+					const modifiedLine = line.replace(/:/g, "_").replace(/^title_ /, "title: ")
+					fm += (modifiedLine + "\n")
+				} else if (line.startsWith("tagsss: ")) {
+					const bracketPattern = /\[\[.*?\]\]/g;
+
+					// Find all bracketed items
+					const bracketedItems = line.match(bracketPattern) || [];
+					
+					// Remove bracketed items from the input string to deal with the remaining
+					const remainingString = line.replace(bracketPattern, '').trim();
+					
+					// Split the remaining string by spaces to get the individual words
+					const remainingItems = remainingString.split(/\s+/).filter(item => item);
+					
+					// Combine the bracketed items and the individual words into one array
+					const fmtagsss = [...bracketedItems, ...remainingItems];
+
+					let parent : string[] = []
+					let tagsss : string[] = []
+					let skips : string[]= []
+					
+					fmtagsss.forEach(tag => {
+						tag = tag.trim()
+						// [[event n]] / [[event w]] / regex of [[20220717 Journal (Week 28 Sun)]]: put in skips
+						// [[20220721 Journal (Week 29 Thu)]]
+						if (tag === "[[.Header Shortcut]]" || tag === "[[.Current Project]]" || tag === "concept" || tag === "space" || tag === "problem" || tag === "tagsss:" || tag === "[[event n]]" || tag === "[[event w]]"
+							|| /\[\[\d{8} Journal \(Week \d+ [A-Za-z]{3}\)\]\]/.test(tag)) {
+							skips.push(tag)
+						} else if (tag === "permtask" || 	tag === "N" || tag === "W" || tag === "now" || tag === "later" || tag === "waiting" || tag === "done" || tag === "archive" || tag === "action" || tag === "task") {
+							tagsss.push(tag.replace("[[", "").replace("]]", ""))
+						} else if (tag === "preblog" || tag === "prepreblog") {
+							parent.push("[[Blog _ Post]]")
+						} else {
+							parent.push(tag)
+						}
+					})
+					//new Notice(skips.join("\n"))
+					let modifiedLine = ""
+					if (tagsss.length > 0) {
+						modifiedLine += "tagsss: " + tagsss.join(" ") + "\n"
+					}
+					let parentCount = 1
+					if (parent.length > 0) {
+						const uniqueParent = Array.from(new Set(parent));
+						uniqueParent.forEach(p => {
+							if (p.startsWith("[[") && p.endsWith("]]")) {
+								modifiedLine += "parent" + parentCount + ": \"" + p + "\"\n"
+							} else {
+								modifiedLine += "parent" + parentCount + ": \"[[" + p + "]]\"\n"
+							}
+							parentCount++
+						})
+					}
+					fm += modifiedLine
+				} else {
+					fm += (line + "\n")
+				}
+			}
+			if (h3Count >= 2) {
+				c += (line + "\n")
+			}
+			if (line === "---") {
+				h3Count++;
+			}
+		} 
+		text += content
+		if (fm.length > 0) {
+			text += fm
+		}
+		text += c
+		
+		return text.replace(/^---\n---\n/m, "").replace(/\n$/, "")
+	}
 
 	shouldSkipFrontMatter(line: string) : boolean {
 		for (let i = 0; i < skipFrontMatterField.length; i++) {
