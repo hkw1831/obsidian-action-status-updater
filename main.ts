@@ -405,6 +405,7 @@ export default class MyPlugin extends Plugin {
 			name: "NT Note to Tree List",
 			icon: `note-to-tree-list`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const checkboxMap = new Map<string, string>();
 				const lineCount = editor.lineCount()
 				if (editor.getValue().startsWith("- " + view.file.basename + "\n")) {
 					// already tidy once, here only should remove empty line and remove duplicate list name (tw hierarchy)
@@ -464,6 +465,17 @@ export default class MyPlugin extends Plugin {
 								} else if (actionTag.length == 1) {
 									new Notice("error on setting action tag")
 								}
+							} else if (line.startsWith("checkboxbytime_")) {
+								const keyValueArray = line.split(":").map(item => item.trim());
+								if (keyValueArray.length === 2) {
+									const key = keyValueArray[0];
+									const value = keyValueArray[1];
+
+									const splitArray = key.split("_");
+									const modifiedKey = `<<checkboxByTime "${splitArray[1]}">>`;
+
+									checkboxMap.set(modifiedKey, value === "open" ? "[ ]" : "[x]");
+								}
 							} else {
 								if (line.trim().length != 0) {
 									let modifiedLine = line
@@ -485,6 +497,11 @@ export default class MyPlugin extends Plugin {
 								modifiedLine = modifiedLine.replace(/^(\t*)\*\s/, "$1- ")
 								modifiedLine = /^\t*- /.test(modifiedLine) ? ("\t" + modifiedLine) : ("\t- " + modifiedLine)
 								// modifiedLine = line === "---" ? "---" : modifiedLine
+
+								for (const [key, value] of checkboxMap) {
+									modifiedLine = modifiedLine.replace(new RegExp(key, "g"), value);
+								}
+								
 								text += "\n" + modifiedLine
 							}
 						}
