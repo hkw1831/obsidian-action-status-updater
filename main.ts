@@ -451,19 +451,21 @@ export default class MyPlugin extends Plugin {
 			callback: async () => {
 				const vault: Vault = this.app.vault;
 				
-				let count = 0
+				let startCount = 0
+				let finishedCount = 0
 				const files = vault.getMarkdownFiles()
 				new Notice("all=" + files.length)
 				for (const file of files) {
 					// note that still async
-					console.log("s: " + count)
+					console.log("s: " + startCount)
 					vault.read(file).then((content) => {
 						const modifiedValue = this.tidyUpFrontMatterOnValue(content)
 						return vault.modify(file, modifiedValue);
 					}).then(() => {
-						console.log("f: " + count)
+						console.log("f: " + finishedCount)
+						finishedCount++
 					})
-					count++
+					startCount++
 				}
 				new Notice("Done")
 			},
