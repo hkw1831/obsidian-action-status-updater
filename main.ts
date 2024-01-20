@@ -464,10 +464,12 @@ export default class MyPlugin extends Plugin {
 					}).then(() => {
 						console.log("f: " + finishedCount)
 						finishedCount++
+						if (finishedCount == files.length) {
+							new Notice("finished")
+						}
 					})
 					startCount++
 				}
-				new Notice("Done")
 			},
 			hotkeys: [
 				{
