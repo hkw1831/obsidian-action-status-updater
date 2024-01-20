@@ -414,7 +414,9 @@ export default class MyPlugin extends Plugin {
 					for (let i = 0; i < lineCount; i++) {
 						const line = editor.getLine(i)
 						if (line.trim().length != 0) {
-							text += line.replace(`${filename} _ `, "") + "\n"
+							if (!/^\t*- $/.test(line) && !/^\t*\d+\. $/.test(line)) { // empty list item
+								text += line.replace(`${filename} _ `, "") + "\n"
+							}
 						}
 					}
 					editor.setValue(text.replace(/\n$/m, ""))
@@ -432,7 +434,7 @@ export default class MyPlugin extends Plugin {
 									modifiedLine = modifiedLine.replace(/^    /, "\t")
 								}
 								modifiedLine = modifiedLine.replace(/^(\t*)\*\s/, "$1- ")
-								modifiedLine = /^\t*- /.test(modifiedLine) ? ("\t" + modifiedLine) : ("\t- " + modifiedLine)
+								modifiedLine = (/^\t*- /.test(modifiedLine) || /^\t*\d+\. /.test(modifiedLine)) ? ("\t" + modifiedLine) : ("\t- " + modifiedLine)
 								content += "\n" + modifiedLine
 							}
 						} else if (h3Count == 1) {
@@ -483,7 +485,7 @@ export default class MyPlugin extends Plugin {
 										modifiedLine = modifiedLine.replace(/^    /, "\t")
 									}
 									modifiedLine = modifiedLine.replace(/^(\t*)\*\s/, "$1- ")
-									modifiedLine = /^\t*- /.test(modifiedLine) ? ("\t" + modifiedLine) : ("\t- " + modifiedLine)
+									modifiedLine = (/^\t*- /.test(modifiedLine) || /^\t*\d+\. /.test(modifiedLine)) ? ("\t" + modifiedLine) : ("\t- " + modifiedLine)
 									content += "\n" + modifiedLine
 								}
 							}
@@ -495,13 +497,13 @@ export default class MyPlugin extends Plugin {
 									modifiedLine = modifiedLine.replace(/^    /, "\t")
 								}
 								modifiedLine = modifiedLine.replace(/^(\t*)\*\s/, "$1- ")
-								modifiedLine = /^\t*- /.test(modifiedLine) ? ("\t" + modifiedLine) : ("\t- " + modifiedLine)
+								modifiedLine = (/^\t*- /.test(modifiedLine) || /^\t*\d+\. /.test(modifiedLine)) ? ("\t" + modifiedLine) : ("\t- " + modifiedLine)
 								// modifiedLine = line === "---" ? "---" : modifiedLine
 
 								for (const [key, value] of checkboxMap) {
 									modifiedLine = modifiedLine.replace(new RegExp(key, "g"), value);
 								}
-								
+
 								text += "\n" + modifiedLine
 							}
 						}
