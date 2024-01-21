@@ -549,7 +549,13 @@ this.addCommand({
 		if (/^parent\d+: /.test(lineContent) || /^\t+- parent\d+: /.test(lineContent)) {
 			const parentLink = lineContent.replace(/^parent\d+: /, "").replace(/^\t+- parent\d+: /, "").replace(/"/g, "").replace(/\[\[/, "").replace(/\]\]/, "")
 			navigator.clipboard.writeText(parentLink).then(() => {
-				editor.replaceRange("", {line: line, ch: 0}, {line: line, ch: lineContent.length + 1})
+				if (line == 0) {
+					editor.setValue("")
+				} else {
+					const previousLine = editor.getLine(line-1)
+					editor.replaceRange("", {line: line-1, ch: previousLine.length}, {line: line, ch: lineContent.length})
+				}
+				editor.setValue(editor.getValue().replace(/^---\n+---\n/, "---\ntag: b/n/c\n---\n").replace(/\n$/, ""))
 				editor.setCursor({line: line, ch: ch > editor.getLine(line).length ? editor.getLine(line).length : ch})
 				new Notice("Copied to clipboard: " + parentLink)
 			})
@@ -558,11 +564,11 @@ this.addCommand({
 	hotkeys: [
 		{
 			modifiers: [`Ctrl`, `Meta`, `Shift`],
-			key: `6`,
+			key: `y`,
 		},
 		{
 			modifiers: [`Ctrl`, `Alt`, `Shift`],
-			key: `6`,
+			key: `y`,
 		},
 	]
 });
@@ -572,19 +578,16 @@ this.addCommand({
 this.addObsidianIcon('tw-task', '--');
 this.addCommand({
 	id: "tw-task",
-	name: "TT TW Task",
+	name: "TT -- TW Task",
 	icon: `tw-task`,
 	editorCallback: (editor: Editor, view: MarkdownView) => {
-		const checkboxMap = new Map<string, string>();
 		const lineCount = editor.lineCount()
-
 		let fm = ""
 		let c = ""
 		let text = ""
 		let h3Count = 0;
 		let content = ""
 		let taskTag = ""
-		//let parent = ""
 		for (let i = 0; i < lineCount; i++) {
 			const line = editor.getLine(i)
 			if (h3Count == 0) {
@@ -640,6 +643,7 @@ this.addCommand({
 		text += c
 		text = text.replace(/^---\n---\n/m, "").replace(/\n$/, "")
 		editor.setValue(text)
+		editor.setCursor({line: this.getParentLine(text), ch: 0})
 	},
 	hotkeys: [
 		{
@@ -743,7 +747,10 @@ this.addCommand({
 						const line = editor.getLine(i)
 						if (line.trim().length != 0) {
 							if (!/^\t*- $/.test(line) && !/^\t*\d+\. $/.test(line)) { // empty list item
-								let modLine = line.replace(`${filename} _ `, "")
+								let modLine = line
+								if (!modLine.contains("[[") && !modLine.contains("]]")) {
+									modLine = line.replace(`${filename} _ `, "") // prevent replace link
+								}
 								if (line !== `- ${view.file.basename}` && /^- /.test(line)){
 									modLine = "\t" + modLine
 								}
@@ -751,7 +758,9 @@ this.addCommand({
 							}
 						}
 					}
-					editor.setValue(text.replace(/\n$/m, ""))
+					text = text.replace(/\n$/m, "")
+					editor.setValue(text)
+					editor.setCursor({line: this.getParentLine(text), ch: 0})
 				} else {
 					let text = "- "
 					let h3Count = 0;
@@ -853,6 +862,7 @@ this.addCommand({
 					} 
 					text += content
 					editor.setValue(text)
+					editor.setCursor({line: this.getParentLine(text), ch: 0})
 				}
 			},
 			hotkeys: [
@@ -1958,6 +1968,17 @@ this.addCommand({
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
+	}
+
+	getParentLine(value: string) {
+		const values = value.split("\n")
+		for (let i = 0; i < values.length; i++) {
+			const lineContent = values[i]
+			if (/^parent\d+: /.test(lineContent) || /^\t+- parent\d+: /.test(lineContent)) {
+				return i
+			}
+		}
+		return 0
 	}
 
 	convertChatGPTToTwitterFormat(editor: Editor) : boolean { // true means success
