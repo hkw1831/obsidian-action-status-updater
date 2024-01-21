@@ -11,6 +11,7 @@ export class ClipboardPasteModal extends FuzzySuggestModal<string> {
     super(app)
     this.editor = editor
     this.clipboardContent = clipboardContent
+    this.setPlaceholder(`Which clipboard content do you want to paste?`)
   }
 
   getItems(): string[] {

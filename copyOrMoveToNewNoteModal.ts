@@ -25,6 +25,7 @@ export class CopyOrMoveToNewNoteModal extends FuzzySuggestModal<CopyOrMove> {
   {
     super(app)
     this.editor = editor
+    this.setPlaceholder(`Copy or move selection to new note?`)
   }
 
   getItems(): CopyOrMove[] {

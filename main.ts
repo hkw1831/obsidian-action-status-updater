@@ -574,7 +574,7 @@ this.addCommand({
 			text += fm
 		}
 		text += c
-		text = text.replace(/^---\n---\n/m, "").replace(/\n$/, "")
+		text = text.replace(/^---\n+---\n/m, "---\ntag: b/n/c\n---\n").replace(/\n$/, "")
 		editor.setValue(text)
 		editor.setCursor({line: getParentLine(text), ch: 0})
 	},

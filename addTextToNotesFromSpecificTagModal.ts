@@ -25,6 +25,7 @@ export class AddTextToNotesFromSpecificTagModal extends FuzzySuggestModal<string
     this.insertFromBeginning = insertFromBeginning
     this.description = description
     this.postAction = postAction
+    this.setPlaceholder(`Which notes with tag ${tagToFind} do you want to ${description} to?`)
     this.setInstructions([
       {
         command: "",

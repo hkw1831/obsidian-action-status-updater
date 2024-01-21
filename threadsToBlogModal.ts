@@ -13,6 +13,7 @@ export class ThreadsToBlogModal extends FuzzySuggestModal<string> {
     super(app)
     this.editor = editor
     this.view = view
+    this.setPlaceholder(`Putting Threads content to Blog notes. Which option do you want to proceed?`)
   }
 
   getItems(): string[] {
