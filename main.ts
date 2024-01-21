@@ -2464,7 +2464,7 @@ this.addCommand({
 				editor.replaceRange(`#${t}l `, cursor);
 				cursor.ch = cursor.ch + 4;
 				editor.setCursor(cursor);
-			},
+			}/*,
 			hotkeys: [
 				{
 					modifiers: [`Ctrl`, `Meta`, `Shift`],
@@ -2474,7 +2474,7 @@ this.addCommand({
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
 					key: t == 'n' ? '1' : '2'
 				}
-			]
+			]*/
 		});
 	}
 
