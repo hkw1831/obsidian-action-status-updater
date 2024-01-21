@@ -577,6 +577,7 @@ this.addCommand({
 		text = text.replace(/^---\n+---\n/m, "---\ntag: b/n/c\n---\n").replace(/\n$/, "")
 		editor.setValue(text)
 		editor.setCursor({line: getParentLine(text), ch: 0})
+		app.vault.rename(view.file, "C/" + view.file.name)
 	},
 	hotkeys: [
 		{
