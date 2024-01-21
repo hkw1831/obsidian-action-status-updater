@@ -2,7 +2,7 @@ import { AddTextToNotesFromSpecificTagModal } from "addTextToNotesFromSpecificTa
 import { App, FuzzySuggestModal, FuzzyMatch, getAllTags } from "obsidian";
 import { addTextToNotes } from "selfutil/addlinktonotes";
 import { getAllNoteTags } from "selfutil/getAllNoteTags";
-import { getRecentNotes } from "selfutil/getRecentNotes";
+import { getAllNotes, getRecentNotes } from "selfutil/getRecentNotes";
 
 export class AddTextToNotesModal extends FuzzySuggestModal<string> {
 
@@ -28,7 +28,7 @@ export class AddTextToNotesModal extends FuzzySuggestModal<string> {
   }
 
   getItems() : string[] {
-		return [...['I/Inbox.md'], ...getRecentNotes(this.app, 7), ...getAllNoteTags(this.app)];
+		return [...['I/Inbox.md'], ...getRecentNotes(this.app, 7), ...getAllNoteTags(this.app), ...getAllNotes(this.app)];
   }
 
   getItemText(value: string): string {

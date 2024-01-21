@@ -1,7 +1,7 @@
 import { NavigateToNoteFromSpecificTagModal } from "navigateToNoteFromSpecificTagModal";
-import { App, FuzzySuggestModal, FuzzyMatch, getAllTags, TFile } from "obsidian";
+import { App, FuzzySuggestModal, FuzzyMatch, getAllTags, TFile, Notice } from "obsidian";
 import { getAllTagsWithFilter } from "selfutil/getAllNoteTags";
-import { getRecentNotes } from "selfutil/getRecentNotes";
+import { getAllNotes, getRecentNotes } from "selfutil/getRecentNotes";
 
 export class NavigateToNoteFromTagModal extends FuzzySuggestModal<string> {
 
@@ -19,7 +19,7 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<string> {
   }
 
   getItems() : string[] {
-		return [...getRecentNotes(this.app, 7), ...getAllTagsWithFilter(this.app)];
+		return [...getRecentNotes(this.app, 7), ...getAllTagsWithFilter(this.app), ...getAllNotes(this.app)];
   }
 
   getItemText(value: string): string {

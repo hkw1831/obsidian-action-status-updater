@@ -501,11 +501,11 @@ export default class MyPlugin extends Plugin {
 			hotkeys: [
 				{
 					modifiers: [`Ctrl`, `Meta`, `Shift`],
-					key: `5`,
+					key: `1`,
 				},
 				{
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
-					key: `5`,
+					key: `1`,
 				},
 			]
 		});
@@ -522,14 +522,50 @@ export default class MyPlugin extends Plugin {
 			hotkeys: [
 				{
 					modifiers: [`Ctrl`, `Meta`, `Shift`],
-					key: `6`,
+					key: `2`,
 				},
 				{
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
-					key: `6`,
+					key: `2`,
 				},
 			]
 		});
+
+// TODO remove after TW migrate finish
+this.addObsidianIcon('tw-get-parent-link', '[]');
+this.addCommand({
+	id: "tw-get-parent-link",
+	name: "tw-get-parent-link",
+	icon: `tw-get-parent-link`,
+	editorCallback: (editor: Editor, view: MarkdownView) => {
+		// example cursor line is either one of following:
+		// parent1: "[[ITIVITI _ ASX Trading]]"
+		// - parent1: "[[ITIVITI _ ASX Trading]]"
+		// goal is to copy "ITIVITI _ ASX Trading" to clipboard and remove this line
+		const cursor = editor.getCursor()
+		const line = cursor.line
+		const ch = cursor.ch
+		const lineContent = editor.getLine(line)
+		if (/^parent\d+: /.test(lineContent) || /^\t+- parent\d+: /.test(lineContent)) {
+			const parentLink = lineContent.replace(/^parent\d+: /, "").replace(/^\t+- parent\d+: /, "").replace(/"/g, "").replace(/\[\[/, "").replace(/\]\]/, "")
+			navigator.clipboard.writeText(parentLink).then(() => {
+				editor.replaceRange("", {line: line, ch: 0}, {line: line, ch: lineContent.length + 1})
+				editor.setCursor({line: line, ch: ch > editor.getLine(line).length ? editor.getLine(line).length : ch})
+				new Notice("Copied to clipboard: " + parentLink)
+			})
+		}
+	},
+	hotkeys: [
+		{
+			modifiers: [`Ctrl`, `Meta`, `Shift`],
+			key: `6`,
+		},
+		{
+			modifiers: [`Ctrl`, `Alt`, `Shift`],
+			key: `6`,
+		},
+	]
+});
 
 
 // TODO remove after TW migrate finish
@@ -548,7 +584,7 @@ this.addCommand({
 		let h3Count = 0;
 		let content = ""
 		let taskTag = ""
-		let parent = ""
+		//let parent = ""
 		for (let i = 0; i < lineCount; i++) {
 			const line = editor.getLine(i)
 			if (h3Count == 0) {
@@ -556,8 +592,6 @@ this.addCommand({
 			} else if (h3Count == 1) {
 				if (line.startsWith("title: ")) {
 					// do nothing
-				} else if (/^parent\d+: /.test(line)) {
-					parent += (line.replace(/^parent\d+: /, "") + " / ")
 				} else if (line.startsWith("tagsss: ")) {
 					taskTag = "a/"
 					if (/ N /.test(line) || / N$/.test(line)) {
@@ -602,9 +636,6 @@ this.addCommand({
 		text += content
 		if (fm.length > 0) {
 			text += fm
-		}
-		if (parent.length > 0) {
-			text += "\nParent link: " + parent + "\n"
 		}
 		text += c
 		text = text.replace(/^---\n---\n/m, "").replace(/\n$/, "")
@@ -726,7 +757,6 @@ this.addCommand({
 					let h3Count = 0;
 					let actionTag = ""
 					let content = ""
-					//let parent = ""
 					for (let i = 0; i < lineCount; i++) {
 						const line = editor.getLine(i)
 						if (h3Count == 0) {
@@ -741,9 +771,7 @@ this.addCommand({
 							}
 						} else if (h3Count == 1) {
 							if (line === "---" || this.shouldSkipFrontMatter(line) || line.startsWith("title: ")) {
-							//	text += line.replace("title: ", "")
-							//} else if (/^parent\d+: /.test(line)) {
-							//	parent += (line.replace(/^parent\d+: /, "") + " / ")
+								// do nothing
 							} else if (line.startsWith("tagsss: ")) {
 								if (/ N /.test(line) || / N$/.test(line)) {
 									actionTag = "n"

@@ -224,7 +224,6 @@ export class UpdateNoteTypeModal extends FuzzySuggestModal<NoteType> {
     let firstLineIndex = 0;
     const lineCount = this.editor.lineCount();
     for (let i = 0; i < lineCount; i++) {
-      new Notice(this.editor.getLine(i))
       if (this.editor.getLine(i).trim() == "---".trim()) {
         firstLineIndex = i;
         break;
