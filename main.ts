@@ -15,6 +15,7 @@ import moment from 'moment';
 import { AddTextToNotesModal } from 'addTextToNotesModal';
 import { NavigateToNoteFromTagModal } from 'navigateToNoteFromTagModal';
 import { SelectionRange, exportCurrentSelection, getCurrentSelectionLineNumber } from 'selfutil/extractSelection';
+import { replaceTWUselessValue } from 'twmigration/twMigrateTools';
 
 // Remember to rename these classes and interfaces!
 
@@ -581,6 +582,7 @@ this.addCommand({
 	name: "TT -- TW Task",
 	icon: `tw-task`,
 	editorCallback: (editor: Editor, view: MarkdownView) => {
+		editor.setValue(replaceTWUselessValue(editor.getValue()))
 		const lineCount = editor.lineCount()
 		let fm = ""
 		let c = ""
@@ -762,6 +764,7 @@ this.addCommand({
 					editor.setValue(text)
 					editor.setCursor({line: this.getParentLine(text), ch: 0})
 				} else {
+					editor.setValue(replaceTWUselessValue(editor.getValue()))
 					let text = "- "
 					let h3Count = 0;
 					let actionTag = ""
