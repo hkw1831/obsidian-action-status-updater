@@ -58,15 +58,15 @@ const ALL_TYPES = [
   },
   {
     type: "b/n/z",
-    description: "Zettelkasten - Slip box",
+    description: "Zettelkasten - Slip box (mainly on thought and the one I am interested)",
   },
   {
     type: "b/n/i",
-    description: "Index Notes for a big topic",
+    description: "Index Notes for self framework",
   },
   {
-    type: "b/n/n",
-    description: "Zettelkasten - Notes (Deprecated)",
+    type: "b/n/w",
+    description: "Wiki Notes for a messy wiki topic",
   },
   {
     type: "b/n/v",
