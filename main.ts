@@ -505,6 +505,74 @@ this.addCommand({
 	]
 });
 
+// TODO remove after TW migrate finish
+this.addObsidianIcon('tw-tidy-list-note', '==');
+this.addCommand({
+	id: "tw-tidy-list-note",
+	name: "TL == TW Tidy List Note",
+	icon: `tw-tidy-list-note`,
+	editorCallback: (editor: Editor, view: MarkdownView) => {
+		editor.setValue(replaceTWUselessValue(editor.getValue()))
+		const lineCount = editor.lineCount()
+		let fm = ""
+		let c = ""
+		let text = ""
+		let h3Count = 0;
+		let content = ""
+		let taskTag = ""
+		for (let i = 0; i < lineCount; i++) {
+			const line = editor.getLine(i)
+			if (h3Count == 0) {
+				if (line.length != 0) {
+					const modifiedLine = line.contains("[[") && line.contains("]]") 
+			            ? line
+						: line.replace(view.file.basename + " _ ", "")
+					content += (modifiedLine + "\n")
+				}
+			} else if (h3Count == 1) {
+				if (line.startsWith("title: ") || line.startsWith("list: ")) {
+					fm += (line + "\n")
+				} else if (line.length != 0) { 
+					const modifiedLine = line.contains("[[") && line.contains("]]") 
+						? line
+						: line.replace(view.file.basename + " _ ", "")
+					fm += (modifiedLine + "\n")
+				}
+			}
+			if (h3Count >= 2) {
+				if (line.length != 0) {
+					const modifiedLine = line.contains("[[") && line.contains("]]") 
+						? line
+						: line.replace(view.file.basename + " _ ", "")
+					c += (modifiedLine + "\n")
+				}
+			}
+			if (line === "---") {
+				h3Count++;
+				if (h3Count == 2) {
+					fm += "\n"
+				}
+			}
+		} 
+		text += content
+		if (fm.length > 0) {
+			text += fm
+		}
+		text += c
+		text = text.replace(/^---\n+---\n/m, "---\ntag: b/n/c\n---\n").replace(/\n$/, "")
+		editor.setValue(text)
+	},
+	hotkeys: [
+		{
+			modifiers: [`Ctrl`, `Meta`, `Shift`],
+			key: `6`,
+		},
+		{
+			modifiers: [`Ctrl`, `Alt`, `Shift`],
+			key: `6`,
+		},
+	]
+});
 
 // TODO remove after TW migrate finish
 this.addObsidianIcon('tw-task', '--');
