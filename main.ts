@@ -523,27 +523,28 @@ this.addCommand({
 		for (let i = 0; i < lineCount; i++) {
 			const line = editor.getLine(i)
 			if (h3Count == 0) {
-				if (line.length != 0) {
+				if (line.length != 0 && !/^\t*- ```$/.test(line)) {
 					const modifiedLine = line.contains("[[") && line.contains("]]") 
 			            ? line
-						: line.replace(view.file.basename + " _ ", "")
+						: line.replace(view.file.basename + " _ ", "").replace(/(\t*- )#+ > /, "$1").replace(/(\t+- )#+ /, "$1")
+						// 	- ## > cstatus and txstat = 0
 					content += (modifiedLine + "\n")
 				}
 			} else if (h3Count == 1) {
 				if (line.startsWith("title: ") || line.startsWith("list: ")) {
 					fm += (line + "\n")
-				} else if (line.length != 0) { 
+				} else if (line.length != 0 && !/^\t*- ```$/.test(line)) { 
 					const modifiedLine = line.contains("[[") && line.contains("]]") 
 						? line
-						: line.replace(view.file.basename + " _ ", "")
+						: line.replace(view.file.basename + " _ ", "").replace(/(\t*- )#+ > /, "$1").replace(/(\t+- )#+ /, "$1")
 					fm += (modifiedLine + "\n")
 				}
 			}
 			if (h3Count >= 2) {
-				if (line.length != 0) {
+				if (line.length != 0 && !/^\t*- ```$/.test(line)) {
 					const modifiedLine = line.contains("[[") && line.contains("]]") 
 						? line
-						: line.replace(view.file.basename + " _ ", "")
+						: line.replace(view.file.basename + " _ ", "").replace(/(\t*- )#+ > /, "$1").replace(/(\t+- )#+ /, "$1")
 					c += (modifiedLine + "\n")
 				}
 			}

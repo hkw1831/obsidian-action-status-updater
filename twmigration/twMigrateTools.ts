@@ -128,7 +128,7 @@ export function	tidyUpFrontMatterOnValue(value: String) {
             if (shouldSkipFrontMatter(line)) {
                 // do nothing
             } else if (/parent\d+: /.test(line)) {
-                const modifiedLine = line.replace(/\//g, "_").replace(/\?/g, "_")
+                const modifiedLine = line.replace(/\//g, "_").replace(/\?/g, "_").replace(/:/g, "_")
                 fm += (modifiedLine + "\n")
             } else if (line.startsWith("title: ")) {
                 const modifiedLine = line.replace(/:/g, "_").replace(/^title_ /, "title: ").replace(/\//g, "_").replace(/\?/g, "_")
