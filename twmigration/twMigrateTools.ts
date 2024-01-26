@@ -127,8 +127,8 @@ export function	tidyUpFrontMatterOnValue(value: String) {
         } else if (h3Count == 1) {
             if (shouldSkipFrontMatter(line)) {
                 // do nothing
-            } else if (/parent\d+: /.test(line)) {
-                const modifiedLine = line.replace(/\//g, "_").replace(/\?/g, "_").replace(/:/g, "_")
+            } else if (/^parent\d+: /.test(line)) {
+                const modifiedLine = line.replace(/\//g, "_").replace(/\?/g, "_").replace(/:/g, "_").replace(/^(parent\d+)_ /, "$1: ")
                 fm += (modifiedLine + "\n")
             } else if (line.startsWith("title: ")) {
                 const modifiedLine = line.replace(/:/g, "_").replace(/^title_ /, "title: ").replace(/\//g, "_").replace(/\?/g, "_")
