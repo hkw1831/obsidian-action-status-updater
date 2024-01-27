@@ -443,6 +443,34 @@ export default class MyPlugin extends Plugin {
 		});
 
 		// TODO remove after TW migrate finish
+		this.addObsidianIcon('tw-fix-broken-link', ':_');
+		this.addCommand({
+			id: "tw-fix-broken-link",
+			name: "BL Fix TW Broken Link",
+			icon: `tw-fix-broken-link`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const cursor = editor.getCursor()
+				const line = cursor.line
+				const lineContent = editor.getLine(line)
+				// replace all : to _ and replace all ? to _ and replace all / to _ and replace all . to _
+				editor.setLine(line, lineContent.replace(/:/g, "_").replace(/\?/g, "_").replace(/\//g, "_").replace(/\./g, "_")
+				.replace(/^(parent\d+)_ /, "$1: ")
+				.replace(/^(title\d+)_ /, "$1: ")
+				)
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `5`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `5`,
+				},
+			]
+		});
+
+		// TODO remove after TW migrate finish
 		this.addObsidianIcon('format-notes-custom', 'FN');
 		this.addCommand({
 			id: "format-notes-custom",
