@@ -170,6 +170,29 @@ export default class MyPlugin extends Plugin {
 		});
 	*/
 
+
+	this.addCommand({
+		id: "find-broken-link",
+		name: "Find Broken Link",
+		callback: () => {
+			let count = 0
+			const unresolvedLinks: Record<string, Record<string, number>> = this.app.metadataCache.unresolvedLinks;	
+			// then loop the record data in console
+			for (const [key, value] of Object.entries(unresolvedLinks)) {
+				let v = ''
+				for (const [k1, v1] of Object.entries(value)) {
+					v += k1 + ":" + v1 + ", "
+				}
+				v = v.replace(/, $/, "")
+				if (v !== "") {
+					console.log(key + '[' + v + ']');
+					count++
+				}
+			}
+			console.log("count=" + count)
+		}
+	});
+
 		this.addCommand({
 			id: "open-tag-search",
 			name: "Open tag search",
