@@ -176,6 +176,7 @@ export default class MyPlugin extends Plugin {
 		name: "Find Broken Link",
 		callback: () => {
 			let count = 0
+			let result = ""
 			const unresolvedLinks: Record<string, Record<string, number>> = this.app.metadataCache.unresolvedLinks;	
 			// then loop the record data in console
 			for (const [key, value] of Object.entries(unresolvedLinks)) {
@@ -185,11 +186,16 @@ export default class MyPlugin extends Plugin {
 				}
 				v = v.replace(/, $/, "")
 				if (v !== "") {
-					console.log(key + '[' + v + ']');
+					console.log(key + ' -> [' + v + ']')
+					result += "- [[" + key.replace(/\.md$/,"") + ']]'// : [' + v + ']'
+					result += "\n"
 					count++
 				}
 			}
-			console.log("count=" + count)
+			navigator.clipboard.writeText(result).then(() => {
+				new Notice("count=" + count)
+				new Notice("copied result to clipboard!")
+			})
 		}
 	});
 
