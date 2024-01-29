@@ -1166,27 +1166,52 @@ this.addCommand({
 			name: "FE Add Fantastical Event",
 			icon: `event-to-fantastical-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				let text = ""
-				const listSelections : EditorSelection[] = editor.listSelections()
-				listSelections.forEach(listSelection => {
-					const a = listSelection.head.line
-					const b = listSelection.anchor.line
-					const fromLineNum = b > a ? a : b
-					const toLineNum = b > a ? b : a
-					for (let i = fromLineNum; i <= toLineNum; i++) {
-						const line = editor.getLine(i)
-						if (/^- \d\d\d\d-\d\d-\d\d \d\d:\d\d /.test(line)) {
-							const modifiedLine = line.replace(/^- /, `- #tm `)
-							editor.setLine(i, modifiedLine);
-							text += line + "\n"
-						}
+				let text = "";
+				const vault: Vault = this.app.vault;
+				const listSelections: EditorSelection[] = editor.listSelections();
+			  
+				const processLine = async (line: string, i: number) => {
+				  if (/^- \d\d\d\d-\d\d-\d\d \d\d:\d\d /.test(line)) {
+					const modifiedLine = line.replace(/^- /, `- #tm `);
+					editor.setLine(i, modifiedLine);
+					text += line + "\n";
+			  
+					const lineToAdd = '-' + line.replace(/-/g, '');
+					const path = line.replace(/^- (\d\d\d\d)-(\d\d)-.*/, "J/$1-M$2.md");
+			  
+					let tFile = vault.getAbstractFileByPath(path);
+					if (tFile == null) {
+					  tFile = await vault.create(path, lineToAdd);
+					} else {
+					  const tFileOriginalValue = await vault.read(tFile as TFile);
+					  await vault.modify(tFile as TFile, tFileOriginalValue + "\n" + lineToAdd);
 					}
-				})
-				if (text.length != 0) {
-					text = encodeURI(text)
+				  }
+				};
+			  
+				const processSelections = async () => {
+				  for (const listSelection of listSelections) {
+					const a = listSelection.head.line;
+					const b = listSelection.anchor.line;
+					const fromLineNum = b > a ? a : b;
+					const toLineNum = b > a ? b : a;
+			  
+					for (let i = fromLineNum; i <= toLineNum; i++) {
+					  const line = editor.getLine(i);
+					  await processLine(line, i);
+					}
+				  }
+				};
+			  
+				processSelections().then(() => {
+				  if (text.length !== 0) {
+					text = encodeURI(text);
 					window.open(`shortcuts://run-shortcut?name=Add%20Obsidian%20Inbox%20Event%20via%20Fantastical&input=text&text=${text}&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://`);
-				}
-			}
+				  }
+				});
+			  },
+			  
+			
 		});
 
 		/*
