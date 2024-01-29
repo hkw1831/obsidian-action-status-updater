@@ -174,7 +174,11 @@ export default class MyPlugin extends Plugin {
 	this.addCommand({
 		id: "find-broken-link",
 		name: "Find Broken Link",
-		callback: () => {
+		editorCallback: (editor: Editor, view: MarkdownView) => {
+			if (view.file.path !== "I/Broken Link.md") {
+				new Notice("Will not proceed. Please open I/Broken Link.md to run this action")
+				return
+			}
 			let count = 0
 			let result = ""
 			const unresolvedLinks: Record<string, Record<string, number>> = this.app.metadataCache.unresolvedLinks;	
@@ -189,13 +193,21 @@ export default class MyPlugin extends Plugin {
 					console.log(key + ' -> [' + v + ']')
 					result += "- [[" + key.replace(/\.md$/,"") + ']]'// : [' + v + ']'
 					result += "\n"
+					for (const [k2, v2] of Object.entries(value)) {
+						result += "\t- " + k2.replace(/\.md$/,"") + ''
+						result += "\n"
+					}
 					count++
 				}
 			}
+			editor.setValue(result)
+			new Notice("count=" + count)
+			/*
 			navigator.clipboard.writeText(result).then(() => {
 				new Notice("count=" + count)
 				new Notice("copied result to clipboard!")
 			})
+			*/
 		}
 	});
 
