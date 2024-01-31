@@ -1171,6 +1171,7 @@ this.addCommand({
 				const listSelections: EditorSelection[] = editor.listSelections();
 			  
 				const processLine = async (line: string, i: number) => {
+					// to modify line add tm (to move) tag and add to corresponding journal note
 				  if (/^- \d\d\d\d-\d\d-\d\d \d\d:\d\d /.test(line)) {
 					const modifiedLine = line.replace(/^- /, `- #tm `);
 					editor.setLine(i, modifiedLine);
