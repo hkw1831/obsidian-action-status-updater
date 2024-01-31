@@ -494,7 +494,7 @@ export default class MyPlugin extends Plugin {
 				const line = cursor.line
 				const lineContent = editor.getLine(line)
 				// replace all : to _ and replace all ? to _ and replace all / to _ and replace all . to _
-				editor.setLine(line, lineContent.replace(/:/g, "_").replace(/\?/g, "_").replace(/\//g, "_").replace(/\./g, "_")
+				editor.setLine(line, lineContent.replace(/:/g, "_").replace(/\?/g, "_").replace(/\//g, "_").replace(/</g, "_").replace(/>/g, "_")
 				.replace(/^(parent\d+)_ /, "$1: ")
 				.replace(/^(title\d+)_ /, "$1: ")
 				)
