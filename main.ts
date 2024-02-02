@@ -950,6 +950,81 @@ this.addCommand({
 			]
 		});
 
+		
+		this.addCommand({
+			id: "remove-content-left",
+			name: "Remove content left same line",
+			icon: `arrow-left-circle`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const cursor = editor.getCursor()
+				const line = cursor.line
+				const ch = cursor.ch
+				const lineContent = editor.getLine(line)
+				// remove content from first character to ch character of lineContent
+				editor.setLine(line, lineContent.substring(ch))
+				cursor.ch = 0
+				editor.setCursor(cursor)
+			}
+		});
+
+		this.addCommand({
+			id: "remove-content-right",
+			name: "Remove content right same line",
+			icon: `arrow-right-circle`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const cursor = editor.getCursor()
+				const line = cursor.line
+				const ch = cursor.ch
+				const lineContent = editor.getLine(line)
+				// remove content from ch character to end of lineContent
+				editor.setLine(line, lineContent.substring(0, ch))
+				cursor.ch = editor.getLine(line).length
+				editor.setCursor(cursor)
+			}
+		});
+
+		this.addCommand({
+			id: "remove-content-top-left",
+			name: "Remove content from start of note to cursor",
+			icon: `arrow-up-circle`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const cursor = editor.getCursor()
+				const line = cursor.line
+				const ch = cursor.ch
+				const lineContent = editor.getLine(line)
+				// remove content from first character to ch character of lineContent
+				let newContent = lineContent.substring(ch)
+				for (let i = line + 1; i < editor.lineCount(); i++) {
+					newContent += "\n" + editor.getLine(i)
+				}
+				editor.setValue(newContent)
+				cursor.line = 0
+				cursor.ch = 0
+				editor.setCursor(cursor)
+			}
+		});
+
+		this.addCommand({
+			id: "remove-content-bottom-right",
+			name: "Remove content from cursor to end of note",
+			icon: `arrow-down-circle`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const cursor = editor.getCursor()
+				const line = cursor.line
+				const ch = cursor.ch
+				const lineContent = editor.getLine(line)
+				let newContent = ""
+				for (let i = 0; i < line; i++) {
+					newContent += editor.getLine(i) + "\n"
+				}
+				newContent += lineContent.substring(0, ch)
+				editor.setValue(newContent)
+				cursor.line = line
+				cursor.ch = ch
+				editor.setCursor(cursor)
+			}
+		});
+
 		this.addObsidianIcon('threads-to-blog-icon', 'TB');
 		this.addCommand({
 			id: "threads-to-blog",
