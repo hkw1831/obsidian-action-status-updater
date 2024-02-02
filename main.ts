@@ -1969,18 +1969,26 @@ this.addCommand({
 				const ch = cursor.ch
 				const line = cursor.line
 				const lineContent = editor.getLine(line)
+				const previousLineContent = line == 0 ? "" : editor.getLine(line - 1)
 
 				if (/^(> )*\s*- /.test(lineContent)) { // bullet list case
 					// toggle to number list
-					const replacedLineContent = lineContent.replace(/^((> )*)(\s*)- /, "$1$31. ")
+					let n = "1."
+					const a = previousLineContent.match(/^\t*(\d+)\. /)
+					if (a) {
+						const nextN = parseInt(a[0]) + 1
+						n = nextN.toString() + "."
+					}
+					const replacedLineContent = lineContent.replace(/^((> )*)(\s*)- /, "$1$3" + n + " ")
 					editor.setLine(line, replacedLineContent)
-					cursor.ch = cursor.ch + 1
+					cursor.ch = cursor.ch + n.length - 1
 					editor.setCursor(cursor)
 				} else if (/^(> )*\s*[\d]+\. /.test(lineContent)) { // number list case
 					// toggle to non list
+					const n = lineContent.replace(/^((> )*)(\s*)([\d]+\. ).*/, "$4")
 					const replacedLineContent = lineContent.replace(/^((> )*)(\s*)[\d]+\. /, "$1$3")
 					editor.setLine(line, replacedLineContent)
-					cursor.ch = cursor.ch - 3
+					cursor.ch = (cursor.ch - n.length) > 0 ? (cursor.ch - n.length) : 0
 					editor.setCursor(cursor)
 				} else { // no list
 					// toggle to bullet list
