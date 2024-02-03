@@ -16,6 +16,8 @@ import { AddTextToNotesModal } from 'addTextToNotesModal';
 import { NavigateToNoteFromTagModal } from 'navigateToNoteFromTagModal';
 import { SelectionRange, exportCurrentSelection, getCurrentSelectionLineNumber } from 'selfutil/extractSelection';
 import { getParentLine, replaceTWUselessValue, shouldSkipFrontMatter, tidyUpFrontMatterOnValue, tidyUpFrontMatteronEditor } from 'twmigration/twMigrateTools';
+import { removeContentFromCursorToEndOfNote, removeContentFromStartOfNoteToCursor, removeContentLeftSameLine } from 'selfutil/removeContentFromCursor';
+import { RemoveContentFromCursorModal } from 'removeContentFromCursorModal';
 
 // Remember to rename these classes and interfaces!
 
@@ -171,12 +173,52 @@ export default class MyPlugin extends Plugin {
 	*/
 
 
+	this.addObsidianIcon('find-broken-link', 'BL');
 	this.addCommand({
 		id: "find-broken-link",
-		name: "Find Broken Link",
+		name: "Find Broken Link BL",
+		icon: "find-broken-link",
 		editorCallback: (editor: Editor, view: MarkdownView) => {
 			if (view.file.path !== "I/Broken Link.md") {
-				new Notice("Will not proceed. Please open I/Broken Link.md to run this action")
+				
+				const cursor = editor.getCursor()
+				const line = cursor.line
+				const lineContent = editor.getLine(line)
+
+				// if line content has [[ and ]]  and : ? / < > in between, replace them to _
+				if (/\[\[.*[:?\/\\<>].*\]\]/.test(lineContent)) {
+					new Notice("Trying to fix broken line in current line: " + lineContent)
+					// replace all : to _ and replace all ? to _ and replace all / to _ and replace all . to _
+					editor.setLine(line, lineContent.replace(/:/g, "_").replace(/\?/g, "_").replace(/\//g, "_").replace(/\\/g, "_").replace(/</g, "_").replace(/>/g, "_")
+					.replace(/^(parent\d+)_ /, "$1: ")
+					.replace(/^(title\d+)_ /, "$1: ")
+					)
+				} else {
+					// find next broken link
+					const unresolvedLinks: Record<string, Record<string, number>> = this.app.metadataCache.unresolvedLinks;
+					const brokenLinkRecord: Record<string, number> = unresolvedLinks[view.file.path]
+					if (brokenLinkRecord == null) {
+						new Notice("No broken link found in this file")	
+						return
+					}
+					const brokenLinks = Object.keys(brokenLinkRecord)
+					if (brokenLinks == null || brokenLinks.length == 0) {
+						new Notice("No broken link found in this file")	
+						return
+					}
+					for (let i = line + 1; i < editor.lineCount(); i++) {
+						const lineContent = editor.getLine(i)
+						for (let b = 0; b < brokenLinks.length; b++) {
+							const brokenLink = brokenLinks[b]
+							if (lineContent.contains("[[" + brokenLink + "]]")) {
+								editor.setCursor({line: i, ch: 0})
+								new Notice("Navigated to next Broken link starting from cursor")
+								return
+							}
+						}
+					}
+					new Notice("No broken link found after cursor line in this file")	
+				}
 				return
 			}
 			let count = 0
@@ -201,14 +243,24 @@ export default class MyPlugin extends Plugin {
 				}
 			}
 			editor.setValue(result)
-			new Notice("count=" + count)
+			new Notice("Updated broken link. count=" + count)
 			/*
 			navigator.clipboard.writeText(result).then(() => {
 				new Notice("count=" + count)
 				new Notice("copied result to clipboard!")
 			})
 			*/
-		}
+		},
+		hotkeys: [
+			{
+				modifiers: [`Ctrl`, `Meta`, `Shift`],
+				key: `5`,
+			},
+			{
+				modifiers: [`Ctrl`, `Alt`, `Shift`],
+				key: `5`,
+			},
+		]
 	});
 
 		this.addCommand({
@@ -498,7 +550,7 @@ export default class MyPlugin extends Plugin {
 				.replace(/^(parent\d+)_ /, "$1: ")
 				.replace(/^(title\d+)_ /, "$1: ")
 				)
-			},
+			}/*,
 			hotkeys: [
 				{
 					modifiers: [`Ctrl`, `Meta`, `Shift`],
@@ -508,7 +560,7 @@ export default class MyPlugin extends Plugin {
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
 					key: `5`,
 				},
-			]
+			]*/
 		});
 
 		// TODO remove after TW migrate finish
@@ -950,20 +1002,31 @@ this.addCommand({
 			]
 		});
 
+		this.addCommand({
+			id: "remove-content-from-cursor",
+			name: "Remove content from cursor",
+			icon: `axe`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				new RemoveContentFromCursorModal(this.app, editor).open()
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `x`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `x`,
+				},
+			]
+		});
 		
 		this.addCommand({
 			id: "remove-content-left",
 			name: "Remove content left same line",
 			icon: `arrow-left-circle`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const cursor = editor.getCursor()
-				const line = cursor.line
-				const ch = cursor.ch
-				const lineContent = editor.getLine(line)
-				// remove content from first character to ch character of lineContent
-				editor.setLine(line, lineContent.substring(ch))
-				cursor.ch = 0
-				editor.setCursor(cursor)
+				removeContentLeftSameLine(editor)
 			}
 		});
 
@@ -972,14 +1035,7 @@ this.addCommand({
 			name: "Remove content right same line",
 			icon: `arrow-right-circle`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const cursor = editor.getCursor()
-				const line = cursor.line
-				const ch = cursor.ch
-				const lineContent = editor.getLine(line)
-				// remove content from ch character to end of lineContent
-				editor.setLine(line, lineContent.substring(0, ch))
-				cursor.ch = editor.getLine(line).length
-				editor.setCursor(cursor)
+				removeContentLeftSameLine(editor)
 			}
 		});
 
@@ -988,19 +1044,7 @@ this.addCommand({
 			name: "Remove content from start of note to cursor",
 			icon: `arrow-up-circle`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const cursor = editor.getCursor()
-				const line = cursor.line
-				const ch = cursor.ch
-				const lineContent = editor.getLine(line)
-				// remove content from first character to ch character of lineContent
-				let newContent = lineContent.substring(ch)
-				for (let i = line + 1; i < editor.lineCount(); i++) {
-					newContent += "\n" + editor.getLine(i)
-				}
-				editor.setValue(newContent)
-				cursor.line = 0
-				cursor.ch = 0
-				editor.setCursor(cursor)
+				removeContentFromStartOfNoteToCursor(editor)
 			}
 		});
 
@@ -1009,19 +1053,7 @@ this.addCommand({
 			name: "Remove content from cursor to end of note",
 			icon: `arrow-down-circle`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const cursor = editor.getCursor()
-				const line = cursor.line
-				const ch = cursor.ch
-				const lineContent = editor.getLine(line)
-				let newContent = ""
-				for (let i = 0; i < line; i++) {
-					newContent += editor.getLine(i) + "\n"
-				}
-				newContent += lineContent.substring(0, ch)
-				editor.setValue(newContent)
-				cursor.line = line
-				cursor.ch = ch
-				editor.setCursor(cursor)
+				removeContentFromCursorToEndOfNote(editor)
 			}
 		});
 
@@ -2958,3 +2990,5 @@ class SampleSettingTab extends PluginSettingTab {
 				}));
 	}
 }
+
+
