@@ -18,6 +18,7 @@ import { SelectionRange, exportCurrentSelection, getCurrentSelectionLineNumber }
 import { getParentLine, replaceTWUselessValue, shouldSkipFrontMatter, tidyUpFrontMatterOnValue, tidyUpFrontMatteronEditor } from 'twmigration/twMigrateTools';
 import { removeContentFromCursorToEndOfNote, removeContentFromStartOfNoteToCursor, removeContentLeftSameLine } from 'selfutil/removeContentFromCursor';
 import { RemoveContentFromCursorModal } from 'removeContentFromCursorModal';
+import { FindReplaceModal } from 'findReplaceModal';
 
 // Remember to rename these classes and interfaces!
 
@@ -1992,6 +1993,16 @@ this.addCommand({
 				})
 			},
 		});
+
+		this.addCommand({
+			id: "n-find-replace",
+			name: "Find or Replace",
+			icon: `file-search`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				new FindReplaceModal(this.app).open()
+			},
+		});
+
 
 		/*
 		this.addObsidianIcon('n-previous-tab', 'T<');
