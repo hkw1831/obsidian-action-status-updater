@@ -1960,6 +1960,32 @@ this.addCommand({
 			},
 		});
 
+		this.addObsidianIcon('n-previous-tab', 'T<');
+		this.addCommand({
+			id: "n-previous-tab",
+			name: "Previous tab",
+			icon: `n-previous-tab`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				// @ts-ignore
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+				//console.log(this.app.commands.commands)
+				this.app.commands.executeCommandById("workspace:previous-tab")
+			},
+		});
+
+		this.addObsidianIcon('n-next-tab', 'T>');
+		this.addCommand({
+			id: "n-next-tab",
+			name: "Next tab",
+			icon: `n-next-tab`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				// @ts-ignore
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+				//console.log(this.app.commands.commands)
+				this.app.commands.executeCommandById("workspace:next-tab")
+			},
+		});
+
 		this.addCommand({
 			id: "toggle-bullet-number-list",
 			name: "Toggle Bullet Number List",
