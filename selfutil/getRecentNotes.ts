@@ -10,3 +10,4 @@ export function getAllNotes(app: App): string[] {
   const allNotes = files.map((file) => file.path);
   return allNotes;
 }
+

@@ -1,11 +1,27 @@
 import { NavigateToNoteFromSpecificTagModal } from "navigateToNoteFromSpecificTagModal";
-import { App, FuzzySuggestModal, FuzzyMatch, getAllTags, TFile, Notice } from "obsidian";
+import { App, FuzzySuggestModal, FuzzyMatch, getAllTags, TFile, Notice, MarkdownView } from "obsidian";
 import { getAllTagsWithFilter } from "selfutil/getAllNoteTags";
 import { getAllNotes, getRecentNotes } from "selfutil/getRecentNotes";
 
-export class NavigateToNoteFromTagModal extends FuzzySuggestModal<string> {
+interface Note {
+  search: string,
+  secondary: string
+  type: string
+}
 
-  taskType: String
+interface Heading {
+  note: string,
+  heading: string,
+  level: number
+}
+
+const note = "note"
+const tag = "tag"
+const heading = "heading"
+
+export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
+
+  taskType: Note
 
   constructor(app: App)
   {
@@ -19,30 +35,84 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<string> {
     ]);
   }
 
-  getItems() : string[] {
-		return [...getRecentNotes(this.app, 7), ...getAllTagsWithFilter(this.app), ...getAllNotes(this.app)];
+  getItems() : Note[] {
+    const allNotes = getAllNotes(this.app)
+    let headings: Heading[] = []
+    allNotes.forEach(n => {
+      const file = this.app.vault.getAbstractFileByPath(n) as TFile
+      const fileCache = this.app.metadataCache.getFileCache(file)
+      if (!fileCache) {
+        return
+      }
+      if (!fileCache.headings) {
+        return
+      }
+      fileCache.headings.forEach(h => {
+        headings.push({note: n, heading: h.heading, level: h.level})
+      })
+    })
+		return [
+      ...getRecentNotes(this.app, 7).map(n => {
+        return {search: n, secondary: "", type: note}
+      }),
+      ...getAllTagsWithFilter(this.app).map(n => {
+        return {search: n.replace(/^#/, "@"), secondary: "", type: tag}
+      }),
+      ...allNotes.map(n => {
+        return {search: n, secondary: "", type: note}
+      }),
+      ...headings.map(h => {
+        return {search: '#'.repeat(h.level) + " " + h.heading, secondary: h.note, type: heading}
+      })
+    ];
   }
 
-  getItemText(value: string): string {
-    return value;
+  getItemText(value: Note): string {
+    return value.search;
   }
 
   // Renders each suggestion item.
-  renderSuggestion(value: FuzzyMatch<string>, el: HTMLElement) {
+  renderSuggestion(value: FuzzyMatch<Note>, el: HTMLElement) {
     const item = value.item
-    el.createEl("div", { text: item });
+    el.createEl("div", { text: item.search });
+    el.createEl("small", { text: item.type + " " + item.secondary });
   }
 
   // Perform action on the selected suggestion.
-  async onChooseItem(choosenValue: string, evt: MouseEvent | KeyboardEvent) {
-    if (choosenValue.startsWith("#")) {
-      new NavigateToNoteFromSpecificTagModal(this.app, choosenValue).open()
-    } else {
+  async onChooseItem(choosenValue: Note, evt: MouseEvent | KeyboardEvent) {
+    if (choosenValue.type == tag) {
+      new NavigateToNoteFromSpecificTagModal(this.app, choosenValue.search.replace("@", "#")).open()
+    } else if (choosenValue.type == note) {
       const { vault, workspace } = this.app;
       const leaf = workspace.getLeaf(false);
       Promise.resolve()
       .then(() => {
-          return leaf.openFile(vault.getAbstractFileByPath(choosenValue) as TFile, { active : true });
+          return leaf.openFile(vault.getAbstractFileByPath(choosenValue.search) as TFile, { active : true });
+      })
+    } else if (choosenValue.type == heading) {
+      const { vault, workspace } = this.app;
+      const leaf = workspace.getLeaf(false);
+      Promise.resolve()
+      .then(() => {
+          return leaf.openFile(vault.getAbstractFileByPath(choosenValue.secondary) as TFile, { active : true });
+      })
+      .then(() => {
+        const markdownView = app.workspace.getActiveViewOfType(MarkdownView);
+        const editor = markdownView?.editor
+        if (markdownView == null || editor == null) {
+            const errorReason = `editor or value ${choosenValue.secondary} not exist. Aborting...`
+            return Promise.reject(errorReason)
+        }
+        const totalLineNum = editor.lineCount()
+        for (let i = 0; i < totalLineNum; i++) {
+          const line = editor.getLine(i)
+          if (line == choosenValue.search) {
+            editor.setCursor({line: i, ch: 0})
+            // scroll the view to the cursor
+            editor.scrollIntoView({from: {line: i, ch: 0}, to: {line: i, ch: 0}}, true)
+            return
+          }
+        }
       })
     }
   }

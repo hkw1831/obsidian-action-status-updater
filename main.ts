@@ -212,6 +212,7 @@ export default class MyPlugin extends Plugin {
 							const brokenLink = brokenLinks[b]
 							if (lineContent.contains("[[" + brokenLink + "]]")) {
 								editor.setCursor({line: i, ch: 0})
+								editor.scrollIntoView({from: {line: i, ch: 0}, to: {line: i, ch: 0}}, true)
 								new Notice("Navigated to next Broken link starting from cursor")
 								return
 							}
