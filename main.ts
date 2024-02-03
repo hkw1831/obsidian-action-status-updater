@@ -1992,6 +1992,7 @@ this.addCommand({
 			},
 		});
 
+		/*
 		this.addObsidianIcon('n-previous-tab', 'T<');
 		this.addCommand({
 			id: "n-previous-tab",
@@ -2017,6 +2018,7 @@ this.addCommand({
 				this.app.commands.executeCommandById("workspace:next-tab")
 			},
 		});
+		*/
 
 		this.addCommand({
 			id: "toggle-bullet-number-list",
