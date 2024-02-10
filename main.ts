@@ -2344,7 +2344,9 @@ this.addCommand({
 
 
 	convertThreadsContentToFormatForThreadsApp(editor: Editor) : string {
-		return this.convertThreadsContentToLightPostFormat(editor, "🧵", "\n\n\n")
+		let result = this.convertThreadsContentToLightPostFormat(editor, "🧵", "\n\n\n")
+		result = result.replace(/https\:\/\/github.com[^\n]+\n\n\n/m, "")
+		return result
 	}
 
 	convertThreadsContentToFormatForFacebookApp(editor: Editor) : string {
