@@ -29,7 +29,9 @@ export class AddTextToNotesModal extends FuzzySuggestModal<string> {
   }
 
   getItems() : string[] {
-		return [...['I/Inbox.md'], ...getRecentNotes(this.app, 7), ...getAllNoteTags(this.app).map(s => s.replace(/^#/, "@")), ...getAllNotes(this.app)];
+		const l = [...['I/Inbox.md'], ...getRecentNotes(this.app, 7), ...getAllNoteTags(this.app).map(s => s.replace(/^#/, "@")), ...getAllNotes(this.app)];
+    // remove duplicate for l
+    return l.filter((item, index) => l.indexOf(item) === index);
   }
 
   getItemText(value: string): string {
