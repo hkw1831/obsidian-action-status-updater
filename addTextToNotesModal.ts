@@ -29,7 +29,7 @@ export class AddTextToNotesModal extends FuzzySuggestModal<string> {
   }
 
   getItems() : string[] {
-		return [...['I/Inbox.md'], ...getRecentNotes(this.app, 7), ...getAllNoteTags(this.app), ...getAllNotes(this.app)];
+		return [...['I/Inbox.md'], ...getRecentNotes(this.app, 7), ...getAllNoteTags(this.app).map(s => s.replace(/^#/, "@")), ...getAllNotes(this.app)];
   }
 
   getItemText(value: string): string {
@@ -39,13 +39,13 @@ export class AddTextToNotesModal extends FuzzySuggestModal<string> {
   // Renders each suggestion item.
   renderSuggestion(value: FuzzyMatch<string>, el: HTMLElement) {
     const item = value.item
-    el.createEl("div", { text: item });
+    el.createEl("div", { text: item })
   }
 
   // Perform action on the selected suggestion.
   async onChooseItem(choosenValue: string, evt: MouseEvent | KeyboardEvent) {
-    if (choosenValue.startsWith("#")) {
-      new AddTextToNotesFromSpecificTagModal(this.app, this.linkToAdd, choosenValue, this.description, this.insertFromBeginning, this.postAction).open()
+    if (choosenValue.startsWith("@")) {
+      new AddTextToNotesFromSpecificTagModal(this.app, this.linkToAdd, choosenValue.replace(/^@/, "#"), this.description, this.insertFromBeginning, this.postAction).open()
     } else {
       addTextToNotes(this.linkToAdd, choosenValue, this.app, this.insertFromBeginning)
       this.postAction()
