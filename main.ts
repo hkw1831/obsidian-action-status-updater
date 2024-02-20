@@ -173,6 +173,25 @@ export default class MyPlugin extends Plugin {
 		});
 	*/
 
+	this.addObsidianIcon('auto-correct', 'AC');
+	this.addCommand({
+		id: "auto-correct",
+		name: "Auto Correct AC",
+		icon: "auto-correct",
+		editorCallback: (editor: Editor, view: MarkdownView) => {
+			const value = editor.getValue()
+			let modifiedValue = value
+			.replace(/10分/g, "十分")
+			.replace(/裏/g, "裡")
+			.replace(/大佬/g, "大腦")
+
+			// then add spaces between english and chinese if no space
+			modifiedValue = modifiedValue
+			.replace(/([a-zA-Z0-9])([\u4E00-\u9FFF])/g, "$1 $2")
+			.replace(/([\u4E00-\u9FFF])([a-zA-Z0-9])/g, "$1 $2")
+			editor.setValue(modifiedValue)
+		}
+	});
 
 	this.addObsidianIcon('find-broken-link', 'BL');
 	this.addCommand({
