@@ -2,49 +2,40 @@ import { App, Editor, FuzzySuggestModal, FuzzyMatch } from "obsidian";
 
 interface CommentType {
   type: string;
+  cursor: string;
   description: string;
 }
 
 const ALL_TYPES = [
   {
     type: "n",
-    description: "N"
-  },
-  {
-    type: "w",
-    description: "W"
+    cursor: "c",
+    description: "N Cursor"
   },
   {
     type: "n",
-    description: "N"
-  },
-  {
-    type: "w",
-    description: "W"
+    cursor: "b",
+    description: "N Beginning of line"
   },
   {
     type: "n",
-    description: "N"
+    cursor: "e",
+    description: "N End of line"
   },
   {
     type: "w",
-    description: "W"
-  },
-  {
-    type: "n",
-    description: "N"
+    cursor: "c",
+    description: "W Cursor"
   },
   {
     type: "w",
-    description: "W"
-  },
-  {
-    type: "n",
-    description: "N"
+    cursor: "b",
+    description: "W Beginning of line"
   },
   {
     type: "w",
-    description: "W"
+    cursor: "e",
+    description: "W End of line"
   }
 ];
 
@@ -65,13 +56,13 @@ export class AddTaskTagModal extends FuzzySuggestModal<CommentType> {
   }
 
   getItemText(noteType: CommentType): string {
-    return noteType.type;
+    return noteType.type + noteType.cursor;
   }
 
   // Renders each suggestion item.
   renderSuggestion(choosenNoteTypeMatch: FuzzyMatch<CommentType>, el: HTMLElement) {
     const noteType = choosenNoteTypeMatch.item
-    el.createEl("div", { text: noteType.type });
+    el.createEl("div", { text: noteType.type + " " + noteType.cursor });
     el.createEl("small", { text: noteType.description });
   }
 
@@ -84,8 +75,28 @@ export class AddTaskTagModal extends FuzzySuggestModal<CommentType> {
     const cursor = this.editor.getCursor()
     const line = this.editor.getLine(cursor.line);
     
-    this.editor.replaceRange(`${line.charAt(cursor.ch - 1) != ' ' ? ' ' : ""}#${choosenNoteType.type}${this.taskType} `, cursor);  
-    cursor.ch = cursor.ch + 4 + (line.charAt(cursor.ch - 1) != ' ' ? 1 : 0);
-		this.editor.setCursor(cursor);
+    if (choosenNoteType.cursor == "c") {
+      this.editor.replaceRange(`${line.charAt(cursor.ch - 1) != ' ' ? ' ' : ""}#${choosenNoteType.type}${this.taskType} `, cursor);  
+      cursor.ch = cursor.ch + 4 + (line.charAt(cursor.ch - 1) != ' ' ? 1 : 0);
+		  this.editor.setCursor(cursor);
+    } else if (choosenNoteType.cursor == "b") {
+      let modifiedLine = line;
+      if (/^\t*- /.test(line)) {
+        modifiedLine = line.replace(/^(\t*- )/, `$1#${choosenNoteType.type}${this.taskType} `);
+      } else if (/^\t*\d+\. /.test(line)) {
+        modifiedLine = line.replace(/^(\t*\d+\. )/, `$1${choosenNoteType.type}${this.taskType} `);
+      } else {
+        modifiedLine = line.replace(/^/, `#${choosenNoteType.type}${this.taskType} `);
+      }
+      this.editor.setLine(cursor.line, modifiedLine);
+      cursor.ch = cursor.ch + 4;
+		  this.editor.setCursor(cursor);
+    } else if (choosenNoteType.cursor == "e") {
+      let modifiedLine = line.replace(/$/, ` #${choosenNoteType.type}${this.taskType}`);
+      this.editor.setLine(cursor.line, modifiedLine);
+      cursor.ch = cursor.ch;
+		  this.editor.setCursor(cursor);
+    }
+    
   }
 }
