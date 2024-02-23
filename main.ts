@@ -265,6 +265,36 @@ export default class MyPlugin extends Plugin {
 		]
 	});
 
+			this.addCommand({
+			id: "open-tag-search",
+			name: "Open tag search",
+			icon: "hash",
+			callback: () => {
+				/* eslint-disable @typescript-eslint/no-explicit-any */
+				const searchPlugin = (
+					this.app as any
+				).internalPlugins.getPluginById("global-search");
+				/* eslint-enable @typescript-eslint/no-explicit-any */
+				const search = searchPlugin && searchPlugin.instance;
+
+				if (searchPlugin && searchPlugin.instance) {
+					new TagSearchModal(this.app, search).open();
+				} else {
+					new Notice("Please enable the search core plugin!");
+				}
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `s`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `s`,
+				},
+			]
+		});
+
 		this.addCommand({
 			id: "open-tag-search",
 			name: "Open tag search",
@@ -293,6 +323,27 @@ export default class MyPlugin extends Plugin {
 					key: `s`,
 				},
 			]
+		});
+
+		
+		this.addCommand({
+			id: "test",
+			name: "Test",
+			icon: "test",
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const backlink = this.app.metadataCache.getBacklinksForFile(view.file)
+				if (backlink) {
+					console.log(backlink)
+					if (backlink.data) {
+						console.log(backlink.data)
+						Object.keys(backlink.data).forEach(a => {
+							console.log("### " + a)
+							console.log("=== " + backlink.data[a])
+						}
+					}
+				}
+				
+			}
 		});
 
 		this.addObsidianIcon('obsidian-paste', '⌘V');
