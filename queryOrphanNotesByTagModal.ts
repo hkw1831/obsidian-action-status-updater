@@ -43,7 +43,8 @@ export class QueryOrphanNotesByTagModal extends FuzzySuggestModal<string> {
   // Perform action on the selected suggestion.
   async onChooseItem(choosenValue: string, evt: MouseEvent | KeyboardEvent) {
     console.log(this.view.file.path)
-    if (this.view.file.path === "I/Self Query.md") {
+    const queryMd = "I/Self Query.md"
+    if (this.view.file.path === queryMd) {
       new Notice("Checking... may need some time")
       const tag =  choosenValue.replace(/^@/, "#")
       const filePaths = filesWhereTagIsUsed(tag)
@@ -58,13 +59,20 @@ export class QueryOrphanNotesByTagModal extends FuzzySuggestModal<string> {
           console.log(`No backlinks for ${tFile.path}`)
           result += "\n" + "- [[" + tFile.basename + "]]"
         } else {
-          console.log(`Has backlinks for ${tFile.path}`)
+          // remove key "aaa" from backlinks.data
+          delete backlinks.data[queryMd]
+          if (Object.keys(backlinks.data).length === 0) {
+            console.log(`No backlinks for ${tFile.path}`)
+            result += "\n" + "- [[" + tFile.basename + "]]"
+          } else {
+            console.log(`Has backlinks for ${tFile.path}`)
+          }
         }
       }
       this.editor.setValue(result)
       new Notice("Updated orphan")
     } else {
-      new Notice("Please go to 'I/Self Query.md' to run this action")
+      new Notice("Please go to '" + queryMd + "' to run this action")
     }
     
     
