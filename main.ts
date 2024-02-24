@@ -19,6 +19,7 @@ import { getParentLine, replaceTWUselessValue, shouldSkipFrontMatter, tidyUpFron
 import { removeContentFromCursorToEndOfNote, removeContentFromStartOfNoteToCursor, removeContentLeftSameLine } from 'selfutil/removeContentFromCursor';
 import { RemoveContentFromCursorModal } from 'removeContentFromCursorModal';
 import { FindReplaceModal } from 'findReplaceModal';
+import { QueryOrphanNotesByTagModal } from 'queryOrphanNotesByTagModal';
 
 // Remember to rename these classes and interfaces!
 
@@ -327,22 +328,10 @@ export default class MyPlugin extends Plugin {
 
 		
 		this.addCommand({
-			id: "test",
-			name: "Test",
-			icon: "test",
+			id: "self-query",
+			name: "Self Query",
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const backlink = this.app.metadataCache.getBacklinksForFile(view.file)
-				if (backlink) {
-					console.log(backlink)
-					if (backlink.data) {
-						console.log(backlink.data)
-						Object.keys(backlink.data).forEach(a => {
-							console.log("### " + a)
-							console.log("=== " + backlink.data[a])
-						}
-					}
-				}
-				
+				new QueryOrphanNotesByTagModal(this.app, editor, view).open()
 			}
 		});
 
