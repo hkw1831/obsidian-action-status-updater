@@ -111,6 +111,7 @@ export function	tidyUpFrontMatteronEditor(editor: Editor) {
     editor.setValue(modifiedValue)
 }
 
+/*
 export function	tidyUpFrontMatterOnValue(value: String) {
     const values: string[] = value.split("\n")
     const lineCount = values.length
@@ -187,6 +188,43 @@ export function	tidyUpFrontMatterOnValue(value: String) {
                     })
                 }
                 fm += modifiedLine
+            } else {
+                fm += (line + "\n")
+            }
+        }
+        if (h3Count >= 2) {
+            c += (line + "\n")
+        }
+        if (line === "---") {
+            h3Count++;
+        }
+    } 
+    text += content
+    if (fm.length > 0) {
+        text += fm
+    }
+    text += c
+    
+    return text.replace(/^---\n---\n/m, "").replace(/\n$/, "")
+}
+*/
+
+export function	tidyUpFrontMatterOnValue(value: String) {
+    const values: string[] = value.split("\n")
+    const lineCount = values.length
+
+    let fm = ""
+    let c = ""
+    let text = ""
+    let h3Count = 0;
+    let content = ""
+    for (let i = 0; i < lineCount; i++) {
+        const line = values[i]
+        if (h3Count == 0) {
+            content += (line + "\n")
+        } else if (h3Count == 1) {
+            if (/^tag: [a-c]\/[a-z]\/[a-z]$/.test(line)) {
+                fm += (line.replace(/^tag: /, "tags: ") + "\n")
             } else {
                 fm += (line + "\n")
             }

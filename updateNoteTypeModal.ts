@@ -209,7 +209,7 @@ export class UpdateNoteTypeModal extends FuzzySuggestModal<NoteType> {
     const cursor = this.editor.getCursor()
     const oldLine = cursor.line
     const oldCh = cursor.ch
-    const addText = `---\ntag: ${value}\n---\n\n${this.editor.getValue()}`
+    const addText = `---\ntags: ${value}\n---\n\n${this.editor.getValue()}`
     this.editor.setValue(addText)
     cursor.line = oldLine + 4
     cursor.ch = oldCh
@@ -237,7 +237,7 @@ export class UpdateNoteTypeModal extends FuzzySuggestModal<NoteType> {
     for (let i = 0; i <= firstLineIndex; i++) {
       text = text + this.editor.getLine(i) + "\n";
     }
-    text = text + `tag: ${value}\n`
+    text = text + `tags: ${value}\n`
     for (let i = firstLineIndex + 1; i <= this.editor.lineCount(); i++) {
       text = text + this.editor.getLine(i) + "\n";
     }

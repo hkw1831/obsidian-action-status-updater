@@ -669,7 +669,7 @@ this.addCommand({
 					const previousLine = editor.getLine(line-1)
 					editor.replaceRange("", {line: line-1, ch: previousLine.length}, {line: line, ch: lineContent.length})
 				}
-				editor.setValue(editor.getValue().replace(/^---\n+---\n/, "---\ntag: b/n/c\n---\n").replace(/\n$/, ""))
+				editor.setValue(editor.getValue().replace(/^---\n+---\n/, "---\ntags: b/n/c\n---\n").replace(/\n$/, ""))
 				editor.setCursor({line: line, ch: ch > editor.getLine(line).length ? editor.getLine(line).length : ch})
 				new Notice("Copied to clipboard: " + parentLink)
 			})
@@ -742,7 +742,7 @@ this.addCommand({
 			text += fm
 		}
 		text += c
-		text = text.replace(/^---\n+---\n/m, "---\ntag: b/n/c\n---\n").replace(/\n$/, "")
+		text = text.replace(/^---\n+---\n/m, "---\ntags: b/n/c\n---\n").replace(/\n$/, "")
 		editor.setValue(text)
 	},
 	hotkeys: [
@@ -803,7 +803,7 @@ this.addCommand({
 						taskTag += "a"
 					}
 					if (taskTag.length == 5) {
-						fm += ("tag: " + taskTag + "\n")
+						fm += ("tags: " + taskTag + "\n")
 					} else {
 						new Notice("error on setting action tag")
 						fm += (line + "\n")
@@ -825,7 +825,7 @@ this.addCommand({
 			text += fm
 		}
 		text += c
-		text = text.replace(/^---\n+---\n/m, "---\ntag: b/n/c\n---\n").replace(/\n$/, "")
+		text = text.replace(/^---\n+---\n/m, "---\ntags: b/n/c\n---\n").replace(/\n$/, "")
 		editor.setValue(text)
 		editor.setCursor({line: getParentLine(text), ch: 0})
 		app.vault.rename(view.file, "C/" + view.file.name)
