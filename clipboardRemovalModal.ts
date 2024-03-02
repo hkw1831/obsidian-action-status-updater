@@ -17,7 +17,7 @@ export class ClipboardRemovalModal extends FuzzySuggestModal<string> {
   }
 
   getItems(): string[] {
-    return [...[this.REMOVE_ALL], ...this.clipboardContent.reverse()];
+    return [...[this.REMOVE_ALL], ...this.clipboardContent.slice().reverse()];
   }
 
   getItemText(item: string): string {
