@@ -15,7 +15,7 @@ export class ClipboardPasteModal extends FuzzySuggestModal<string> {
   }
 
   getItems(): string[] {
-    return this.clipboardContent.reverse();
+    return this.clipboardContent.slice().reverse();
   }
 
   getItemText(item: string): string {
@@ -33,7 +33,7 @@ export class ClipboardPasteModal extends FuzzySuggestModal<string> {
   onChooseItem(selectedContent: string, evt: MouseEvent | KeyboardEvent) {
     const index = this.clipboardContent.indexOf(selectedContent, 0);
     if (index > -1) {
-      this.clipboardContent.splice(index, 1);
+      this.clipboardContent.remove(selectedContent);
     }
     this.clipboardContent.push(selectedContent);
     const selection = this.editor.getSelection()
