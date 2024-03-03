@@ -2413,7 +2413,9 @@ this.addCommand({
 	}
 
 	convertThreadsContentToFormatForFacebookApp(editor: Editor) : string {
-		return this.convertThreadsContentToLightPostFormat(editor, "", "\n\nᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳ\n\n", (a) => a.replace("👇", ""))
+		let result = this.convertThreadsContentToLightPostFormat(editor, "", "\n\nᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳ\n\n", (a) => a.replace("👇", ""))
+		result = result.replace(/https\:\/\/github.com[^\n]+\n\nᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳ\n\n/m, "")
+		return result
 	}
 
 	convertThreadsContentToPOE(editor: Editor) : string {
