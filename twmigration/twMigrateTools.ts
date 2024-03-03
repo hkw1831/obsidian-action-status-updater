@@ -223,11 +223,18 @@ export function	tidyUpFrontMatterOnValue(value: String) {
         if (h3Count == 0) {
             content += (line + "\n")
         } else if (h3Count == 1) {
+            if (/^list: /.test(line)) {
+                // remove list field
+            } else {
+                fm += (line + "\n")
+            }
+            /*
             if (/^tag: [a-c]\/[a-z]\/[a-z]$/.test(line)) {
                 fm += (line.replace(/^tag: /, "tags: ") + "\n")
             } else {
                 fm += (line + "\n")
             }
+            */
         }
         if (h3Count >= 2) {
             c += (line + "\n")
