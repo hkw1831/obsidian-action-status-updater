@@ -1793,22 +1793,23 @@ this.addCommand({
 					new Notice(`Copied content to clipboard for generating prompt!`);
 					window.open(`shortcuts://run-shortcut?name=Generate%20ChatGPT%20Prompt&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://`);
 				}, function (error) {
-					new Notice(`error when copy to clipboard!`);
-				});
-			},
-		});
-
-		this.addObsidianIcon('threads-to-clipboard-icon', 'TC');
-		this.addCommand({
-			id: "threads-to-clipboard",
-			name: "TC Threads content to clipboard",
+					new Notice(`error when copy to clipboard!`);   
+				});   
+			},   
+		});   
+   
+		this.addObsidianIcon('threads-to-clipboard-icon', 'TC');   
+		this.addCommand({   
+			id: "threads-to-clipboard",   
+			name: "TC Threads content to clipboard",   
 			icon: `threads-to-clipboard-icon`,
-			editorCallback: (editor: Editor, view: MarkdownView) => {
+			editorCallback: (editor: Editor, view: MarkdownView) => {   
 				const value = editor.getValue()
 				//if (!value.contains("%% #tm to zk %%") && !value.contains("%% #nd to zk %%")) {
 				//	this.addTaskToPutIntoCardInThreadsContent(editor)
 				//}
-				const text = this.convertThreadsContentToFormatForThreadsApp(editor)
+				// const text = this.convertThreadsContentToFormatForThreadsApp(editor)
+				const text = this.getThreadsSegment(editor)
 				const beforeTag = "c/t/r"
 				const afterTag = "c/t/t"
 			
@@ -2708,6 +2709,78 @@ this.addCommand({
 		text = text.replace(/\n+$/, "")
 		return text
 	}
+
+	getThreadsSegment(editor: Editor) : string {
+		let cursor = editor.getCursor();
+		let line = cursor.line;
+		let above = line;
+		let below = line;
+		// first get above
+		
+		while (above >= 0) {
+			let l = editor.getLine(above);
+			if (l == '---') {
+				break;
+			}
+			above--;
+		}
+		if (editor.getLine(above) == '---') {
+			above++;
+		}
+		while(true) {
+			if (editor.getLine(above) == '') {
+				above++;
+			} else {
+				break;
+			}
+		}
+
+		// then get below
+		while (below < editor.lineCount()) {
+			let l = editor.getLine(below);
+			if (l == '---') {
+				break;
+			}
+			below++;
+		}
+		if (editor.getLine(below) == '---') {
+			below--;
+		}
+
+		while(true) {
+			if (editor.getLine(below) == '') {
+				below--;
+			} else {
+				break;
+			}
+		}
+
+		// then put them to line
+
+		let text = "";
+		Array.from(Array(below - above + 1).keys()).forEach(i => {
+			const line = editor.getLine(i + above)
+			if (!line.trim().startsWith("%%") || !line.trim().endsWith("%%")) {
+				let modifiedLine = editor.getLine(i + above)
+				if (!/\d+\/\d+ *【.*】/.test(modifiedLine)) {
+					modifiedLine = modifiedLine.replace(/🧵[ ]+(.*)/g, "【$1】")
+											.replace(/^\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
+											.replace(/[^!]\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
+											.replace(/!\[.*\]\(https[^\n]+\.jpeg\)/g, "")
+											.replace(/https[^\n]+\.jpeg/g, "")
+											.replace(/？([^】」\n])/g, "？\n\n$1")
+											.replace(/。([^】」\n])/g, "。\n\n$1")
+											.replace(/！([^】」\n])/g, "！\n\n$1")
+											.replace(/～([^】」\n])/g, "～\n\n$1")
+											.replace(/^\s+$/, "")
+				}
+				text = text + modifiedLine + "\n"
+			}
+		})
+		text = text.replace(/\n+$/, "")
+		return text
+	}
+
 
 	async add3DaysActionNoteContent(vault: Vault) {
 		const scheduleNoteWithoutMd = "D/Query Schedule and Actions next 3 days"
