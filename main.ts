@@ -286,6 +286,69 @@ export default class MyPlugin extends Plugin {
 		]
 	});
 
+	this.addCommand({
+		id: "previous-unfinished-action",
+		name: "PA Previous unfinished action",
+		icon: "chevrons-up",
+		editorCallback: (editor: Editor, view: MarkdownView) => {				
+			const cursor = editor.getCursor()
+			const line = cursor.line
+			const lineContent = editor.getLine(line)
+			for (let i = line - 1; i >= 0; i--) {
+				const lineContent = editor.getLine(i)
+				if (/ #[nw][nlw]/.test(lineContent) || /#[nw][nlw] /.test(lineContent) || / #t[tme]/.test(lineContent) || /#t[tme] /.test(lineContent)) {
+					editor.setCursor({line: i, ch: 0})
+					editor.scrollIntoView({from: {line: i, ch: 0}, to: {line: i, ch: 0}}, true)
+					new Notice("Navigated to previous unfinished action starting from cursor")
+					return
+				}
+			}
+			new Notice("No unfinished action found after cursor line in this file")	
+		},
+		hotkeys: [
+			{
+				modifiers: [`Ctrl`, `Meta`, `Shift`],
+				key: `k`,
+			},
+			{
+				modifiers: [`Ctrl`, `Alt`, `Shift`],
+				key: `k`,
+			},
+		]
+	});
+
+	this.addCommand({
+		id: "next-unfinished-action",
+		name: "NA Next unfinished action",
+		icon: "chevrons-down",
+		editorCallback: (editor: Editor, view: MarkdownView) => {				
+			const cursor = editor.getCursor()
+			const line = cursor.line
+			const lineContent = editor.getLine(line)
+			for (let i = line + 1; i < editor.lineCount(); i++) {
+				const lineContent = editor.getLine(i)
+				if (/ #[nw][nlw]/.test(lineContent) || /#[nw][nlw] /.test(lineContent) || / #t[tme]/.test(lineContent) || /#t[tme] /.test(lineContent)) {
+					editor.setCursor({line: i, ch: 0})
+					editor.scrollIntoView({from: {line: i, ch: 0}, to: {line: i, ch: 0}}, true)
+					new Notice("Navigated to next unfinished action starting from cursor")
+					return
+				}
+			}
+			new Notice("No unfinished action found after cursor line in this file")	
+		},
+		hotkeys: [
+			{
+				modifiers: [`Ctrl`, `Meta`, `Shift`],
+				key: `j`,
+			},
+			{
+				modifiers: [`Ctrl`, `Alt`, `Shift`],
+				key: `j`,
+			},
+		]
+	});
+
+
 			this.addCommand({
 			id: "open-tag-search",
 			name: "Open tag search",
