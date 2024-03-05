@@ -3,6 +3,7 @@ import { App, FuzzySuggestModal, FuzzyMatch, Notice, CachedMetadata, parseFrontM
 import { filesWhereTagIsUsed } from "selfutil/findNotesFromTag"
 
 const BACK_TO_SELECT_TAG = "Back to select tag"
+const OPEN_IN_SEARCH_MODE = "Open in search mode"
 
 export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<string> {
 
@@ -23,7 +24,7 @@ export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<string
 
 
   getItems(): string[] {
-    return [...[BACK_TO_SELECT_TAG], ...filesWhereTagIsUsed(this.tagToFind)];
+    return [...[BACK_TO_SELECT_TAG, OPEN_IN_SEARCH_MODE], ...filesWhereTagIsUsed(this.tagToFind)];
   }
 
   getItemText(path: string): string {
@@ -40,6 +41,15 @@ export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<string
   onChooseItem(path: string, evt: MouseEvent | KeyboardEvent) {
     if (BACK_TO_SELECT_TAG == path) {
       new NavigateToNoteFromTagModal(this.app).open()
+    } else if (OPEN_IN_SEARCH_MODE == path) {
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+				const searchPlugin = (
+					this.app as any
+				).internalPlugins.getPluginById("global-search");
+				/* eslint-enable @typescript-eslint/no-explicit-any */
+				const search = searchPlugin && searchPlugin.instance;
+        const defaultTagSearchString = `tag:${this.tagToFind}`;
+        search.openGlobalSearch(defaultTagSearchString);
     } else {
       const { vault, workspace } = this.app;
       const leaf = workspace.getLeaf(false);
