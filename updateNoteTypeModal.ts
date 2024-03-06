@@ -89,6 +89,10 @@ const ALL_TYPES = [
     description: "Area of Responsibility - Secondary",
   },
   {
+    type: "b/a/a",
+    description: "Area of Responsibility - Archived",
+  },
+  {
     type: "c/b/i",
     description: "Blog post content completed but awaiting upload image",
   },
