@@ -3058,9 +3058,7 @@ this.addCommand({
 				} else if (replacedLine == line) { // no tag, to add tag
 					let { frontmatter } = app.metadataCache.getFileCache(view.file) || {};
     				const fmtags = (parseFrontMatterTags(frontmatter) || []);
-					console.log("====")
 					for (const tag of fmtags) {
-						console.log("== " + tag)
 						if (tag.contains(`#a/w/`)) {
 							let modifiedLine = line;
 							if (/^\t*- /.test(line)) {
