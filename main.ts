@@ -1,5 +1,5 @@
 import { UpdateNoteTypeModal } from 'updateNoteTypeModal';
-import { App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, Vault, EditorSelection, Workspace } from 'obsidian';
+import { App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, Vault, EditorSelection, Workspace, parseFrontMatterTags } from 'obsidian';
 import { AddFootnoteTagModal } from 'addCommentTagModal';
 import { AddTaskTagModal } from 'addTaskTagModal';
 import { renameBlogTitle, renameTag } from 'tagrenamer/renaming';
@@ -3056,6 +3056,40 @@ this.addCommand({
 				} else if (line.contains(` a/n/${t}`) || line.contains(` a/w/${t}`)) {
 					// do nothing
 				} else if (replacedLine == line) { // no tag, to add tag
+					let { frontmatter } = app.metadataCache.getFileCache(view.file) || {};
+    				const fmtags = (parseFrontMatterTags(frontmatter) || []);
+					console.log("====")
+					for (const tag of fmtags) {
+						console.log("== " + tag)
+						if (tag.contains(`#a/w/`)) {
+							let modifiedLine = line;
+							if (/^\t*- /.test(line)) {
+							  modifiedLine = line.replace(/^(\t*- )/, `$1#w${t} `);
+							} else if (/^\t*\d+\. /.test(line)) {
+							  modifiedLine = line.replace(/^(\t*\d+\. )/, `$1w${t} `);
+							} else {
+							  modifiedLine = line.replace(/^/, `#w${t} `);
+							}
+							editor.setLine(cursor.line, modifiedLine);
+							cursor.ch = cursor.ch + 4;
+							editor.setCursor(cursor);
+							return
+						}
+						if (tag.contains(`#a/n/`)) {
+							let modifiedLine = line;
+							if (/^\t*- /.test(line)) {
+							  modifiedLine = line.replace(/^(\t*- )/, `$1#n${t} `);
+							} else if (/^\t*\d+\. /.test(line)) {
+							  modifiedLine = line.replace(/^(\t*\d+\. )/, `$1n${t} `);
+							} else {
+							  modifiedLine = line.replace(/^/, `#n${t} `);
+							}
+							editor.setLine(cursor.line, modifiedLine);
+							cursor.ch = cursor.ch + 4;
+							editor.setCursor(cursor);
+							return
+						}
+					}
 					new AddTaskTagModal(this.app, editor, t).open();
 				} else {			 
 					editor.setLine(lineNumber, replacedLine);
