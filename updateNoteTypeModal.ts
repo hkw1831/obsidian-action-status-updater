@@ -33,6 +33,18 @@ const ALL_TYPES = [
     description: "W Permanent Task",
   },
   {
+    type: "a/a/p",
+    description: "Area of Responsibility - Primary",
+  },
+  {
+    type: "a/a/s",
+    description: "Area of Responsibility - Secondary",
+  },
+  {
+    type: "a/a/a",
+    description: "Area of Responsibility - Abandoned",
+  },
+  {
     type: "b/n/s",
     description: "Zettelkasten - Source notes (like books / video / thoughts / conversation)",
   },
@@ -79,14 +91,6 @@ const ALL_TYPES = [
   {
     type: "b/n/p",
     description: "Placeholder Notes (Deprecated?)",
-  },
-  {
-    type: "b/a/p",
-    description: "Area of Responsibility - Primary",
-  },
-  {
-    type: "b/a/s",
-    description: "Area of Responsibility - Secondary",
   },
   {
     type: "c/b/i",
