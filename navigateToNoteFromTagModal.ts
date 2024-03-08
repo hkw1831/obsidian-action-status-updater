@@ -78,6 +78,12 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
     el.createEl("small", { text: item.type + " " + item.secondary });
   }
 
+  onOpen() {
+    super.onOpen();
+    this.inputEl.value = "@";
+    this.inputEl.trigger("input");
+  }
+
   // Perform action on the selected suggestion.
   async onChooseItem(choosenValue: Note, evt: MouseEvent | KeyboardEvent) {
     if (choosenValue.type == tag) {
