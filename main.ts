@@ -1899,6 +1899,60 @@ this.addCommand({
 				});   
 			},   
 		});   
+
+		this.addObsidianIcon('threads-to-gpt', 'TC');
+		this.addCommand({
+			id: "threads-to-gpt",
+			name: "TC Threads to ChatGPT Prompt",
+			icon: `threads-to-gpt`,
+			editorCallback: async (editor: Editor, view: MarkdownView) => {
+				let line = editor.lineCount();
+
+				let text = "【" + view.file.basename + "】\n\n";
+				let numLineFirstContent = 0
+				let frontMatterLineCount = 0
+				for (let i = 0; i < line; i++) {
+					if (frontMatterLineCount == 2) {
+						numLineFirstContent = i;
+						break;
+					}
+					if (editor.getLine(i) == "---") {
+						frontMatterLineCount++
+					}
+				}
+				for (let i = 0; i < line; i++) {
+					if (editor.getLine(numLineFirstContent).trim() == "") {
+						numLineFirstContent++;
+					} else {
+						break;
+					}
+				}
+
+				Array.from(Array(line - numLineFirstContent).keys()).forEach(i => {
+					const line = editor.getLine(i + numLineFirstContent);
+					if (!line.startsWith("%%") && !line.endsWith("%%")) {
+						text = text + line + "\n"
+					}
+				});
+				
+				text = text.replace(/## References\:([\n]*.*)*$/, "")
+				const beforeTag = "c/t/r"
+				const afterTag = "c/t/t"
+
+				navigator.clipboard.writeText(text)
+				.then(function () {
+					return renameTag(view.file, beforeTag, afterTag)
+				}, function (error) {
+					new Notice(`error when copy to clipboard!`);
+				})
+				.then(function () {
+					new Notice(`Copied content to clipboard for generating prompt!`);
+					window.open(`shortcuts://run-shortcut?name=Generate%20ChatGPT%20Prompt&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://`);
+				}, function (error) {
+					new Notice(`error when copy to clipboard!`);   
+				});   
+			},   
+		});   
    
 		this.addObsidianIcon('threads-to-clipboard-icon', 'TC');   
 		this.addCommand({   
