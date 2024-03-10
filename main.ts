@@ -1860,36 +1860,44 @@ this.addCommand({
 			name: "GP Generate ChatGPT Prompt",
 			icon: `generate-chatgpt-prompt`,
 			editorCallback: async (editor: Editor, view: MarkdownView) => {
-				let line = editor.lineCount();
+				let text = ""
 
-				let text = "【" + view.file.basename + "】\n\n";
-				let numLineFirstContent = 0
-				let frontMatterLineCount = 0
-				for (let i = 0; i < line; i++) {
-					if (frontMatterLineCount == 2) {
-						numLineFirstContent = i;
-						break;
-					}
-					if (editor.getLine(i) == "---") {
-						frontMatterLineCount++
-					}
-				}
-				for (let i = 0; i < line; i++) {
-					if (editor.getLine(numLineFirstContent).trim() == "") {
-						numLineFirstContent++;
-					} else {
-						break;
-					}
-				}
+				const selection = editor.getSelection()
 
-				Array.from(Array(line - numLineFirstContent).keys()).forEach(i => {
-					const line = editor.getLine(i + numLineFirstContent);
-					if (!line.startsWith("%%") && !line.endsWith("%%")) {
-						text = text + line + "\n"
+				if (selection.length == 0) {
+					let line = editor.lineCount();
+
+					text = "【" + view.file.basename + "】\n\n";
+					let numLineFirstContent = 0
+					let frontMatterLineCount = 0
+					for (let i = 0; i < line; i++) {
+						if (frontMatterLineCount == 2) {
+							numLineFirstContent = i;
+							break;
+						}
+						if (editor.getLine(i) == "---") {
+							frontMatterLineCount++
+						}
 					}
-				});
-				
-				text = text.replace(/## References\:([\n]*.*)*$/, "")
+					for (let i = 0; i < line; i++) {
+						if (editor.getLine(numLineFirstContent).trim() == "") {
+							numLineFirstContent++;
+						} else {
+							break;
+						}
+					}
+
+					Array.from(Array(line - numLineFirstContent).keys()).forEach(i => {
+						const line = editor.getLine(i + numLineFirstContent);
+						if (!line.startsWith("%%") && !line.endsWith("%%")) {
+							text = text + line + "\n"
+						}
+					});
+					
+					text = text.replace(/## References\:([\n]*.*)*$/, "")
+				} else {
+					text = selection
+				}
 				
 				navigator.clipboard.writeText(text).then(function () {
 					new Notice(`Copied content to clipboard for generating prompt!`);
