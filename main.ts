@@ -1193,6 +1193,43 @@ this.addCommand({
 			}
 		});
 
+		this.addObsidianIcon('card-to-threads-icon', 'CT');
+		this.addCommand({
+			id: "card-to-threads",
+			name: "CT Card to Threads",
+			icon: `card-to-threads-icon`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				let text = ""
+				text += "---\ntags: c/t/d\n---\n\n"
+				text += "🧵 " + view.file.basename + "\n\n---\n\n\n\n---\n\n";
+				text += "## References\n\n- ";
+				text += "[[" + view.file.basename + "]]\n"
+
+				const { vault } = this.app;
+				const path = view.file.path
+				const newPath = path.replace(/^([A-Z]\/)/, "$1Threads ")
+				console.log("newPath=" + newPath)
+
+				const { workspace } = this.app;
+				const leaf = workspace.getLeaf(false);
+				Promise.resolve()
+				.then(() => {
+					return vault.adapter.exists(newPath);
+				})
+				.then((fileExists) => {
+					if (fileExists) {
+					new Notice(`Will not proceed. Thread post "${newPath}" already exist.`);
+					return Promise.reject("Thread post exist");
+					}
+					return vault.create(newPath, text);
+				})
+				.then((tFile) => {
+					return leaf.openFile(tFile, { active : true});
+				},
+				(rejectReason) => {})
+			}
+		});
+
 		/*
 		this.addObsidianIcon('chatgpt-prompt-for-generating-summary-to-clipboard', 'GS');
 		this.addCommand({
