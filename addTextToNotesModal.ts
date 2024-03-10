@@ -44,6 +44,12 @@ export class AddTextToNotesModal extends FuzzySuggestModal<string> {
     el.createEl("div", { text: item })
   }
 
+  onOpen() {
+    super.onOpen();
+    this.inputEl.value = "@";
+    this.inputEl.trigger("input");
+  }
+
   // Perform action on the selected suggestion.
   async onChooseItem(choosenValue: string, evt: MouseEvent | KeyboardEvent) {
     if (choosenValue.startsWith("@")) {

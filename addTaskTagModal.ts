@@ -7,16 +7,19 @@ interface CommentType {
 }
 
 const ALL_TYPES = [
+  /*
   {
     type: "n",
     cursor: "c",
     description: "N Cursor"
   },
+  */
   {
     type: "n",
     cursor: "b",
     description: "N Beginning of line"
   },
+  /*
   {
     type: "n",
     cursor: "e",
@@ -27,16 +30,19 @@ const ALL_TYPES = [
     cursor: "c",
     description: "W Cursor"
   },
+  */
   {
     type: "w",
     cursor: "b",
     description: "W Beginning of line"
   },
+  /*
   {
     type: "w",
     cursor: "e",
     description: "W End of line"
   }
+  */
 ];
 
 export class AddTaskTagModal extends FuzzySuggestModal<CommentType> {

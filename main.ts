@@ -1,5 +1,5 @@
 import { UpdateNoteTypeModal } from 'updateNoteTypeModal';
-import { App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, Vault, EditorSelection, Workspace } from 'obsidian';
+import { App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, Vault, EditorSelection, Workspace, parseFrontMatterTags } from 'obsidian';
 import { AddFootnoteTagModal } from 'addCommentTagModal';
 import { AddTaskTagModal } from 'addTaskTagModal';
 import { renameBlogTitle, renameTag } from 'tagrenamer/renaming';
@@ -1947,6 +1947,7 @@ this.addCommand({
 						const line = editor.getLine(i);
 						text = text + line + "\n"
 					})
+					text = text.replace(/## References\:([\n]*.*)*$/, "");
 					editor.setValue(text)
 
 					renameTag(view.file, "c/t/d", "c/x/d")
@@ -2010,7 +2011,9 @@ this.addCommand({
 				//if (!value.contains("%% #nm to zk %%") && !value.contains("%% #nd to zk %%")) {
 				//	this.addTaskToPutIntoCardInThreadsContent(editor)
 				//}
-				const text = this.convertThreadsContentToFormatForFacebookApp(editor)
+				let text = this.convertThreadsContentToFormatForFacebookApp(editor)
+				text = text.replace(/ᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳ\n+## [Rr]eferences?\:([\n]*.*)*$/, "");
+				text = text.replace(/ᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳ\n+## [Rr]eferences?([\n]*.*)*$/, "");
 			
 				const beforeTag = "c/t/t"
 				const afterTag = "c/t/p"
@@ -2584,7 +2587,6 @@ this.addCommand({
 		text2 = text2.replace("\n\n\n\n", "") // remove empty line
 		text2 = text2.replace("\nᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳ\n\n\n", "") // remove empty line
 		text2 = text2.replace(/\n\n## Opinion from ChatGPT\:([\n]*.*)*$/, "")
-		text2 = text2.replace(/## References\:([\n]*.*)*$/, "");
 		text2 = text2.replace(/\n+$/, "")
 
 		return text2
@@ -3056,6 +3058,38 @@ this.addCommand({
 				} else if (line.contains(` a/n/${t}`) || line.contains(` a/w/${t}`)) {
 					// do nothing
 				} else if (replacedLine == line) { // no tag, to add tag
+					let { frontmatter } = app.metadataCache.getFileCache(view.file) || {};
+    				const fmtags = (parseFrontMatterTags(frontmatter) || []);
+					for (const tag of fmtags) {
+						if (tag.contains(`#a/w/`)) {
+							let modifiedLine = line;
+							if (/^\t*- /.test(line)) {
+							  modifiedLine = line.replace(/^(\t*- )/, `$1#w${t} `);
+							} else if (/^\t*\d+\. /.test(line)) {
+							  modifiedLine = line.replace(/^(\t*\d+\. )/, `$1w${t} `);
+							} else {
+							  modifiedLine = line.replace(/^/, `#w${t} `);
+							}
+							editor.setLine(cursor.line, modifiedLine);
+							cursor.ch = cursor.ch + 4;
+							editor.setCursor(cursor);
+							return
+						}
+						if (tag.contains(`#a/n/`)) {
+							let modifiedLine = line;
+							if (/^\t*- /.test(line)) {
+							  modifiedLine = line.replace(/^(\t*- )/, `$1#n${t} `);
+							} else if (/^\t*\d+\. /.test(line)) {
+							  modifiedLine = line.replace(/^(\t*\d+\. )/, `$1n${t} `);
+							} else {
+							  modifiedLine = line.replace(/^/, `#n${t} `);
+							}
+							editor.setLine(cursor.line, modifiedLine);
+							cursor.ch = cursor.ch + 4;
+							editor.setCursor(cursor);
+							return
+						}
+					}
 					new AddTaskTagModal(this.app, editor, t).open();
 				} else {			 
 					editor.setLine(lineNumber, replacedLine);
