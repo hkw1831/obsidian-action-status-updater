@@ -1901,7 +1901,7 @@ this.addCommand({
 				
 				navigator.clipboard.writeText(text).then(function () {
 					new Notice(`Copied content to clipboard for generating prompt!`);
-					window.open(`shortcuts://run-shortcut?name=Generate%20ChatGPT%20Prompt&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://`);
+					window.open(`shortcuts://run-shortcut?name=Generate%20ChatGPT%20Prompt&x-success=Poe-app://&x-cancel=obsidian://&x-error=obsidian://`);
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);   
 				});   
@@ -1955,7 +1955,7 @@ this.addCommand({
 				})
 				.then(function () {
 					new Notice(`Copied content to clipboard for generating prompt!`);
-					window.open(`shortcuts://run-shortcut?name=Generate%20ChatGPT%20Prompt&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://`);
+					window.open(`shortcuts://run-shortcut?name=Generate%20ChatGPT%20Prompt&x-success=Poe-app://&x-cancel=obsidian://&x-error=obsidian://`);
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);   
 				});   
