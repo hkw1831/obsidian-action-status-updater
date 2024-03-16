@@ -2139,8 +2139,12 @@ this.addCommand({
 			id: "threads-block-to-image",
 			name: "TI Threads segment to image",
 			icon: `threads-block-to-image`,
-			editorCallback: (editor: Editor, view: MarkdownView) => {
+			editorCallback: async(editor: Editor, view: MarkdownView) => {
 				const threadSegment = this.getThreadSegment(editor)
+				const beforeTag = "c/t/d"
+				const afterTag = "c/t/r"
+				const result = await renameTag(view.file, beforeTag, afterTag)
+				console.log(result)
 				new ThreadsToImagesModal(this.app, threadSegment).open()
 			},
 		});
