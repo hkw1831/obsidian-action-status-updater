@@ -20,6 +20,7 @@ import { removeContentFromCursorToEndOfNote, removeContentFromStartOfNoteToCurso
 import { RemoveContentFromCursorModal } from 'removeContentFromCursorModal';
 import { FindReplaceModal } from 'findReplaceModal';
 import { QueryOrphanNotesByTagModal } from 'queryOrphanNotesByTagModal';
+import { NavigateToForwardAndBacklinkTagModal } from 'navigateToForwardAndBacklinkModal';
 
 // Remember to rename these classes and interfaces!
 
@@ -1715,6 +1716,26 @@ this.addCommand({
 				{
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
 					key: `]`,
+				},
+			]
+		})
+
+		this.addObsidianIcon('navigate-to-forwardlinks-backlinks', 'BL');
+		this.addCommand({
+			id: "navigate-to-forwardlinks-backlinks",
+			name: "BL Navigate to Forwardlinks/Backlinks",
+			icon: `navigate-to-forwardlinks-backlinks`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				new NavigateToForwardAndBacklinkTagModal(this.app, view).open()
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `G`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `G`,
 				},
 			]
 		})
