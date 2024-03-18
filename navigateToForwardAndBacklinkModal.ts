@@ -74,7 +74,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
       const matches = line.match(/([A-Za-z0-9-]+?:\/\/[^ ]*)/g)
       if (matches) {
         for (let j = 0; j < matches.length; j++) {
-          result.push({path: matches[j], type: "e ", index: "", line: i, ch: 0})
+          result.push({path: matches[j], type: "w ", index: "", line: i, ch: 0})
         }
       }
     }
@@ -141,7 +141,6 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
   renderSuggestion(ll: LinkType, el: HTMLElement) {
     //const ll: LinkType = l.item
     el.createEl("div", { text: ll.type + ll.path + ll.index});
-    el.createEl("small", { text: "" });
   }
 
   // Perform action on the selected suggestion.
