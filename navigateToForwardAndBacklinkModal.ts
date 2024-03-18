@@ -55,7 +55,9 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     for (let i in backlinksData) {
       for (let j = 0; j < backlinksData[i].length; j++) {
         const index = backlinksData[i].length > 1 ? "[" + j + "]" : ""
-        result.push({path: i, type: "< ", index: index, line: backlinksData[i][j]['position']['start']['line'], ch: backlinksData[i][j]['position']['start']['col']})
+        if (i != this.view.file.path) {
+          result.push({path: i, type: "< ", index: index, line: backlinksData[i][j]['position']['start']['line'], ch: backlinksData[i][j]['position']['start']['col']})
+        }
       }
     }
     return result
