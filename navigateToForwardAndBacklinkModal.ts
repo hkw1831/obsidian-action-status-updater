@@ -44,14 +44,11 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
 
   getBacklinkItems(): LinkType[] {
     const backlinks = this.app.metadataCache.getBacklinksForFile(this.view.file)
-    console.log(backlinks)
     const backlinksData = backlinks?.data
     if (!backlinksData) {
       return []
     }
     let result = []
-    console.log(typeof backlinks.data)
-    console.log(backlinksData)
     for (let i in backlinksData) {
       for (let j = 0; j < backlinksData[i].length; j++) {
         const index = backlinksData[i].length > 1 ? "[" + j + "]" : ""
@@ -94,9 +91,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     let resultAsContent = []
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim()
-      console.log(line)
       if (line != "---" && line !== "" && !/^tags: [a-z]\/[a-z]\/[a-z]/.test(line)) {
-        console.log("--" + line + "--")
         if (/^[#]{1,6} /.test(line)) {
           resultAsHeader.push({path: line.replace(/^[#]{1,6}/, ""), type: "# ", index: "", line: i, ch: 0})
         } else if (/#[wnt][nlwdatme] /.test(line) || / #[wnt][nlwdatme]/.test(line)) {
@@ -169,6 +164,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
           }
           editor.setCursor({line: line, ch: ch})
           editor.scrollIntoView({from: {line: line, ch: ch}, to: {line: line, ch: ch}}, true)
+          //editor.markText({line: line, ch: ch}, {line: line + 1, ch: ch + 3}, {className: "my-highlight"})
           return Promise.resolve()
       })
       .catch((reason) => { 
@@ -183,6 +179,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     const ch = l.ch
     this.editor.setCursor({line: line, ch: ch})
     this.editor.scrollIntoView({from: {line: line, ch: ch}, to: {line: line, ch: ch}}, true)
+    //this.editor.markText({line: line, ch: ch}, {line: line + 1, ch: ch}, {className: "my-highlight"})
     return
   }
 }
