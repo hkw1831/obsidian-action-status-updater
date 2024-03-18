@@ -172,7 +172,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
       })
       return
     }
-    if (l.type === "e ") {
+    if (l.type === "w ") {
       window.open(l.path, '_blank');
     }
     const line = l.line
