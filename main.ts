@@ -1720,13 +1720,13 @@ this.addCommand({
 			]
 		})
 
-		this.addObsidianIcon('navigate-to-forwardlinks-backlinks', 'BL');
+		this.addObsidianIcon('navigate-to-forwardlinks-backlinks', '<>');
 		this.addCommand({
 			id: "navigate-to-forwardlinks-backlinks",
 			name: "BL Navigate to Forwardlinks/Backlinks",
 			icon: `navigate-to-forwardlinks-backlinks`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				new NavigateToForwardAndBacklinkTagModal(this.app, view).open()
+				new NavigateToForwardAndBacklinkTagModal(this.app, view, editor).open()
 			},
 			hotkeys: [
 				{
