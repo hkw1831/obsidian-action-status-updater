@@ -174,6 +174,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     }
     if (l.type === "w ") {
       window.open(l.path, '_blank');
+      return
     }
     const line = l.line
     const ch = l.ch
