@@ -2084,6 +2084,9 @@ this.addCommand({
 					new Notice("copied to clipboard, please open chatgpt to paste")
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);
+				})
+				.then(() => {
+					window.open(`Poe-app://`);
 				});
 			},
 		});
