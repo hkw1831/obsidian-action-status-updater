@@ -87,31 +87,21 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     const lines = value.split("\n")
 
     let resultAsHeader = []
-    let resultAsAction = []
     let resultAsUnfinishedAction = []
     let resultAsFinishedAction = []
-    let resultAsNowAction = []
-    let resultAsWaitingAction = []
     let resultAsContent = []
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim()
       console.log(line)
-      if (line != "---" && line !== "" && !/^tags: [a-z]\/[a-z]\/[a-z]\//.test(line)) {
+      if (line != "---" && line !== "" && !/^tags: [a-z]\/[a-z]\/[a-z]/.test(line)) {
         console.log("--" + line + "--")
         if (/^[#]{1,6} /.test(line)) {
-          resultAsHeader.push({path: line, type: "h ", index: "", line: i, ch: 0})
+          resultAsHeader.push({path: line.replace(/^[#]{1,6}/, ""), type: "# ", index: "", line: i, ch: 0})
         } else if (/#[wnt][nlwdatme] /.test(line) || / #[wnt][nlwdatme]/.test(line)) {
-          resultAsAction.push({path: line, type: "a ", index: "", line: i, ch: 0})
           if (/#[wn][da] /.test(line) || / #[wn][da]/.test(line)) {
-            resultAsFinishedAction.push({path: line, type: "f ", index: "", line: i, ch: 0})
+            resultAsFinishedAction.push({path: line, type: "x ", index: "", line: i, ch: 0})
           } else {
-            resultAsUnfinishedAction.push({path: line, type: "p ", index: "", line: i, ch: 0})
-          }
-          if (/#[wn][n] /.test(line) || / #[wn][n]/.test(line)) {
-            resultAsNowAction.push({path: line, type: "n ", index: "", line: i, ch: 0})
-          }
-          if (/#[wn][w] /.test(line) || / #[wn][w]/.test(line)) {
-            resultAsWaitingAction.push({path: line, type: "w ", index: "", line: i, ch: 0})
+            resultAsUnfinishedAction.push({path: line, type: "z ", index: "", line: i, ch: 0})
           }
         } else {
           resultAsContent.push({path: line, type: "c ", index: "", line: i, ch: 0})
@@ -120,11 +110,8 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     }
     return [
       ...resultAsHeader,
-      ...resultAsNowAction,
-      ...resultAsWaitingAction,
       ...resultAsUnfinishedAction,
       ...resultAsFinishedAction,
-      ...resultAsAction,
       ...resultAsContent
     ]
   }
@@ -135,7 +122,6 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
       ...this.getForwardlinkItems(),
       ...[{path: "------------------", type: "", index: "", line: 0, ch: 0}],
       ...this.getExternallinkItems(),
-      ...[{path: "------------------", type: "", index: "", line: 0, ch: 0}],
       ...this.getContentItems()
     ]
   }
@@ -143,7 +129,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
   getSuggestions(query: string): LinkType[] | Promise<LinkType[]> {
     return this.getItems().filter((i) => {
       const lowerQuery = query.toLowerCase()
-      return i.type !== "" && new RegExp(lowerQuery).test((i.type + i.path).toLowerCase())
+      return new RegExp(lowerQuery).test((i.type + i.path).toLowerCase())
     });
   }
 

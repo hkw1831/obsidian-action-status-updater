@@ -1731,12 +1731,12 @@ this.addCommand({
 			hotkeys: [
 				{
 					modifiers: [`Ctrl`, `Meta`, `Shift`],
-					key: `G`,
+					key: `O`,
 				},
 				{
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
-					key: `G`,
-				},
+					key: `O`,
+				}
 			]
 		})
 
