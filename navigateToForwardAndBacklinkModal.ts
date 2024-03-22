@@ -12,6 +12,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
 
   view: MarkdownView
   editor: Editor
+  items: LinkType[]
 
   constructor(app: App, view: MarkdownView, editor: Editor)
   {
@@ -25,6 +26,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
         purpose: `Which link do you want to navigate to?`
       }
     ]);
+    this.items = this.getItems()
   }
 
 
@@ -60,27 +62,6 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     return result
   }
 
-  getExternallinkItems(): LinkType[] {
-    // grep all links starts with http in the file
-    const fileContent = this.editor.getValue()
-    if (!fileContent) {
-      return []
-    }
-    const lines = fileContent.split("\n")
-    let result = []
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i]
-      const matches = line.match(/([A-Za-z0-9-]+?:\/\/[^ ]*)/g)
-      if (matches) {
-        for (let j = 0; j < matches.length; j++) {
-          result.push({path: matches[j], type: "w ", index: "", line: i, ch: 0})
-        }
-      }
-    }
-    return result
-
-  }
-
   getContentItems(): LinkType[] {
     const value = this.editor.getValue()
     const lines = value.split("\n")
@@ -89,6 +70,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     let resultAsUnfinishedAction = []
     let resultAsFinishedAction = []
     let resultAsContent = []
+    let resultAsExternalLinks = []
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim()
       if (line != "---" && line !== "" && !/^tags: [a-z]\/[a-z]\/[a-z]/.test(line)) {
@@ -104,11 +86,19 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
           resultAsContent.push({path: line, type: "c ", index: "", line: i, ch: 0})
         }
       }
+      const urlRegex = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/g;
+      const matches = line.match(urlRegex)
+      if (matches) {
+        for (let j = 0; j < matches.length; j++) {
+          resultAsExternalLinks.push({path: matches[j], type: "w ", index: "", line: i, ch: 0})
+        }
+      }
     }
     return [
       ...resultAsHeader,
       ...resultAsUnfinishedAction,
-      ...resultAsFinishedAction,
+      //...resultAsFinishedAction,
+      ...resultAsExternalLinks,
       ...resultAsContent
     ]
   }
@@ -118,13 +108,12 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
       ...[{path: "------------------", type: "", index: "", line: 0, ch: 0}],
       ...this.getForwardlinkItems(),
       ...[{path: "------------------", type: "", index: "", line: 0, ch: 0}],
-      ...this.getExternallinkItems(),
-      ...this.getContentItems()
+      ...this.getContentItems(),      
     ]
   }
 
   getSuggestions(query: string): LinkType[] | Promise<LinkType[]> {
-    return this.getItems().filter((i) => {
+    return this.items.filter((i) => {
       const lowerQuery = query.toLowerCase()
       return new RegExp(lowerQuery).test((i.type + i.path).toLowerCase())
     });
