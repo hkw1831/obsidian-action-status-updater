@@ -63,6 +63,31 @@ export function renameBlogTitle(app : App, path: string, view: MarkdownView) : P
     }
 }
 
+export function renameThreadsTitle(app : App, path: string, view: MarkdownView) : Promise<void> {
+    let moment = require('moment');
+    const dateYYYYMMDD = moment().format('YYYYMMDD');
+    let renamedPath = ""
+    if (path.match(/^.\/Threads \d\d\d\d\d\d\d\d/)) {
+        return Promise.resolve()
+    } else if (path.match(/^.\/threads \d\d\d\d\d\d\d\d/)) {
+        new Notice("start with threads with date, renaming threads to Threads")
+        renamedPath = path.replace(/^(.\/)threads /, `$1Threads `)
+        return renameFile(app, view.file, renamedPath);
+    } else if (path.match(/^.\/Threads /)) {
+        new Notice("starts with Threads but no date, adding date")
+        renamedPath = path.replace(/^(.\/Threads )/, `$1${dateYYYYMMDD} `)
+        return renameFile(app, view.file, renamedPath);
+    } else if (path.match(/^.\/threads /)) {
+        new Notice("starts with threads but no date, adding date")
+        renamedPath = path.replace(/^(.\/)threads /, `$1Threads ${dateYYYYMMDD} `)
+        return renameFile(app, view.file, renamedPath);
+    } else {
+        new Notice("starts without threads, adding Threads + date")
+        renamedPath = path.replace(/^(.\/)/, `$1Threads ${dateYYYYMMDD} `)
+        return renameFile(app, view.file, renamedPath);
+    }
+}
+
 async function renameFile(app : App, file : TAbstractFile, newPath: string) {
     app.fileManager.renameFile(file, newPath)
 }

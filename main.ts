@@ -2,7 +2,7 @@ import { UpdateNoteTypeModal } from 'updateNoteTypeModal';
 import { App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, Vault, EditorSelection, Workspace, parseFrontMatterTags } from 'obsidian';
 import { AddFootnoteTagModal } from 'addCommentTagModal';
 import { AddTaskTagModal } from 'addTaskTagModal';
-import { renameBlogTitle, renameTag } from 'tagrenamer/renaming';
+import { renameBlogTitle, renameTag, renameThreadsTitle } from 'tagrenamer/renaming';
 import { ThreadsToImagesModal } from 'ThreadsToImagesModal';
 import { CopyOrMoveToNewNoteModal } from 'copyOrMoveToNewNoteModal';
 import { ClipboardPasteModal } from 'clipboardPasteModal';
@@ -2168,6 +2168,7 @@ this.addCommand({
 				const beforeTag = "c/t/d"
 				const afterTag = "c/t/r"
 				const result = await renameTag(view.file, beforeTag, afterTag)
+				await renameThreadsTitle(app, view.file.path, view);
 				console.log(result)
 				new ThreadsToImagesModal(this.app, threadSegment).open()
 			},
