@@ -93,6 +93,10 @@ const ALL_TYPES = [
     description: "Placeholder Notes (Deprecated?)",
   },
   {
+    type: "b/n/t",
+    description: "Placeholder Notes for Target Audience (Notes starts with TA)",
+  },
+  {
     type: "c/b/i",
     description: "Blog post content completed but awaiting upload image",
   },
