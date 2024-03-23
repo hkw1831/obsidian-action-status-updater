@@ -1844,7 +1844,7 @@ this.addCommand({
 					text = text + line + "\n";
 				});
 				text = text.replace(/\n---\n\n#nd generate summary for meta description below:\n[^\n]*\n([^\n]*)\n[^\n]*\n---\n/, "\n<!-- Meta Summary -->\n<!--\n$1\n-->\n");
-				text = text.replace(/## References\:([\n]*.*)*$/, "");
+				text = text.replace(/## References?[\:]?([\n]*.*)*$/, "");
 
 				const app = this.app;
 				const beforeTagCBR = "c/b/r";
@@ -1915,7 +1915,7 @@ this.addCommand({
 						}
 					});
 					
-					text = text.replace(/## References\:([\n]*.*)*$/, "")
+					text = text.replace(/## References?[\:]?([\n]*.*)*$/, "")
 				} else {
 					text = selection
 				}
@@ -1964,7 +1964,8 @@ this.addCommand({
 					}
 				});
 				
-				text = text.replace(/## References\:([\n]*.*)*$/, "")
+				text = text.replace(/## References?[\:]?([\n]*.*)*$/, "")
+
 				const beforeTag = "c/t/r"
 				const afterTag = "c/t/t"
 
@@ -2068,7 +2069,7 @@ this.addCommand({
 						const line = editor.getLine(i);
 						text = text + line + "\n"
 					})
-					text = text.replace(/## References\:([\n]*.*)*$/, "");
+					text = text.replace(/## References?[\:]?([\n]*.*)*$/, "");
 					editor.setValue(text)
 
 					renameTag(view.file, "c/t/d", "c/x/d")

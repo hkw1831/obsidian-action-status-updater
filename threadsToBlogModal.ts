@@ -69,8 +69,7 @@ export class ThreadsToBlogModal extends FuzzySuggestModal<string> {
         text = text + modifiedLine + "\n";
       }
     }
-    text = text.replace(/## .\n+## [Rr]eferences?\:([\n]*.*)*$/, "");
-    text = text.replace(/## .\n+## [Rr]eferences?([\n]*.*)*$/, "");
+    text = text.replace(/## .\n+## [Rr]eferences?[\:]?([\n]*.*)*$/, "");
 
     text += `\n\n---\n\n#nl generate summary for meta description below:\n\n\n\n`
     text += `---\n\n## References:\n\n- Thread post 1: [[${this.view.file.basename}]]\n- Blog link: \n`
