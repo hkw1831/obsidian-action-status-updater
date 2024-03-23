@@ -3287,10 +3287,24 @@ this.addCommand({
 					cursor.ch = newCh
 					editor.setCursor(cursor);
 				} else if (replacedLine == line) { // no tag, to add tag
+					/*
 					const cursor = editor.getCursor()
 					const line = editor.getLine(cursor.line);
 					editor.replaceRange(`${line.charAt(cursor.ch - 1) != ' ' ? ' ' : ""}#t${t} `, cursor);  
 					cursor.ch = cursor.ch + 4 + (line.charAt(cursor.ch - 1) != ' ' ? 1 : 0);
+					editor.setCursor(cursor);
+					*/
+
+					let modifiedLine = line;
+					if (/^\t*- /.test(line)) {
+						modifiedLine = line.replace(/^(\t*- )/, `$1#t${t} `);
+					} else if (/^\t*\d+\. /.test(line)) {
+						modifiedLine = line.replace(/^(\t*\d+\. )/, `$1t${t} `);
+					} else {
+						modifiedLine = line.replace(/^/, `#t${t} `);
+					}
+					editor.setLine(cursor.line, modifiedLine);
+					cursor.ch = cursor.ch + 4;
 					editor.setCursor(cursor);
 				} else {			 
 					editor.setLine(lineNumber, replacedLine);
