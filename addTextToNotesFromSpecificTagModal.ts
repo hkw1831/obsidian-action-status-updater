@@ -2,6 +2,7 @@ import { AddTextToNotesModal } from "addTextToNotesModal"
 import { App, FuzzySuggestModal, FuzzyMatch } from "obsidian"
 import { addTextToNotes } from "selfutil/addlinktonotes"
 import { filesWhereTagIsUsed } from "selfutil/findNotesFromTag"
+import { getNoteType } from "selfutil/getTaskTag"
 
 const BACK_TO_SELECT_TAG = "Back to select tag"
 
@@ -45,7 +46,12 @@ export class AddTextToNotesFromSpecificTagModal extends FuzzySuggestModal<string
   // Renders each suggestion item.
   renderSuggestion(path: FuzzyMatch<string>, el: HTMLElement) {
     const pathItem: string = path.item
-    el.createEl("div", { text: pathItem });
+    let prefix = ""
+    if (pathItem !== BACK_TO_SELECT_TAG) {
+      const noteType = getNoteType(pathItem)
+      prefix = noteType ? noteType.prefix + " " : ""
+    }
+    el.createEl("div", { text: prefix + pathItem });
   }
 
   // Perform action on the selected suggestion.

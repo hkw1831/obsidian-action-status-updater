@@ -3,6 +3,7 @@ import { App, FuzzySuggestModal, FuzzyMatch, getAllTags } from "obsidian";
 import { addTextToNotes } from "selfutil/addlinktonotes";
 import { getAllNoteTags } from "selfutil/getAllNoteTags";
 import { getAllNotes, getRecentNotes } from "selfutil/getRecentNotes";
+import { getNoteType } from "selfutil/getTaskTag";
 
 export class AddTextToNotesModal extends FuzzySuggestModal<string> {
 
@@ -41,7 +42,12 @@ export class AddTextToNotesModal extends FuzzySuggestModal<string> {
   // Renders each suggestion item.
   renderSuggestion(value: FuzzyMatch<string>, el: HTMLElement) {
     const item = value.item
-    el.createEl("div", { text: item })
+    let prefix = ""
+    if (!item.startsWith("@")) {
+      const noteType = getNoteType(item)
+      prefix = noteType ? noteType.prefix + " " : ""
+    }
+    el.createEl("div", { text: prefix + item })
   }
 
   onOpen() {

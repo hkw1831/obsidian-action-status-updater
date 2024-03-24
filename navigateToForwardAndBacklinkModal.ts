@@ -1,4 +1,5 @@
 import { App, FuzzySuggestModal, FuzzyMatch, TFile, MarkdownView, Notice, Editor, SuggestModal } from "obsidian"
+import { getNoteType } from "selfutil/getTaskTag";
 
 interface LinkType {
   path: string;
@@ -126,7 +127,15 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
   // Renders each suggestion item.
   renderSuggestion(ll: LinkType, el: HTMLElement) {
     //const ll: LinkType = l.item
-    el.createEl("div", { text: ll.type + ll.path + ll.index});
+    el.createEl("div", { text: ll.type + this.getTaskTag(ll.type, ll.path) + ll.path + ll.index});
+  }
+
+  getTaskTag(type: string, path: string): string {
+    if (type === "> " || type === "< ") {
+      const noteType = getNoteType(path)
+      return noteType ? " " + noteType.prefix + " " : ""
+    }
+    return ""
   }
 
   // Perform action on the selected suggestion.

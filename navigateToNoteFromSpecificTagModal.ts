@@ -1,6 +1,7 @@
 import { NavigateToNoteFromTagModal } from "navigateToNoteFromTagModal"
 import { App, FuzzySuggestModal, FuzzyMatch, Notice, CachedMetadata, parseFrontMatterTags, parseFrontMatterAliases, TFile } from "obsidian"
 import { filesWhereTagIsUsed } from "selfutil/findNotesFromTag"
+import { getNoteType } from "selfutil/getTaskTag"
 
 const BACK_TO_SELECT_TAG = "Back to select tag"
 const OPEN_IN_SEARCH_MODE = "Open in search mode"
@@ -34,14 +35,19 @@ export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<string
   // Renders each suggestion item.
   renderSuggestion(path: FuzzyMatch<string>, el: HTMLElement) {
     const pathItem: string = path.item
-    el.createEl("div", { text: pathItem });
+    let prefix = ""
+    if (pathItem !== BACK_TO_SELECT_TAG && pathItem !== OPEN_IN_SEARCH_MODE) {
+      const noteType = getNoteType(pathItem)
+      prefix = noteType ? noteType.prefix + " " : ""
+    }
+    el.createEl("div", { text: prefix + pathItem });
   }
 
   // Perform action on the selected suggestion.
   onChooseItem(path: string, evt: MouseEvent | KeyboardEvent) {
-    if (BACK_TO_SELECT_TAG == path) {
+    if (BACK_TO_SELECT_TAG === path) {
       new NavigateToNoteFromTagModal(this.app).open()
-    } else if (OPEN_IN_SEARCH_MODE == path) {
+    } else if (OPEN_IN_SEARCH_MODE === path) {
       /* eslint-disable @typescript-eslint/no-explicit-any */
 				const searchPlugin = (
 					this.app as any

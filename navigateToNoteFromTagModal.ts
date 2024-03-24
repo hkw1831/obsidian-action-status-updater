@@ -2,6 +2,7 @@ import { NavigateToNoteFromSpecificTagModal } from "navigateToNoteFromSpecificTa
 import { App, FuzzySuggestModal, FuzzyMatch, getAllTags, TFile, Notice, MarkdownView } from "obsidian";
 import { getAllTagsWithFilter } from "selfutil/getAllNoteTags";
 import { getAllNotes, getRecentNotes } from "selfutil/getRecentNotes";
+import { getNoteType } from "selfutil/getTaskTag";
 
 interface Note {
   search: string,
@@ -74,7 +75,12 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
   // Renders each suggestion item.
   renderSuggestion(value: FuzzyMatch<Note>, el: HTMLElement) {
     const item = value.item
-    el.createEl("div", { text: item.search });
+    let prefix = ""
+    if (item.type === "note") {
+      const noteType = getNoteType(item.search)
+      prefix = noteType ? noteType.prefix + " " : ""
+    }
+    el.createEl("div", { text: prefix + item.search });
     el.createEl("small", { text: item.type + " " + item.secondary });
   }
 
