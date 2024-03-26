@@ -67,6 +67,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     const value = this.editor.getValue()
     const lines = value.split("\n")
 
+    let resultAsJiraLink = []
     let resultAsHeader = []
     let resultAsUnfinishedAction = []
     let resultAsFinishedAction = []
@@ -93,12 +94,21 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
         for (let j = 0; j < matches.length; j++) {
           resultAsExternalLinks.push({path: matches[j], type: "w ", index: "", line: i, ch: 0})
         }
+      } else {
+        const jiraLinkRegex = /([A-Z]+-[0-9]+)/g
+        const jiraMatches = line.match(jiraLinkRegex)
+        if (jiraMatches) {
+          for (let j = 0; j < jiraMatches.length; j++) {
+            resultAsJiraLink.push({path: "https://jira.orcsoftware.com/browse/" + jiraMatches[j], type: "j ", index: "", line: i, ch: 0})
+          }
+        }
       }
     }
     return [
       ...resultAsHeader,
       ...resultAsUnfinishedAction,
       //...resultAsFinishedAction,
+      ...resultAsJiraLink,
       ...resultAsExternalLinks,
       ...resultAsContent
     ]
@@ -170,7 +180,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
       })
       return
     }
-    if (l.type === "w ") {
+    if (l.type === "w " || l.type === "j ") {
       window.open(l.path, '_blank');
       return
     }
