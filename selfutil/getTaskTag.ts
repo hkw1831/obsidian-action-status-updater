@@ -72,11 +72,13 @@ export const ALL_TYPES = [
       description: "Blog post draft",
       prefix: "📄",
     },
+    /*
     {
       type: "b/n/u",
       description: "Zettelkasten - Unprocessed material like an inbox",
       prefix: "📥",
     },
+    */
     {
       type: "b/n/m",
       description: "Zettelkasten - MOC Notes for a small topic",
@@ -92,21 +94,27 @@ export const ALL_TYPES = [
       description: "Index Notes for self framework",
       prefix: "📉",
     },
+    /*
     {
       type: "b/n/w",
       description: "Wiki Notes for a messy wiki topic",
       prefix: "📖",
     },
+    */
+    /*
     {
       type: "b/n/v",
       description: "Zettelkasten - Voice script (Deprecated?)",
       prefix: "🗣️",
     },
+    */
+    /*
     {
       type: "b/n/r",
       description: "Zettelkasten - Reference (Deprecated?)",
       prefix: "📖",
     },
+    */
     {
       type: "b/n/t",
       description: "Placeholder Notes for Target Audience (Notes starts with TA)",
