@@ -1205,6 +1205,19 @@ this.addCommand({
 				text += "🧵 " + view.file.basename + "\n\n---\n\n\n\n---\n\n";
 				text += "## References\n\n- ";
 				text += "[[" + view.file.basename + "]]\n"
+				text += `
+- 一個要說的點
+\t- 
+- 一個個人例子
+\t- 
+- 二個這個點的類別（對比 / 比較）
+\t- 
+\t- 
+- 三個步驟
+1. 
+2. 
+3. 
+`
 
 				const { vault } = this.app;
 				const path = view.file.path
