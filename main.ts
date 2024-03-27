@@ -21,6 +21,7 @@ import { RemoveContentFromCursorModal } from 'removeContentFromCursorModal';
 import { FindReplaceModal } from 'findReplaceModal';
 import { QueryOrphanNotesByTagModal } from 'queryOrphanNotesByTagModal';
 import { NavigateToForwardAndBacklinkTagModal } from 'navigateToForwardAndBacklinkModal';
+import { NoteType, getNoteType } from 'selfutil/getTaskTag';
 
 // Remember to rename these classes and interfaces!
 
@@ -1992,7 +1993,7 @@ this.addCommand({
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);
 				})
-				.then(function () {
+				.then(function (a) {
 					new Notice(`Copied content to clipboard for generating prompt!`);
 					window.open(`shortcuts://run-shortcut?name=Generate%20ChatGPT%20Prompt&x-success=Poe-app://&x-cancel=obsidian://&x-error=obsidian://`);
 				}, function (error) {
@@ -2044,6 +2045,11 @@ this.addCommand({
 					new Notice("Note name not contains 'Twitter', did not copy from thread note?")
 					return;
 				}
+				const noteType : NoteType | null = getNoteType(view.file.path);
+				if (noteType != null && noteType.type.startsWith("c/x/")) {
+					new Notice("Note type starts with c/x, will not proceed")
+					return;
+				}
 				
 				let content = this.convertThreadsContentToPOE(editor)
 				let numTweet = Math.ceil(content.length / 110)
@@ -2089,21 +2095,26 @@ this.addCommand({
 					text = text.replace(/## References?[\:]?([\n]*.*)*$/, "");
 					editor.setValue(text)
 
-					renameTag(view.file, "c/t/d", "c/x/d")
-					renameTag(view.file, "c/t/r", "c/x/d")
-					renameTag(view.file, "c/t/t", "c/x/d")
-					renameTag(view.file, "c/t/p", "c/x/d")
-
 					const cursor = editor.getCursor()
 					cursor.line = editor.lineCount() - 1
 					cursor.ch = 0
 					editor.setCursor(cursor)
 
 					new Notice("copied to clipboard, please open chatgpt to paste")
+					return renameTag(view.file, "c/t/d", "c/x/d")
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);
 				})
-				.then(() => {
+				.then((a) => {
+					renameTag(view.file, "c/t/r", "c/x/d")
+				})
+				.then((a) => {
+					renameTag(view.file, "c/t/t", "c/x/d")
+				})
+				.then((a) => {
+					renameTag(view.file, "c/t/p", "c/x/d")
+				})
+				.then((a) => {
 					window.open(`Poe-app://`);
 				});
 			},
