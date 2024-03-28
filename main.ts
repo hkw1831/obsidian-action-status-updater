@@ -835,6 +835,7 @@ this.addCommand({
 	editorCallback: (editor: Editor, view: MarkdownView) => {
 		if (getChildlinkItems(this.app, view.file).length > 0) {
 			new Notice("Still have child link. Please check the child link first. Abort...")
+			new NavigateToForwardAndBacklinkTagModal(this.app, view, editor).open()
 			return
 		}
 		editor.setValue(replaceTWUselessValue(editor.getValue()))
@@ -998,6 +999,7 @@ this.addCommand({
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				if (getChildlinkItems(this.app, view.file).length > 0) {
 					new Notice("Still have child link. Please check the child link first. Abort...")
+					new NavigateToForwardAndBacklinkTagModal(this.app, view, editor).open()
 					return
 				}
 				const checkboxMap = new Map<string, string>();
