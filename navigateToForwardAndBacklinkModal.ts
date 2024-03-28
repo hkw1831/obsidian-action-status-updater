@@ -1,4 +1,5 @@
-import { App, FuzzySuggestModal, FuzzyMatch, TFile, MarkdownView, Notice, Editor, SuggestModal } from "obsidian"
+import { link } from "fs";
+import { App, FuzzySuggestModal, FuzzyMatch, TFile, MarkdownView, Notice, Editor, SuggestModal, CachedMetadata, FrontMatterCache } from "obsidian"
 import { getNoteType } from "selfutil/getTaskTag";
 
 interface LinkType {
@@ -30,6 +31,59 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     this.items = this.getItems()
   }
 
+  getLinkItems(): LinkType[] {
+    const forwardLinkItems = this.getForwardlinkItems()
+    let backLinkItems = []
+    let childLinkItems = []
+    let parentLinkItems = []
+
+    const backlinks = this.app.metadataCache.getBacklinksForFile(this.view.file)
+    const backlinksData = backlinks?.data
+    if (backlinksData) {
+      for (let i in backlinksData) {
+        for (let j = 0; j < backlinksData[i].length; j++) {
+          const index = backlinksData[i].length > 1 ? "[" + j + "]" : ""
+          if (i != this.view.file.path) {
+            //console.log("@@")
+            //console.log(i)
+            //console.log(backlinksData[i][j])
+            const key = backlinksData[i][j]['key']
+            if (key) {
+              childLinkItems.push({path: i, type: "v ", index: index, line: 0, ch: 0})  
+            } else {
+              backLinkItems.push({path: i, type: "< ", index: index, line: backlinksData[i][j]['position']['start']['line'], ch: backlinksData[i][j]['position']['start']['col']})
+            }
+          }
+        }
+      }
+    }
+
+    const fileCache : CachedMetadata | null = this.app.metadataCache.getFileCache(this.view.file)
+    if (fileCache) {
+      const frontmatter : FrontMatterCache | undefined = fileCache.frontmatter
+      if (frontmatter) {
+        for (const key in frontmatter) {
+          if (frontmatter.hasOwnProperty(key)) {
+            const value = frontmatter[key];
+            //console.log(`Key: ${key}, Value: ${value}`);
+            if (value.startsWith('[[') && value.endsWith(']]')) {
+              // Extract the note link without the square brackets
+              const noteLink = value.slice(2, -2);
+              //console.log('Note link:', noteLink);
+              const linkedFile = this.app.metadataCache.getFirstLinkpathDest(noteLink, this.view.file.path);
+              //console.log("linkedFile")
+              //console.log(linkedFile)
+              const tf = linkedFile ? this.app.vault.getAbstractFileByPath(linkedFile.path) : null
+              if (tf) {
+                parentLinkItems.push({path: tf.path, type: "^ ", index: "", line: 0, ch: 0}) 
+              }
+            }
+          }
+        }
+      }
+    }
+    return [...backLinkItems, ...forwardLinkItems, ...childLinkItems, ...parentLinkItems]
+  }
 
   getForwardlinkItems(): LinkType[] {
     const forwardlinks = this.app.metadataCache.getFileCache(this.view.file)?.links
@@ -45,23 +99,67 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
        })
   }
 
+  /*
   getBacklinkItems(): LinkType[] {
     const backlinks = this.app.metadataCache.getBacklinksForFile(this.view.file)
     const backlinksData = backlinks?.data
     if (!backlinksData) {
       return []
     }
-    let result = []
+    let backLinkResult = []
+    let childLinkResult = []
     for (let i in backlinksData) {
       for (let j = 0; j < backlinksData[i].length; j++) {
         const index = backlinksData[i].length > 1 ? "[" + j + "]" : ""
         if (i != this.view.file.path) {
-          result.push({path: i, type: "< ", index: index, line: backlinksData[i][j]['position']['start']['line'], ch: backlinksData[i][j]['position']['start']['col']})
+          console.log("@@")
+          console.log(i)
+          console.log(backlinksData[i][j])
+          const key = backlinksData[i][j]['key']
+          if (key) {
+            childLinkResult.push({path: i, type: "v ", index: index, line: 0, ch: 0})  
+          } else {
+            backLinkResult.push({path: i, type: "< ", index: index, line: backlinksData[i][j]['position']['start']['line'], ch: backlinksData[i][j]['position']['start']['col']})
+          }
+        }
+      }
+    }
+    return [...backLinkResult, ...childLinkResult]
+  }
+  */
+
+  /*
+  getMetadataForwardLinkItems(): LinkType[] {
+    const fileCache : CachedMetadata | null = this.app.metadataCache.getFileCache(this.view.file)
+    if (!fileCache) {
+      return []
+    }
+    const frontmatter : FrontMatterCache | undefined = fileCache.frontmatter
+    if (!frontmatter) {
+      return []
+    }
+    const result : LinkType[] = []
+    for (const key in frontmatter) {
+      if (frontmatter.hasOwnProperty(key)) {
+        const value = frontmatter[key];
+        console.log(`Key: ${key}, Value: ${value}`);
+        if (value.startsWith('[[') && value.endsWith(']]')) {
+          // Extract the note link without the square brackets
+          const noteLink = value.slice(2, -2);
+          console.log('Note link:', noteLink);
+          const linkedFile = this.app.metadataCache.getFirstLinkpathDest(noteLink, this.view.file.path);
+          console.log("linkedFile")
+          console.log(linkedFile)
+          const tf = linkedFile ? this.app.vault.getAbstractFileByPath(linkedFile.path) : null
+          if (tf) {
+            result.push({path: tf.path, type: "^ ", index: "", line: 0, ch: 0}) 
+          }
         }
       }
     }
     return result
   }
+  */
 
   getContentItems(): LinkType[] {
     const value = this.editor.getValue()
@@ -115,9 +213,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
   }
 
   getItems(): LinkType[] {
-    return [...this.getBacklinkItems(),
-      ...[{path: "------------------", type: "", index: "", line: 0, ch: 0}],
-      ...this.getForwardlinkItems(),
+    return [...this.getLinkItems(),
       ...[{path: "------------------", type: "", index: "", line: 0, ch: 0}],
       ...this.getContentItems(),      
     ]
@@ -153,7 +249,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     if (l.type === "") {
       return
     }
-    if (l.type === "< " || l.type === "> ") {
+    if (l.type === "< " || l.type === "> " || l.type === "v " || l.type === "^ ") {
         const { vault, workspace } = this.app;
         const leaf = workspace.getLeaf(false);
         const line = l.line
