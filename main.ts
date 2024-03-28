@@ -22,6 +22,7 @@ import { FindReplaceModal } from 'findReplaceModal';
 import { QueryOrphanNotesByTagModal } from 'queryOrphanNotesByTagModal';
 import { NavigateToForwardAndBacklinkTagModal } from 'navigateToForwardAndBacklinkModal';
 import { NoteType, getNoteType } from 'selfutil/getTaskTag';
+import { getChildlinkItems } from 'selfutil/getChildLink';
 
 // Remember to rename these classes and interfaces!
 
@@ -831,6 +832,10 @@ this.addCommand({
 	name: "TT -- TW Task",
 	icon: `tw-task`,
 	editorCallback: (editor: Editor, view: MarkdownView) => {
+		if (getChildlinkItems(this.app, view.file).length > 0) {
+			new Notice("Still have child link. Please check the child link first. Abort...")
+			return
+		}
 		editor.setValue(replaceTWUselessValue(editor.getValue()))
 		const lineCount = editor.lineCount()
 		let fm = ""
@@ -989,6 +994,10 @@ this.addCommand({
 			name: "NT Note to Tree List",
 			icon: `note-to-tree-list`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
+				if (getChildlinkItems(this.app, view.file).length > 0) {
+					new Notice("Still have child link. Please check the child link first. Abort...")
+					return
+				}
 				const checkboxMap = new Map<string, string>();
 				const lineCount = editor.lineCount()
 				if (editor.getValue().startsWith("- " + view.file.basename + "\n")) {

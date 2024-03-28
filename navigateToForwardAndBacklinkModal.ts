@@ -1,14 +1,6 @@
-import { link } from "fs";
 import { App, FuzzySuggestModal, FuzzyMatch, TFile, MarkdownView, Notice, Editor, SuggestModal, CachedMetadata, FrontMatterCache } from "obsidian"
 import { getNoteType } from "selfutil/getTaskTag";
-
-interface LinkType {
-  path: string;
-  type: string;
-  index: string;
-  line: number;
-  ch: number;
-}
+import { LinkType } from "selfutil/linkType";
 
 export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType> {
 
@@ -82,7 +74,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
         }
       }
     }
-    return [...backLinkItems, ...forwardLinkItems, ...childLinkItems, ...parentLinkItems]
+    return [...childLinkItems, ...parentLinkItems, ...backLinkItems, ...forwardLinkItems]
   }
 
   getForwardlinkItems(): LinkType[] {
