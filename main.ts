@@ -812,6 +812,7 @@ this.addCommand({
 		text += c
 		text = text.replace(/^---\n+---\n/m, "---\ntags: b/n/c\n---\n").replace(/\n$/, "")
 		editor.setValue(text)
+		new Notice("Formatted tidy list note")
 	},
 	hotkeys: [
 		{
@@ -901,6 +902,7 @@ this.addCommand({
 		editor.setValue(text)
 		editor.setCursor({line: getParentLine(text), ch: 0})
 		app.vault.rename(view.file, "C/" + view.file.name)
+		new Notice("Formatted for adding link to parent note")
 	},
 	hotkeys: [
 		{
@@ -1022,6 +1024,7 @@ this.addCommand({
 					text = text.replace(/\n$/m, "")
 					editor.setValue(text)
 					editor.setCursor({line: getParentLine(text), ch: 0})
+					new Notice("Formatted to remove empyt line and removed duplicated list name")
 				} else {
 					editor.setValue(replaceTWUselessValue(editor.getValue()))
 					let text = "- "
@@ -1125,6 +1128,7 @@ this.addCommand({
 					text += content
 					editor.setValue(text)
 					editor.setCursor({line: getParentLine(text), ch: 0})
+					new Notice("Formatted for merging link to parent note")
 				}
 			},
 			hotkeys: [
