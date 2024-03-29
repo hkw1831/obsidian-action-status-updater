@@ -213,6 +213,7 @@ export function	tidyUpFrontMatterOnValue(value: String) {
     const values: string[] = value.split("\n")
     const lineCount = values.length
 
+    
     let fm = ""
     let c = ""
     let text = ""
@@ -220,6 +221,10 @@ export function	tidyUpFrontMatterOnValue(value: String) {
     let content = ""
     for (let i = 0; i < lineCount; i++) {
         const line = values[i]
+        const modifiedLine = line.replace(/^(\s*)\* /, "$1- ")
+        text += modifiedLine + "\n"
+
+        /*
         if (h3Count == 0) {
             content += (line + "\n")
         } else if (h3Count == 1) {
@@ -228,13 +233,13 @@ export function	tidyUpFrontMatterOnValue(value: String) {
             } else {
                 fm += (line + "\n")
             }
-            /*
-            if (/^tag: [a-c]\/[a-z]\/[a-z]$/.test(line)) {
-                fm += (line.replace(/^tag: /, "tags: ") + "\n")
-            } else {
-                fm += (line + "\n")
-            }
-            */
+            
+            //if (/^tag: [a-c]\/[a-z]\/[a-z]$/.test(line)) {
+            //    fm += (line.replace(/^tag: /, "tags: ") + "\n")
+            //} else {
+            //    fm += (line + "\n")
+            //}
+            
         }
         if (h3Count >= 2) {
             c += (line + "\n")
@@ -242,12 +247,15 @@ export function	tidyUpFrontMatterOnValue(value: String) {
         if (line === "---") {
             h3Count++;
         }
+        */
     } 
+    /*
     text += content
     if (fm.length > 0) {
         text += fm
     }
     text += c
-    
-    return text.replace(/^---\n---\n/m, "").replace(/\n$/, "")
+    */
+   //console.log(text)
+    return text.replace(/\n$/, "")
 }
