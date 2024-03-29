@@ -13,7 +13,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     super(app)
     this.view = view
     this.editor = editor
-    this.setPlaceholder(`Whichlink do you want to navigate to?`)
+    this.setPlaceholder(`Which link do you want to navigate to?`)
     this.setInstructions([
       {
         command: "",
