@@ -1823,10 +1823,12 @@ this.addCommand({
 					}
 					const value = editor.getValue();
 					let modifiedValue
-					if (!/## [Rr]eference[s]*[:]*\n\n/m.test(value)) {
-						modifiedValue = value + "\n## References\n\n- [[" + view.file.basename.replace(/Threads /, "Twitter ") + "]]\n"
-					} else {
+					if (/---\n\n## [Rr]eference[s]*[:]*\n\n/m.test(value)) {
 						modifiedValue = value.replace(/(## [Rr]eference[s]*[:]*\n\n)/m, "$1- [[" + view.file.basename.replace(/Threads /, "Twitter ") + "]]\n")
+					} else if (/---[\n\s]*$/.test(value)) { // end with ---
+						modifiedValue = value + "\n\n## References\n\n- [[" + view.file.basename.replace(/Threads /, "Twitter ") + "]]\n"
+					} else {
+						modifiedValue = value + "\n---\n\n## References\n\n- [[" + view.file.basename.replace(/Threads /, "Twitter ") + "]]\n"
 					}
 					editor.setValue(modifiedValue)
 					return vault.create(newPath, v);
