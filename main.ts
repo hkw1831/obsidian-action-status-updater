@@ -1821,6 +1821,14 @@ this.addCommand({
 						new Notice(`Will not proceed. Twitter post already exist.`);
 						return Promise.reject("Twitter post already exist")
 					}
+					const value = editor.getValue();
+					let modifiedValue
+					if (!/## [Rr]eference[s]*[:]*\n\n/m.test(value)) {
+						modifiedValue = value + "\n## References\n\n- [[" + view.file.basename.replace(/Threads /, "Twitter ") + "]]\n"
+					} else {
+						modifiedValue = value.replace(/(## [Rr]eference[s]*[:]*\n\n)/m, "$1- [[" + view.file.basename.replace(/Threads /, "Twitter ") + "]]\n")
+					}
+					editor.setValue(modifiedValue)
 					return vault.create(newPath, v);
 				})
 				.then((tFile) => {
