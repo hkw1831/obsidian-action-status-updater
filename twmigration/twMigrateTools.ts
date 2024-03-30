@@ -71,16 +71,16 @@ const skipFrontMatterField: string[] = [
 
 export function replaceTWUselessValue(value: string) : string {
     return value
-        .replace("## > References\n\n* \n\n", "")
-        .replace("## > Goal and Reason\n\n* \n\n", "")
-        .replace("## > Deliverable Spec\n\n* \n\n", "")
-        .replace("## > Conditon of done\n\n* \n\n", "")
-        .replace("## > Step\n\n* \n\n", "")
-        .replace("## > Progress\n\n* \n\n", "")
-        .replace("## > Results\n\n* \n\n", "")
-        .replace("## > Experience\n\n* \n\n", "")
-        .replace("## > References\n\n* \n\n", "")
-        .replace("## > Results, Steps and Exp\n\n* \n\n", "")
+        .replace("## > References\n\n- \n\n", "")
+        .replace("## > Goal and Reason\n\n- \n\n", "")
+        .replace("## > Deliverable Spec\n\n- \n\n", "")
+        .replace("## > Conditon of done\n\n- \n\n", "")
+        .replace("## > Step\n\n- \n\n", "")
+        .replace("## > Progress\n\n- \n\n", "")
+        .replace("## > Results\n\n- \n\n", "")
+        .replace("## > Experience\n\n- \n\n", "")
+        .replace("## > References\n\n- \n\n", "")
+        .replace("## > Results, Steps and Exp\n\n- \n\n", "")
         .replace("## > Checklist\n\n[ ] \n\n", "")
         .replace(/\n\n\n+/, "\n\n")
 }
