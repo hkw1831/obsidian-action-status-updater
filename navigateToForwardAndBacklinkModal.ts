@@ -8,6 +8,8 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
   editor: Editor
   items: LinkType[]
 
+  keydownHandler: (event: KeyboardEvent) => void;
+
   constructor(app: App, view: MarkdownView, editor: Editor)
   {
     super(app)
@@ -21,6 +23,29 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
       }
     ]);
     this.items = this.getItems()
+
+    this.keydownHandler = (event: KeyboardEvent) => {
+      //console.log("ctrl " + event.ctrlKey)
+      //console.log("alt " + event.altKey)
+      //console.log("meta " + event.metaKey)
+      //console.log("shift " + event.shiftKey)
+      // Check if Ctrl + Q was pressed
+      if (event.ctrlKey && event.altKey && event.shiftKey && event.key === 'O') { // windows
+        this.close();
+      } else if (event.ctrlKey && event.metaKey && event.shiftKey && event.key === 'O') { // macos
+        this.close();
+      }
+    };
+
+    // Listen for keydown events at the document level
+    document.addEventListener('keydown', this.keydownHandler);
+
+  }
+
+  onClose() {
+    super.onClose();
+    // Stop listening for keydown events when the modal is closed
+    document.removeEventListener('keydown', this.keydownHandler);
   }
 
   getLinkItems(): LinkType[] {
