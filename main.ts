@@ -2378,37 +2378,74 @@ this.addCommand({
 			name: "Toggle Bullet Number List",
 			icon: `bullet-list`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const cursor = editor.getCursor()
-				const ch = cursor.ch
-				const line = cursor.line
-				const lineContent = editor.getLine(line)
-				const previousLineContent = line == 0 ? "" : editor.getLine(line - 1)
+				if (editor.getSelection().length > 0) {
+					const listSelections: EditorSelection[] = editor.listSelections();
+					for (const listSelection of listSelections) {
+						const a = listSelection.head.line;
+						const b = listSelection.anchor.line;
+						const fromLineNum = b > a ? a : b;
+						const toLineNum = b > a ? b : a;
+				
+						for (let i = fromLineNum; i <= toLineNum; i++) {
+							const line = editor.getLine(i);
+							const lineContent = editor.getLine(i)
+							const previousLineContent = i == 0 ? "" : editor.getLine(i - 1)
 
-				if (/^(> )*\s*- /.test(lineContent)) { // bullet list case
-					// toggle to number list
-					let n = "1."
-					const a = previousLineContent.match(/^\t*(\d+)\. /)
-					if (a) {
-						const nextN = parseInt(a[0]) + 1
-						n = nextN.toString() + "."
+							if (/^(> )*\s*- /.test(lineContent)) { // bullet list case
+								// toggle to number list
+								let n = "1."
+								const a = previousLineContent.match(/^\t*(\d+)\. /)
+								if (a) {
+									const nextN = parseInt(a[0]) + 1
+									n = nextN.toString() + "."
+								}
+								const replacedLineContent = lineContent.replace(/^((> )*)(\s*)- /, "$1$3" + n + " ")
+								editor.setLine(i, replacedLineContent)
+							} else if (/^(> )*\s*[\d]+\. /.test(lineContent)) { // number list case
+								// toggle to non list
+								const n = lineContent.replace(/^((> )*)(\s*)([\d]+\. ).*/, "$4")
+								const replacedLineContent = lineContent.replace(/^((> )*)(\s*)[\d]+\. /, "$1$3")
+								editor.setLine(i, replacedLineContent)
+							} else { // no list
+								// toggle to bullet list
+								const replacedLineContent = lineContent.replace(/^((> )*)(\s*)/, "$1$3- ")
+								editor.setLine(i, replacedLineContent)
+							}
+						}
 					}
-					const replacedLineContent = lineContent.replace(/^((> )*)(\s*)- /, "$1$3" + n + " ")
-					editor.setLine(line, replacedLineContent)
-					cursor.ch = cursor.ch + n.length - 1
-					editor.setCursor(cursor)
-				} else if (/^(> )*\s*[\d]+\. /.test(lineContent)) { // number list case
-					// toggle to non list
-					const n = lineContent.replace(/^((> )*)(\s*)([\d]+\. ).*/, "$4")
-					const replacedLineContent = lineContent.replace(/^((> )*)(\s*)[\d]+\. /, "$1$3")
-					editor.setLine(line, replacedLineContent)
-					cursor.ch = (cursor.ch - n.length) > 0 ? (cursor.ch - n.length) : 0
-					editor.setCursor(cursor)
-				} else { // no list
-					// toggle to bullet list
-					const replacedLineContent = lineContent.replace(/^((> )*)(\s*)/, "$1$3- ")
-					editor.setLine(line, replacedLineContent)
-					cursor.ch = cursor.ch + 2
-					editor.setCursor(cursor)
+				} else {
+					const cursor = editor.getCursor()
+					const ch = cursor.ch
+					const line = cursor.line
+					const lineContent = editor.getLine(line)
+					const previousLineContent = line == 0 ? "" : editor.getLine(line - 1)
+
+					if (/^(> )*\s*- /.test(lineContent)) { // bullet list case
+						// toggle to number list
+						let n = "1."
+						const a = previousLineContent.match(/^\t*(\d+)\. /)
+						if (a) {
+							const nextN = parseInt(a[0]) + 1
+							n = nextN.toString() + "."
+						}
+						const replacedLineContent = lineContent.replace(/^((> )*)(\s*)- /, "$1$3" + n + " ")
+						editor.setLine(line, replacedLineContent)
+						cursor.ch = cursor.ch + n.length - 1
+						editor.setCursor(cursor)
+					} else if (/^(> )*\s*[\d]+\. /.test(lineContent)) { // number list case
+						// toggle to non list
+						const n = lineContent.replace(/^((> )*)(\s*)([\d]+\. ).*/, "$4")
+						const replacedLineContent = lineContent.replace(/^((> )*)(\s*)[\d]+\. /, "$1$3")
+						editor.setLine(line, replacedLineContent)
+						cursor.ch = (cursor.ch - n.length) > 0 ? (cursor.ch - n.length) : 0
+						editor.setCursor(cursor)
+					} else { // no list
+						// toggle to bullet list
+						const replacedLineContent = lineContent.replace(/^((> )*)(\s*)/, "$1$3- ")
+						editor.setLine(line, replacedLineContent)
+						cursor.ch = cursor.ch + 2
+						editor.setCursor(cursor)
+					}
 				}
 			},
 			hotkeys: [
