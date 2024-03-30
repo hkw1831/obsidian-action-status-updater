@@ -209,7 +209,7 @@ export function	tidyUpFrontMatterOnValue(value: String) {
 }
 */
 
-export function	tidyUpFrontMatterOnValue(value: String) {
+export function	tidyUpFrontMatterOnValue(value: string) {
     const values: string[] = value.split("\n")
     const lineCount = values.length
 
@@ -219,11 +219,13 @@ export function	tidyUpFrontMatterOnValue(value: String) {
     let text = ""
     let h3Count = 0;
     let content = ""
+
+    /*
     for (let i = 0; i < lineCount; i++) {
         const line = values[i]
         const modifiedLine = line.replace(/^(\s*)\* /, "$1- ")
         text += modifiedLine + "\n"
-
+*/
         /*
         if (h3Count == 0) {
             content += (line + "\n")
@@ -248,7 +250,7 @@ export function	tidyUpFrontMatterOnValue(value: String) {
             h3Count++;
         }
         */
-    } 
+    //} 
     /*
     text += content
     if (fm.length > 0) {
@@ -257,5 +259,7 @@ export function	tidyUpFrontMatterOnValue(value: String) {
     text += c
     */
    //console.log(text)
-    return text.replace(/\n$/, "")
+    //return text.replace(/\n$/, "")
+
+    return replaceTWUselessValue(value)
 }
