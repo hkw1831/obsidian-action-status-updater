@@ -82,7 +82,20 @@ export function replaceTWUselessValue(value: string) : string {
         .replace("## > References\n\n- \n\n", "")
         .replace("## > Results, Steps and Exp\n\n- \n\n", "")
         .replace("## > Checklist\n\n[ ] \n\n", "")
-        .replace(/\n\n\n+/, "\n\n")
+
+        .replace("## > Scenario\n\n- \n\n", "")
+        .replace("## > Goal\n\n- \n\n", "")
+        .replace("## > Goal\n\n*\n\n", "")
+        .replace("## > Deliverable Spec / Condition of Done\n\n- \n\n", "")
+        .replace("## > Planned Step\n\n#\n\n", "")
+        .replace("## > Actual Step\n\n1. \n\n", "")
+        .replace("## > Actual Step\n\n1.  \n\n", "")
+        .replace("## > Result\n\n- \n\n", "")
+        .replace("## > How to do it better next time\n\n- \n\n", "")
+        .replace("## > Next time action\n\n- \n\n", "")
+        .replace(/---[\n]{2,}---/g, "---")
+        
+        .replace(/\n\n\n+/g, "\n\n")
 }
 
 export function shouldSkipFrontMatter(line: string) : boolean {
