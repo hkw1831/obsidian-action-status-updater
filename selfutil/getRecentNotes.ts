@@ -1,7 +1,7 @@
 import { App } from "obsidian";
 
 export function getRecentNotes(app: App, limit: number): string[] {
-  const recentViewedNotes = app.workspace.getLastOpenFiles();
+  const recentViewedNotes = app.workspace.getLastOpenFiles().filter(path => app.vault.getAbstractFileByPath(path) !== null);
   return recentViewedNotes.slice(0, Math.min(limit, recentViewedNotes.length));
 }
 

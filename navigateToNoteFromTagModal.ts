@@ -17,6 +17,7 @@ interface Heading {
 }
 
 const note = "note"
+const history = "history"
 const tag = "tag"
 const heading = "heading"
 
@@ -54,7 +55,7 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
     })
 		return [
       ...getRecentNotes(this.app, 10).map(n => {
-        return {search: n, secondary: "", type: note}
+        return {search: n, secondary: "", type: history}
       }),
       ...getAllTagsWithFilter(this.app).map(n => {
         return {search: n.replace(/^#/, "@"), secondary: "", type: tag}
@@ -76,7 +77,7 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
   renderSuggestion(value: FuzzyMatch<Note>, el: HTMLElement) {
     const item = value.item
     let prefix = ""
-    if (item.type === "note") {
+    if (item.type === note || item.type === history) {
       const noteType = getNoteType(item.search)
       prefix = noteType ? noteType.prefix + " " : ""
     }
@@ -94,7 +95,7 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
   async onChooseItem(choosenValue: Note, evt: MouseEvent | KeyboardEvent) {
     if (choosenValue.type == tag) {
       new NavigateToNoteFromSpecificTagModal(this.app, choosenValue.search.replace("@", "#")).open()
-    } else if (choosenValue.type == note) {
+    } else if (choosenValue.type == note || choosenValue.type == history) {
       const { vault, workspace } = this.app;
       const leaf = workspace.getLeaf(false);
       Promise.resolve()
