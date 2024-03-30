@@ -23,6 +23,7 @@ import { QueryOrphanNotesByTagModal } from 'queryOrphanNotesByTagModal';
 import { NavigateToForwardAndBacklinkTagModal } from 'navigateToForwardAndBacklinkModal';
 import { NoteType, getNoteType } from 'selfutil/getTaskTag';
 import { getChildlinkItems } from 'selfutil/getChildLink';
+import { getAllNotesWithoutMetadata } from 'selfutil/getRecentNotes';
 
 // Remember to rename these classes and interfaces!
 
@@ -415,8 +416,8 @@ export default class MyPlugin extends Plugin {
 
 		
 		this.addCommand({
-			id: "self-query",
-			name: "Self Query",
+			id: "query-orphan-notes-by-tag",
+			name: "Query orphan notes by tag",
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				new QueryOrphanNotesByTagModal(this.app, editor, view).open()
 			}
@@ -1818,6 +1819,42 @@ this.addCommand({
 					key: `;`,
 				},
 			]
+		})
+
+		this.addCommand({
+			id: "query-notes-without-or-invalid-metadata",
+			name: "Query Notes without or invalid metadata",
+			editorCallback: async (editor: Editor, view: MarkdownView) => {
+				console.log(view.file.path)
+				let resultValue = "## Notes without metadata\n\nHighlight meaning invalid metadata\n"
+				const queryMd = "I/Self Query.md"
+				if (view.file.path === queryMd) {
+					new Notice("Need some time to generate result")
+					const result : string[] = getAllNotesWithoutMetadata(this.app)
+					let resultWithoutMetadata: TFile[] = []
+					let resultInvalidMetadata: TFile[] = []
+					for (const filePath of result) {
+						const tFile: TFile = this.app.vault.getAbstractFileByPath(filePath) as TFile;
+						const content = await this.app.vault.read(tFile);
+						if (content.startsWith("---")) {
+						    resultInvalidMetadata.push(tFile);
+						    //console.log(filePath);
+						} else {
+							resultWithoutMetadata.push(tFile);
+						}
+					}
+					for (const tFile of resultInvalidMetadata) {
+						resultValue += "\n- ==[[" + tFile.basename + "]]=="
+					}
+					for (const tFile of resultWithoutMetadata) {
+						resultValue += "\n- [[" + tFile.basename + "]]"
+					}
+					editor.setValue(resultValue)
+					new Notice("Updated notes without metadata")
+				} else {
+					new Notice("Please go to '" + queryMd + "' to run this action")
+				}
+			}
 		})
 
 		this.addObsidianIcon('threads-to-twitter', 'TX');

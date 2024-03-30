@@ -42,7 +42,7 @@ export class QueryOrphanNotesByTagModal extends FuzzySuggestModal<string> {
 
   // Perform action on the selected suggestion.
   async onChooseItem(choosenValue: string, evt: MouseEvent | KeyboardEvent) {
-    console.log(this.view.file.path)
+    //console.log(this.view.file.path)
     const queryMd = "I/Self Query.md"
     if (this.view.file.path === queryMd) {
       new Notice("Checking... may need some time")
@@ -50,11 +50,11 @@ export class QueryOrphanNotesByTagModal extends FuzzySuggestModal<string> {
       const filePaths = filesWhereTagIsUsed(tag)
       let result = "## Orphan notes for tag `" + tag + "`\n"
       for (const filePath of filePaths) {
-        console.log(`Checking backlinks for ${filePath}`)
+        //console.log(`Checking backlinks for ${filePath}`)
         const tFile: TFile = this.app.vault.getAbstractFileByPath(filePath) as TFile
         const backlinks = this.app.metadataCache.getBacklinksForFile(tFile)
-        console.log(backlinks)
-        console.log(backlinks.data)
+        //console.log(backlinks)
+        //console.log(backlinks.data)
         if (!backlinks || !backlinks.data || Object.keys(backlinks.data).length === 0) {
           console.log(`No backlinks for ${tFile.path}`)
           result += "\n" + "- [[" + tFile.basename + "]]"
@@ -62,10 +62,10 @@ export class QueryOrphanNotesByTagModal extends FuzzySuggestModal<string> {
           // remove key "aaa" from backlinks.data
           delete backlinks.data[queryMd]
           if (Object.keys(backlinks.data).length === 0) {
-            console.log(`No backlinks for ${tFile.path}`)
+            //console.log(`No backlinks for ${tFile.path}`)
             result += "\n" + "- [[" + tFile.basename + "]]"
           } else {
-            console.log(`Has backlinks for ${tFile.path}`)
+            //console.log(`Has backlinks for ${tFile.path}`)
           }
         }
       }
