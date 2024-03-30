@@ -1467,6 +1467,31 @@ this.addCommand({
 			},
 		});
 
+		this.addCommand({
+			id: "duplicate-line-below",
+			name: "Duplicate line below",
+			icon: `align-vertical-space-between`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const cursor = editor.getCursor();
+				const lineNum = cursor.line;
+			
+				//const line = editor.getLine(lineNum);
+				//const length = line.length;
+				let text: string = ""
+				for (let i = 0; i < editor.lineCount(); i++) {
+					const line = editor.getLine(i);
+					text += line + "\n"
+					if (i === lineNum) {
+						text += line + "\n"
+					}
+				}
+				text = text.replace(/\n$/, "")
+				editor.setValue(text)
+				cursor.line = lineNum + 1;
+				editor.setCursor(cursor);
+			}
+		});
+
 		this.addObsidianIcon('event-to-fantastical-icon', 'FE');
 		this.addCommand({
 			id: "add-fantastical-event",
