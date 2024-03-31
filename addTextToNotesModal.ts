@@ -5,6 +5,7 @@ import { getAllHeaders } from "selfutil/getAllHeaders";
 import { getAllNoteTags } from "selfutil/getAllNoteTags";
 import { getAllNotes, getRecentNotes } from "selfutil/getRecentNotes";
 import { getNoteType } from "selfutil/getTaskTag";
+import { NoteWithHeader } from "selfutil/noteWithHeader";
 
 export class AddTextToNotesModal extends FuzzySuggestModal<NoteWithHeader> {
 

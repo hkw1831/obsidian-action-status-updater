@@ -3,6 +3,7 @@ import { App, FuzzySuggestModal, FuzzyMatch } from "obsidian"
 import { addTextToNotes } from "selfutil/addlinktonotes"
 import { filesHeadersWhereTagIsUsed, filesWhereTagIsUsed } from "selfutil/findNotesFromTag"
 import { getNoteType } from "selfutil/getTaskTag"
+import { NoteWithHeader, SEPARATOR } from "selfutil/noteWithHeader"
 
 const BACK_TO_SELECT_TAG = "Back to select tag"
 
@@ -40,9 +41,10 @@ export class AddTextToNotesFromSpecificTagModal extends FuzzySuggestModal<NoteWi
     const filePaths = filesWhereTagIsUsed(this.tagToFind)
     const filePathsForHeader = filesHeadersWhereTagIsUsed(this.tagToFind)
     
-    return [...[{notePath: BACK_TO_SELECT_TAG, header: "", startLine: -1}]
-    , ...filePaths.map(f => { return {notePath: f, header: "", startLine: -1} })
-    , ...filePathsForHeader];
+    return [...[{notePath: BACK_TO_SELECT_TAG, header: "", startLine: -1}], 
+      ...filePaths.map(f => { return {notePath: f, header: "", startLine: -1} }),
+      ...[{notePath: SEPARATOR, header: "", startLine: 0 }],
+      ...filePathsForHeader];
   }
 
   getItemText(path: NoteWithHeader): string {
@@ -68,6 +70,8 @@ export class AddTextToNotesFromSpecificTagModal extends FuzzySuggestModal<NoteWi
   onChooseItem(path: NoteWithHeader, evt: MouseEvent | KeyboardEvent) {
     if (BACK_TO_SELECT_TAG == path.notePath) {
       new AddTextToNotesModal(this.app, this.linkToAdd, this.description, this.insertFromBeginning, this.postAction).open()
+    } else if (SEPARATOR === path.notePath) {
+      // do nothing
     } else {
       addTextToNotes(this.linkToAdd, path.notePath, this.app, this.insertFromBeginning, path.startLine)
       this.postAction()

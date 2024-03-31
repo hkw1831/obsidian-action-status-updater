@@ -1,12 +1,13 @@
 import { NavigateToNoteFromTagModal } from "navigateToNoteFromTagModal"
-import { App, FuzzySuggestModal, FuzzyMatch, Notice, CachedMetadata, parseFrontMatterTags, parseFrontMatterAliases, TFile } from "obsidian"
+import { App, FuzzySuggestModal, FuzzyMatch, Notice, CachedMetadata, parseFrontMatterTags, parseFrontMatterAliases, TFile, MarkdownView } from "obsidian"
 import { filesWhereTagIsUsed } from "selfutil/findNotesFromTag"
 import { getNoteType } from "selfutil/getTaskTag"
+import { NoteWithHeader, SEPARATOR } from "selfutil/noteWithHeader"
 
 const BACK_TO_SELECT_TAG = "Back to select tag"
 const OPEN_IN_SEARCH_MODE = "Open in search mode"
 
-export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<string> {
+export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<NoteWithHeader> {
 
   tagToFind: string
   keydownHandler: (event: KeyboardEvent) => void;
@@ -47,30 +48,52 @@ export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<string
   }
 
 
-  getItems(): string[] {
-    return [...[BACK_TO_SELECT_TAG, OPEN_IN_SEARCH_MODE], ...filesWhereTagIsUsed(this.tagToFind)];
+  getItems(): NoteWithHeader[] {
+    const filePaths : string[] = filesWhereTagIsUsed(this.tagToFind)
+    const headers : NoteWithHeader[] = []
+    filePaths.forEach(n => {
+      const file = this.app.vault.getAbstractFileByPath(n) as TFile
+      const fileCache = this.app.metadataCache.getFileCache(file)
+      if (!fileCache) {
+        return
+      }
+      if (!fileCache.headings) {
+        return
+      }
+      fileCache.headings.forEach(h => {
+        headers.push({notePath: n, header: "#" + h.heading, startLine: h.position.start.line})
+      })
+    })
+    return [...[{notePath: BACK_TO_SELECT_TAG, header: "", startLine: 0}, {notePath: OPEN_IN_SEARCH_MODE, header: "", startLine: 0}],
+            ...filePaths.map(f => { return {notePath: f, header: "", startLine: 0} }),
+            ...[{notePath: SEPARATOR, header: "", startLine: 0 }],
+            ...headers
+          ];
   }
 
-  getItemText(path: string): string {
-    return path;
+  getItemText(path: NoteWithHeader): string {
+    return path.notePath + path.header;
   }
 
   // Renders each suggestion item.
-  renderSuggestion(path: FuzzyMatch<string>, el: HTMLElement) {
-    const pathItem: string = path.item
+  renderSuggestion(path: FuzzyMatch<NoteWithHeader>, el: HTMLElement) {
+    const pathItem: string = path.item.notePath
     let prefix = ""
     if (pathItem !== BACK_TO_SELECT_TAG && pathItem !== OPEN_IN_SEARCH_MODE) {
       const noteType = getNoteType(pathItem)
       prefix = noteType ? noteType.prefix + " " : ""
     }
     el.createEl("div", { text: prefix + pathItem });
+    if (path.item.header.length > 0) {
+      el.createEl("small", { text: path.item.header})
+    }
   }
 
   // Perform action on the selected suggestion.
-  onChooseItem(path: string, evt: MouseEvent | KeyboardEvent) {
-    if (BACK_TO_SELECT_TAG === path) {
+  onChooseItem(path: NoteWithHeader, evt: MouseEvent | KeyboardEvent) {
+    if (BACK_TO_SELECT_TAG === path.notePath) {
       new NavigateToNoteFromTagModal(this.app).open()
-    } else if (OPEN_IN_SEARCH_MODE === path) {
+    } else if (OPEN_IN_SEARCH_MODE === path.notePath) {
       /* eslint-disable @typescript-eslint/no-explicit-any */
 				const searchPlugin = (
 					this.app as any
@@ -79,13 +102,27 @@ export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<string
 				const search = searchPlugin && searchPlugin.instance;
         const defaultTagSearchString = `tag:${this.tagToFind}`;
         search.openGlobalSearch(defaultTagSearchString);
+    } else if (SEPARATOR === path.notePath) {
+      // do nothing
     } else {
       const { vault, workspace } = this.app;
       const leaf = workspace.getLeaf(false);
       Promise.resolve()
       .then(() => {
-          return leaf.openFile(vault.getAbstractFileByPath(path) as TFile, { active : true });
+          return leaf.openFile(vault.getAbstractFileByPath(path.notePath) as TFile, { active : true });
+          
       })
-  }
+      .then(() => {
+        const markdownView = app.workspace.getActiveViewOfType(MarkdownView);
+        const editor = markdownView?.editor
+        if (markdownView == null || editor == null) {
+            const errorReason = `editor or value ${path.notePath} not exist. Aborting...`
+            return Promise.reject(errorReason)
+        }
+        editor.setCursor({line: path.startLine, ch: 0})
+            // scroll the view to the cursor
+        editor.scrollIntoView({from: {line: path.startLine, ch: 0}, to: {line: path.startLine, ch: 0}}, true)
+      })
+    }
   }
 }
