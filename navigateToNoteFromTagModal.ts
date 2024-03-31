@@ -19,6 +19,7 @@ const heading = "heading"
 export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
 
   taskType: Note
+  keydownHandler: (event: KeyboardEvent) => void;
 
   constructor(app: App)
   {
@@ -30,6 +31,28 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
         purpose: "Which notes with tags do you want to navigate to?"
       }
     ]);
+    this.keydownHandler = (event: KeyboardEvent) => {
+      //console.log("ctrl " + event.ctrlKey)
+      //console.log("alt " + event.altKey)
+      //console.log("meta " + event.metaKey)
+      //console.log("shift " + event.shiftKey)
+      //console.log("key " + event.key)
+      // Check if Ctrl + Q was pressed
+      if (event.ctrlKey && event.altKey && event.shiftKey && event.key === ';') { // windows
+        this.close();
+      } else if (event.ctrlKey && event.metaKey && event.shiftKey && event.key === ';') { // macos
+        this.close();
+      }
+    };
+
+    // Listen for keydown events at the document level
+    document.addEventListener('keydown', this.keydownHandler);
+  }
+
+  onClose() {
+    super.onClose();
+    // Stop listening for keydown events when the modal is closed
+    document.removeEventListener('keydown', this.keydownHandler);
   }
 
   getItems() : Note[] {

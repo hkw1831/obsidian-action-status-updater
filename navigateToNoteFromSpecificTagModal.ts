@@ -9,6 +9,7 @@ const OPEN_IN_SEARCH_MODE = "Open in search mode"
 export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<string> {
 
   tagToFind: string
+  keydownHandler: (event: KeyboardEvent) => void;
 
   constructor(app: App, tagToFind: string)
   {
@@ -21,6 +22,28 @@ export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<string
         purpose: `Which notes with tag ${tagToFind} do you want to navigate to?`
       }
     ]);
+    this.keydownHandler = (event: KeyboardEvent) => {
+      //console.log("ctrl " + event.ctrlKey)
+      //console.log("alt " + event.altKey)
+      //console.log("meta " + event.metaKey)
+      //console.log("shift " + event.shiftKey)
+      //console.log("key " + event.key)
+      // Check if Ctrl + Q was pressed
+      if (event.ctrlKey && event.altKey && event.shiftKey && event.key === ';') { // windows
+        this.close();
+      } else if (event.ctrlKey && event.metaKey && event.shiftKey && event.key === ';') { // macos
+        this.close();
+      }
+    };
+
+    // Listen for keydown events at the document level
+    document.addEventListener('keydown', this.keydownHandler);
+  }
+
+  onClose() {
+    super.onClose();
+    // Stop listening for keydown events when the modal is closed
+    document.removeEventListener('keydown', this.keydownHandler);
   }
 
 
