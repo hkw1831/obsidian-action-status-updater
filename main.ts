@@ -1850,7 +1850,7 @@ this.addCommand({
 						resultValue += "\n- [[" + tFile.basename + "]]"
 					}
 					editor.setValue(resultValue)
-					new Notice("Updated notes without metadata")
+					new Notice("Updated notes without metadata. Size=" + result.length)
 				} else {
 					new Notice("Please go to '" + queryMd + "' to run this action")
 				}
