@@ -1,11 +1,12 @@
 import { AddTextToNotesFromSpecificTagModal } from "addTextToNotesFromSpecificTagModal";
 import { App, FuzzySuggestModal, FuzzyMatch, getAllTags } from "obsidian";
 import { addTextToNotes } from "selfutil/addlinktonotes";
+import { getAllHeaders } from "selfutil/getAllHeaders";
 import { getAllNoteTags } from "selfutil/getAllNoteTags";
 import { getAllNotes, getRecentNotes } from "selfutil/getRecentNotes";
 import { getNoteType } from "selfutil/getTaskTag";
 
-export class AddTextToNotesModal extends FuzzySuggestModal<string> {
+export class AddTextToNotesModal extends FuzzySuggestModal<NoteWithHeader> {
 
   linkToAdd: string
   taskType: String
@@ -29,25 +30,36 @@ export class AddTextToNotesModal extends FuzzySuggestModal<string> {
     ]);
   }
 
-  getItems() : string[] {
-		const l = [...['I/Inbox.md'], ...getRecentNotes(this.app, 7), ...getAllNoteTags(this.app).map(s => s.replace(/^#/, "@")), ...getAllNotes(this.app)];
+  getItems() : NoteWithHeader[] {
+    const allNotesPath = getAllNotes(this.app)
+    const allHeader = getAllHeaders(this.app, allNotesPath)
+		const l = [...[{notePath: 'I/Inbox.md', header: "", startLine: -1}],
+               ...getRecentNotes(this.app, 7).map(s => { return {notePath: s, header: "", startLine: -1} }),
+               ...getAllNoteTags(this.app).map(s => s.replace(/^#/, "@")).map(s => { return {notePath: s, header: "", startLine: -1} }),
+               ...allNotesPath.map(s => { return {notePath: s, header: "", startLine: -1} }),
+               ...allHeader
+              ];
     // remove duplicate for l
     return l.filter((item, index) => l.indexOf(item) === index);
+
   }
 
-  getItemText(value: string): string {
-    return value;
+  getItemText(value: NoteWithHeader): string {
+    return value.notePath + value.header;
   }
 
   // Renders each suggestion item.
-  renderSuggestion(value: FuzzyMatch<string>, el: HTMLElement) {
+  renderSuggestion(value: FuzzyMatch<NoteWithHeader>, el: HTMLElement) {
     const item = value.item
     let prefix = ""
-    if (!item.startsWith("@")) {
-      const noteType = getNoteType(item)
+    if (!item.notePath.startsWith("@")) {
+      const noteType = getNoteType(item.notePath)
       prefix = noteType ? noteType.prefix + " " : ""
     }
-    el.createEl("div", { text: prefix + item })
+    el.createEl("div", { text: prefix + item.notePath})// + item.header})
+    if (item.header.length > 0) {
+      el.createEl("small", { text: item.header})
+    }
   }
 
   onOpen() {
@@ -57,11 +69,11 @@ export class AddTextToNotesModal extends FuzzySuggestModal<string> {
   }
 
   // Perform action on the selected suggestion.
-  async onChooseItem(choosenValue: string, evt: MouseEvent | KeyboardEvent) {
-    if (choosenValue.startsWith("@")) {
-      new AddTextToNotesFromSpecificTagModal(this.app, this.linkToAdd, choosenValue.replace(/^@/, "#"), this.description, this.insertFromBeginning, this.postAction).open()
+  async onChooseItem(choosenValue: NoteWithHeader, evt: MouseEvent | KeyboardEvent) {
+    if (choosenValue.notePath.startsWith("@")) {
+      new AddTextToNotesFromSpecificTagModal(this.app, this.linkToAdd, choosenValue.notePath.replace(/^@/, "#"), this.description, this.insertFromBeginning, this.postAction).open()
     } else {
-      addTextToNotes(this.linkToAdd, choosenValue, this.app, this.insertFromBeginning, -1)
+      addTextToNotes(this.linkToAdd, choosenValue.notePath, this.app, this.insertFromBeginning, choosenValue.startLine)
       this.postAction()
     }
   }

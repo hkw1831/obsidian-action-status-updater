@@ -57,7 +57,11 @@ export class AddTextToNotesFromSpecificTagModal extends FuzzySuggestModal<NoteWi
       const noteType = getNoteType(pathItem)
       prefix = noteType ? noteType.prefix + " " : ""
     }
-    el.createEl("div", { text: prefix + pathItem + path.item.header});
+    //el.createEl("div", { text: prefix + pathItem + path.item.header});
+    el.createEl("div", { text: prefix + path.item.notePath})// + item.header})
+    if (path.item.header.length > 0) {
+      el.createEl("small", { text: path.item.header})
+    }
   }
 
   // Perform action on the selected suggestion.
