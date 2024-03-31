@@ -192,7 +192,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
       const line = lines[i].trim()
       if (line != "---" && line !== "" && !/^tags: [a-z]\/[a-z]\/[a-z]/.test(line)) {
         if (/^[#]{1,6} /.test(line)) {
-          resultAsHeader.push({path: line.replace(/^[#]{1,6}/, ""), type: "# ", index: "", line: i, ch: 0})
+          resultAsHeader.push({path: line.replace(/^[#]{1,6}/, ""), type: line.replace(/^([#]{1,6} ).*/, "$1"), index: "", line: i, ch: 0})
         } else if (/#[wnt][nlwdatme] /.test(line) || / #[wnt][nlwdatme]/.test(line)) {
           if (/#[wn][da] /.test(line) || / #[wn][da]/.test(line)) {
             resultAsFinishedAction.push({path: line, type: "x ", index: "", line: i, ch: 0})
