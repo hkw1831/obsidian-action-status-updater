@@ -22,11 +22,11 @@ export class AddTextToNotesModal extends FuzzySuggestModal<NoteWithHeader> {
     this.description = description
     this.insertFromBeginning = insertFromBeginning
     this.postAction = postAction
-    this.setPlaceholder(`Which notes with tags do you want to ${description} to?`)
+    this.setPlaceholder(`Which notes with tags do you want to ${description} to ${insertFromBeginning ? "beginning" : "end"} of the notes?`)
     this.setInstructions([
       {
         command: "",
-        purpose: `Which notes with tags do you want to ${description} to?`
+        purpose: `Which notes with tags do you want to ${description} to ${insertFromBeginning ? "beginning" : "end"} of the notes?`
       }
     ]);
   }

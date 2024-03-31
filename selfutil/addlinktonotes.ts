@@ -201,6 +201,6 @@ function getNoteValueInsertingTextFromEndOfNotesHeading(value: string, text: str
         }
     }
 
-    return {value: result.replace(/\n$/, ""), line: addedLine}
+    return {value: result.replace(/\n$/, ""), line: addedLine + 1}
 }
 
