@@ -3,17 +3,12 @@ import { App, FuzzySuggestModal, FuzzyMatch, getAllTags, TFile, Notice, Markdown
 import { getAllTagsWithFilter } from "selfutil/getAllNoteTags";
 import { getAllNotes, getRecentNotes } from "selfutil/getRecentNotes";
 import { getNoteType } from "selfutil/getTaskTag";
+import { Heading } from "selfutil/heading";
 
 interface Note {
   search: string,
   secondary: string
   type: string
-}
-
-interface Heading {
-  note: string,
-  heading: string,
-  level: number
 }
 
 const note = "note"
@@ -50,7 +45,7 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
         return
       }
       fileCache.headings.forEach(h => {
-        headings.push({note: n, heading: h.heading, level: h.level})
+        headings.push({note: n, heading: h.heading, level: h.level, startLine: h.position.start.line})
       })
     })
 		return [

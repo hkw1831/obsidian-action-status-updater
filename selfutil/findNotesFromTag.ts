@@ -1,4 +1,4 @@
-import { App, CachedMetadata, parseFrontMatterAliases, parseFrontMatterTags } from "obsidian";
+import { App, CachedMetadata, TFile, parseFrontMatterAliases, parseFrontMatterTags } from "obsidian";
 
 export function filesWhereTagIsUsed(findTag: string): string[] {
     const filesList: string[] = [];
@@ -8,6 +8,25 @@ export function filesWhereTagIsUsed(findTag: string): string[] {
         }
     }
     return filesList.sort((a: string, b: string) => a.localeCompare(b));
+}
+
+export function filesHeadersWhereTagIsUsed(findTag: string): NoteWithHeader[] {
+    const fileList: string[] = filesWhereTagIsUsed(findTag);
+    const resultList: NoteWithHeader[] = [];
+    for (const filePath of fileList) {
+        const file = this.app.vault.getAbstractFileByPath(filePath) as TFile
+        const fileCache = this.app.metadataCache.getFileCache(file)
+        if (!fileCache) {
+
+        } else if (!fileCache.headings) {
+
+        } else {
+            fileCache.headings.forEach(h => {
+                resultList.push({notePath: filePath, header: "#" + h.heading, startLine: h.position.start.line})
+            })
+        }   
+    }
+    return resultList
 }
 
 // return array of file path

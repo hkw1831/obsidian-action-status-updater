@@ -61,7 +61,7 @@ export class AddTextToNotesModal extends FuzzySuggestModal<string> {
     if (choosenValue.startsWith("@")) {
       new AddTextToNotesFromSpecificTagModal(this.app, this.linkToAdd, choosenValue.replace(/^@/, "#"), this.description, this.insertFromBeginning, this.postAction).open()
     } else {
-      addTextToNotes(this.linkToAdd, choosenValue, this.app, this.insertFromBeginning)
+      addTextToNotes(this.linkToAdd, choosenValue, this.app, this.insertFromBeginning, -1)
       this.postAction()
     }
   }

@@ -1,9 +1,6 @@
-import { AddTextToNotesFromSpecificTagModal } from "addTextToNotesFromSpecificTagModal";
 import { App, FuzzySuggestModal, FuzzyMatch, getAllTags, TFile, Editor, MarkdownView, Notice } from "obsidian";
-import { addTextToNotes } from "selfutil/addlinktonotes";
 import { filesWhereTagIsUsed } from "selfutil/findNotesFromTag";
 import { getAllNoteTags } from "selfutil/getAllNoteTags";
-import { getAllNotes, getRecentNotes } from "selfutil/getRecentNotes";
 
 export class QueryOrphanNotesByTagModal extends FuzzySuggestModal<string> {
 

@@ -1,12 +1,12 @@
 import { AddTextToNotesModal } from "addTextToNotesModal"
 import { App, FuzzySuggestModal, FuzzyMatch } from "obsidian"
 import { addTextToNotes } from "selfutil/addlinktonotes"
-import { filesWhereTagIsUsed } from "selfutil/findNotesFromTag"
+import { filesHeadersWhereTagIsUsed, filesWhereTagIsUsed } from "selfutil/findNotesFromTag"
 import { getNoteType } from "selfutil/getTaskTag"
 
 const BACK_TO_SELECT_TAG = "Back to select tag"
 
-export class AddTextToNotesFromSpecificTagModal extends FuzzySuggestModal<string> {
+export class AddTextToNotesFromSpecificTagModal extends FuzzySuggestModal<NoteWithHeader> {
 
   linkToAdd: string
 
@@ -35,31 +35,37 @@ export class AddTextToNotesFromSpecificTagModal extends FuzzySuggestModal<string
     ]);
   }
 
-  getItems(): string[] {
-    return [...[BACK_TO_SELECT_TAG], ...filesWhereTagIsUsed(this.tagToFind)];
+
+  getItems(): NoteWithHeader[] {
+    const filePaths = filesWhereTagIsUsed(this.tagToFind)
+    const filePathsForHeader = filesHeadersWhereTagIsUsed(this.tagToFind)
+    
+    return [...[{notePath: BACK_TO_SELECT_TAG, header: "", startLine: -1}]
+    , ...filePaths.map(f => { return {notePath: f, header: "", startLine: -1} })
+    , ...filePathsForHeader];
   }
 
-  getItemText(path: string): string {
-    return path;
+  getItemText(path: NoteWithHeader): string {
+    return path.notePath + path.header;
   }
 
   // Renders each suggestion item.
-  renderSuggestion(path: FuzzyMatch<string>, el: HTMLElement) {
-    const pathItem: string = path.item
+  renderSuggestion(path: FuzzyMatch<NoteWithHeader>, el: HTMLElement) {
+    const pathItem: string = path.item.notePath
     let prefix = ""
     if (pathItem !== BACK_TO_SELECT_TAG) {
       const noteType = getNoteType(pathItem)
       prefix = noteType ? noteType.prefix + " " : ""
     }
-    el.createEl("div", { text: prefix + pathItem });
+    el.createEl("div", { text: prefix + pathItem + path.item.header});
   }
 
   // Perform action on the selected suggestion.
-  onChooseItem(path: string, evt: MouseEvent | KeyboardEvent) {
-    if (BACK_TO_SELECT_TAG == path) {
+  onChooseItem(path: NoteWithHeader, evt: MouseEvent | KeyboardEvent) {
+    if (BACK_TO_SELECT_TAG == path.notePath) {
       new AddTextToNotesModal(this.app, this.linkToAdd, this.description, this.insertFromBeginning, this.postAction).open()
     } else {
-      addTextToNotes(this.linkToAdd, path, this.app, this.insertFromBeginning)
+      addTextToNotes(this.linkToAdd, path.notePath, this.app, this.insertFromBeginning, path.startLine)
       this.postAction()
     }
   }

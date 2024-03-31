@@ -1,6 +1,8 @@
 import { App, Editor, MarkdownView, Notice, TFile, TextFileView, Vault, Workspace } from "obsidian"
 
-export function addTextToNotes(textToAdd: string, toPath: string, app: App, insertFromBeginning: boolean) {
+// if headingLine < 0, meaning insert first or last of notes
+// else insert first or last of heading line
+export function addTextToNotes(textToAdd: string, toPath: string, app: App, insertFromBeginning: boolean, headingLine: number) {
     const vault: Vault = this.app.vault;
     const workspace: Workspace = this.app.workspace
     const leaf = workspace.getLeaf(false);
@@ -24,21 +26,54 @@ export function addTextToNotes(textToAdd: string, toPath: string, app: App, inse
             const errorReason = `Link ${trimmedLink} already exists in ${toPath}!`
             new Notice(errorReason)
         } else {
-            const newValue = insertFromBeginning ? 
-            getNoteValueInsertingTextFromStartOfNotes(value, link) : 
-            getNoteValueInsertingTextFromEndOfNotes(value, link)
-            markdownView.setViewData(newValue, false)
-            if (insertFromBeginning) {
-                const frontMatterRegex = /^(---\n[\s\S]*?\n---\n)/gm
-                if (frontMatterRegex.test(value)) {
-                    editor.setCursor({ line: getLineAfterFrontMatter(value), ch: 0 }) 
+            if (headingLine < 0) {
+                const newValue = insertFromBeginning ? 
+                getNoteValueInsertingTextFromStartOfNotes(value, link) : 
+                getNoteValueInsertingTextFromEndOfNotes(value, link)
+                markdownView.setViewData(newValue, false)
+                if (insertFromBeginning) {
+                    const frontMatterRegex = /^(---\n[\s\S]*?\n---\n)/gm
+                    if (frontMatterRegex.test(value)) {
+                        const lineAfterFrontMatter = getLineAfterFrontMatter(value)
+                        editor.setCursor({ line: lineAfterFrontMatter, ch: 0 }) 
+                        editor.scrollIntoView({from: {line: lineAfterFrontMatter, ch: 0}, to: {line: lineAfterFrontMatter, ch: 0}}, true)
+                    } else {
+                        editor.setCursor({ line: 0, ch: 0 })
+                        editor.scrollIntoView({from: {line: 0, ch: 0}, to: {line: 0, ch: 0}}, true)
+                    }
                 } else {
-                    editor.setCursor({ line: 0, ch: 0 })
+                    const lastLineNum = editor.lineCount() - 1
+                    editor.setCursor({ line: lastLineNum, ch: 0 })
+                    editor.scrollIntoView({from: {line: lastLineNum, ch: 0}, to: {line: lastLineNum, ch: 0}}, true)
                 }
+                new Notice(`Added link to ${insertFromBeginning ? "beginning" : "end"} of ${toPath}!`);
             } else {
-                editor.setCursor({ line: editor.lineCount() - 1, ch: 0 })
+                const newValue: NotesWithCursorLine = insertFromBeginning ? 
+                getNoteValueInsertingTextFromStartOfNotesHeading(value, link, headingLine) : 
+                getNoteValueInsertingTextFromEndOfNotesHeading(value, link, headingLine)
+                markdownView.setViewData(newValue.value, false)
+                editor.setCursor({line: newValue.line, ch: 0})
+                editor.scrollIntoView({from: {line: newValue.line, ch: 0}, to: {line: newValue.line, ch: 0}}, true)
+                new Notice(`Added link to ${insertFromBeginning ? "beginning" : "end"} of Section of ${toPath}!`);
+                /*
+                if (insertFromBeginning) {
+                    const frontMatterRegex = /^(---\n[\s\S]*?\n---\n)/gm
+                    if (frontMatterRegex.test(value)) {
+                        const lineAfterFrontMatter = getLineAfterFrontMatter(value)
+                        editor.setCursor({ line: lineAfterFrontMatter, ch: 0 }) 
+                        editor.scrollIntoView({from: {line: lineAfterFrontMatter, ch: 0}, to: {line: lineAfterFrontMatter, ch: 0}}, true)
+                    } else {
+                        editor.setCursor({ line: 0, ch: 0 })
+                        editor.scrollIntoView({from: {line: 0, ch: 0}, to: {line: 0, ch: 0}}, true)
+                    }
+                } else {
+                    const lastLineNum = editor.lineCount() - 1
+                    editor.setCursor({ line: lastLineNum, ch: 0 })
+                    editor.scrollIntoView({from: {line: lastLineNum, ch: 0}, to: {line: lastLineNum, ch: 0}}, true)
+                }
+                */
+               
             }
-            new Notice(`Added link to ${insertFromBeginning ? "beginning" : "end"} of ${toPath}!`);
         }
         return Promise.resolve()
     })
@@ -100,3 +135,72 @@ function getNoteValueInsertingTextFromStartOfNotes(value: string, text: string) 
 function getNoteValueInsertingTextFromEndOfNotes(value: string, text: string) {
     return value + "\n" + text
 }
+
+export interface NotesWithCursorLine {
+    value: string,
+    line: number
+}
+
+function getNoteValueInsertingTextFromStartOfNotesHeading(value: string, text: string, headingLine: number) : NotesWithCursorLine{
+    const values: string[] = value.split("\n")
+    let result = ""
+    let addedLine = -1
+    let isAddedLine = false
+    for (let i = 0; i < values.length; i++) {
+        if (i <= headingLine) {
+            result += values[i] + "\n"
+        } else if (values[i].trim() === "") {
+            result += values[i] + "\n"
+        } else if (!isAddedLine) {
+            result += text + "\n" + values[i] + "\n"
+            addedLine = i
+            isAddedLine = true
+        } else {
+            result += values[i] + "\n"
+        }
+    }
+    return {value: result.replace(/\n$/, ""), line: isAddedLine ? addedLine : headingLine}
+}
+
+function getNoteValueInsertingTextFromEndOfNotesHeading(value: string, text: string, headingLine: number) : NotesWithCursorLine{
+    const values: string[] = value.split("\n")
+
+    let addedLine = headingLine 
+
+    let endLineOfSection = values.length - 1
+    // first get range of the header
+    for (let i = headingLine; i < values.length; i++) {
+        if (i === headingLine) {
+            
+        } else {
+            if (/^[#]{1,6} /.test(values[i])) {
+                endLineOfSection = i - 1
+                break
+            }
+        }
+    }
+    //console.log(headingLine + " " + endLineOfSection)
+    //console.log(values[endLineOfSection])
+    let finish = false
+    // then get last line of range which is non-empty
+    for (let i = endLineOfSection; i > headingLine && !finish; i--) {
+        if (values[i].trim() !== "") {
+            addedLine = i
+            finish = true
+        }
+    }
+    //console.log(addedLine)
+    //console.log(values[addedLine])
+    // then add in this line
+    let result = ""
+    for (let i = 0; i < values.length; i++) {
+        if (i != addedLine) {
+            result += values[i] + "\n"
+        } else {
+            result += values[i] + "\n" + text + "\n"
+        }
+    }
+
+    return {value: result.replace(/\n$/, ""), line: addedLine}
+}
+
