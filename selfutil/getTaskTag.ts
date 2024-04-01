@@ -80,6 +80,11 @@ export const ALL_TYPES = [
     },
     */
     {
+      type: "b/n/j",
+      description: "Journal / events",
+      prefix: "📅",
+    },
+    {
       type: "b/n/m",
       description: "Zettelkasten - MOC Notes for a small topic",
       prefix: "📂",
