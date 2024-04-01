@@ -35,7 +35,7 @@ export class AddTextToNotesModal extends FuzzySuggestModal<NoteWithHeader> {
     const allNotesPath = getAllNotes(this.app)
     const allHeader = getAllHeaders(this.app, allNotesPath)
 		const l = [...[{notePath: 'I/Inbox.md', header: "", startLine: -1}],
-               ...getRecentNotes(this.app, 7).map(s => { return {notePath: s, header: "", startLine: -1} }),
+               ...getRecentNotes(this.app, 10).map(s => { return {notePath: s, header: "", startLine: -1} }),
                ...getAllNoteTags(this.app).map(s => s.replace(/^#/, "@")).map(s => { return {notePath: s, header: "", startLine: -1} }),
                ...allNotesPath.map(s => { return {notePath: s, header: "", startLine: -1} }),
                ...allHeader
