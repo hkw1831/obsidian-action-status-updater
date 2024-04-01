@@ -67,6 +67,27 @@ export class AddTextToNotesModal extends FuzzySuggestModal<NoteWithHeader> {
     super.onOpen();
     this.inputEl.value = "@";
     this.inputEl.trigger("input");
+
+    this.inputEl.addEventListener('input', () => {
+      if (this.inputEl.value.length > 4 && this.inputEl.value.startsWith('@')) {
+        this.inputEl.value = this.inputEl.value.substring(1);
+      }
+    });
+
+    this.inputEl.addEventListener('paste', (event) => {
+
+      if (this.inputEl.value === "@") {
+        // Prevent the pasted text from being inserted
+        event.preventDefault();
+    
+        // Get the text from the clipboard
+        const text = (event.clipboardData || window.clipboardData).getData('text');
+    
+        // Clear the input and insert the new text
+        this.inputEl.value = text;
+        this.inputEl.trigger("input");
+      }
+    });
   }
 
   // Perform action on the selected suggestion.
