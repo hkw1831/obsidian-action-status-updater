@@ -72,7 +72,7 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
       })
     })
 		return [
-      ...getRecentNotes(this.app, 10).map(n => {
+      ...getRecentNotes(this.app, 50).map(n => {
         return {search: n, secondary: "", type: history}
       }),
       ...getAllTagsWithFilter(this.app).map(n => {
