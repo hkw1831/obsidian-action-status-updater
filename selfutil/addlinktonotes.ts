@@ -21,7 +21,7 @@ export function addTextToNotes(textToAdd: string, toPath: string, app: App, inse
             const errorReason = `editor or value ${toPath} not exist. Aborting...`
             return Promise.reject(errorReason)
         }
-        const trimmedLink = link.trim().replace(/^- /, ' ')
+        const trimmedLink = link.trim().replace(/^- /, '')
         if (editor.getValue().includes(trimmedLink)) {
             const errorReason = `Link ${trimmedLink} already exists in ${toPath}!`
             new Notice(errorReason)
