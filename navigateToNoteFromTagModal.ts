@@ -17,7 +17,7 @@ const tag = "tag"
 const heading = "heading"
 
 export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
-
+  items: Note[]
   taskType: Note
   keydownHandler: (event: KeyboardEvent) => void;
 
@@ -47,6 +47,7 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
 
     // Listen for keydown events at the document level
     document.addEventListener('keydown', this.keydownHandler);
+    this.items = this.prepareItems()
   }
 
   onClose() {
@@ -56,6 +57,10 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
   }
 
   getItems() : Note[] {
+    return this.items
+  }
+
+  prepareItems() : Note[] {
     const allNotes = getAllNotes(this.app)
     let headings: Heading[] = []
     allNotes.forEach(n => {

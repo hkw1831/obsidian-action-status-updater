@@ -22,7 +22,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
         purpose: `Which link do you want to navigate to?`
       }
     ]);
-    this.items = this.getItems()
+    this.items = this.prepareItems()
 
     this.keydownHandler = (event: KeyboardEvent) => {
       //console.log("ctrl " + event.ctrlKey)
@@ -169,6 +169,10 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
   }
 
   getItems(): LinkType[] {
+    return this.items
+  }
+
+  prepareItems(): LinkType[] {
     return [...this.getLinkItems(),
       ...[{path: "------------------", type: "", index: "", line: 0, ch: 0}],
       ...this.getContentItems(),      
