@@ -25,6 +25,15 @@ export function addTextToNotes(textToAdd: string, toPath: string, app: App, inse
         if (editor.getValue().includes(trimmedLink)) {
             const errorReason = `Link ${trimmedLink} already exists in ${toPath}!`
             new Notice(errorReason)
+
+            // Then scroll to that line
+            for (let i = 0; i < editor.lineCount(); i++) {
+                if (editor.getLine(i).includes(trimmedLink)) {
+                    editor.setCursor({line: i, ch: 0})
+                    editor.scrollIntoView({from: {line: i, ch: 0}, to: {line: i, ch: 0}}, true)
+                    break
+                }
+            }
         } else {
             if (headingLine < 0) {
                 const newValue = insertFromBeginning ? 
