@@ -61,12 +61,13 @@ export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<NoteWi
         return
       }
       fileCache.headings.forEach(h => {
-        headers.push({notePath: n, header: "#" + h.heading, startLine: h.position.start.line})
+        headers.push({notePath: n, header: "#" + h.heading, startLine: h.position.start.line, noteType: null})
       })
     })
-    return [...[{notePath: BACK_TO_SELECT_TAG, header: "", startLine: 0}, {notePath: OPEN_IN_SEARCH_MODE, header: "", startLine: 0}],
-            ...filePaths.map(f => { return {notePath: f, header: "", startLine: 0} }),
-            ...[{notePath: SEPARATOR, header: "", startLine: 0 }],
+    return [...[{notePath: BACK_TO_SELECT_TAG, header: "", startLine: 0, noteType: null}],
+            ...[{notePath: OPEN_IN_SEARCH_MODE, header: "", startLine: 0, noteType: null}],
+            ...filePaths.map(f => { return {notePath: f, header: "", startLine: 0, noteType: getNoteType(f)} }),
+            ...[{notePath: SEPARATOR, header: "", startLine: 0, noteType: null }],
             ...headers
           ];
   }
@@ -77,15 +78,19 @@ export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<NoteWi
 
   // Renders each suggestion item.
   renderSuggestion(path: FuzzyMatch<NoteWithHeader>, el: HTMLElement) {
-    const pathItem: string = path.item.notePath
+    const item: NoteWithHeader = path.item
+    const pathItem: string = item.notePath
+    let prefix = item.noteType ? (item.noteType.prefix ? item.noteType.prefix + " " : "") : ""
+    /*
     let prefix = ""
     if (pathItem !== BACK_TO_SELECT_TAG && pathItem !== OPEN_IN_SEARCH_MODE) {
       const noteType = getNoteType(pathItem)
       prefix = noteType ? noteType.prefix + " " : ""
     }
+    */
     el.createEl("div", { text: prefix + pathItem });
     if (path.item.header.length > 0) {
-      el.createEl("small", { text: path.item.header})
+      el.createEl("small", { text: item.header})
     }
   }
 

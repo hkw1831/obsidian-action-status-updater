@@ -39,11 +39,11 @@ export class AddTextToNotesFromSpecificTagModal extends FuzzySuggestModal<NoteWi
 
   getItems(): NoteWithHeader[] {
     const filePaths = filesWhereTagIsUsed(this.tagToFind)
-    const filePathsForHeader = filesHeadersWhereTagIsUsed(this.tagToFind)
+    const filePathsForHeader = filesHeadersWhereTagIsUsed(this.app, this.tagToFind)
     
-    return [...[{notePath: BACK_TO_SELECT_TAG, header: "", startLine: -1}], 
-      ...filePaths.map(f => { return {notePath: f, header: "", startLine: -1} }),
-      ...[{notePath: SEPARATOR, header: "", startLine: 0 }],
+    return [...[{notePath: BACK_TO_SELECT_TAG, header: "", startLine: -1, noteType: null}], 
+      ...filePaths.map(f => { return {notePath: f, header: "", startLine: -1, noteType: getNoteType(f)} }),
+      ...[{notePath: SEPARATOR, header: "", startLine: 0, noteType: null }],
       ...filePathsForHeader];
   }
 
@@ -53,16 +53,20 @@ export class AddTextToNotesFromSpecificTagModal extends FuzzySuggestModal<NoteWi
 
   // Renders each suggestion item.
   renderSuggestion(path: FuzzyMatch<NoteWithHeader>, el: HTMLElement) {
-    const pathItem: string = path.item.notePath
+    const item: NoteWithHeader = path.item
+    const pathItem: string = item.notePath
+    let prefix = item.noteType ? (item.noteType.prefix ? item.noteType.prefix + " " : "") : ""
+    /*
     let prefix = ""
     if (pathItem !== BACK_TO_SELECT_TAG) {
       const noteType = getNoteType(pathItem)
       prefix = noteType ? noteType.prefix + " " : ""
     }
+    */
     //el.createEl("div", { text: prefix + pathItem + path.item.header});
-    el.createEl("div", { text: prefix + path.item.notePath})// + item.header})
+    el.createEl("div", { text: prefix + item.notePath})// + item.header})
     if (path.item.header.length > 0) {
-      el.createEl("small", { text: path.item.header})
+      el.createEl("small", { text: item.header})
     }
   }
 

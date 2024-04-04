@@ -1,4 +1,5 @@
 import { App, CachedMetadata, TFile } from "obsidian";
+import { NoteWithHeader } from "./noteWithHeader";
 
 export function getAllHeaders(app: App, fileList : string[]): NoteWithHeader[] {
     const resultList: NoteWithHeader[] = [];
@@ -11,7 +12,7 @@ export function getAllHeaders(app: App, fileList : string[]): NoteWithHeader[] {
 
         } else {
             fileCache.headings.forEach(h => {
-                resultList.push({notePath: filePath, header: "#" + h.heading, startLine: h.position.start.line})
+                resultList.push({notePath: filePath, header: "#" + h.heading, startLine: h.position.start.line, noteType: null})
             })
         }   
     }

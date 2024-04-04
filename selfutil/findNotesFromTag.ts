@@ -1,4 +1,5 @@
 import { App, CachedMetadata, TFile, parseFrontMatterAliases, parseFrontMatterTags } from "obsidian";
+import { NoteWithHeader } from "./noteWithHeader";
 
 export function filesWhereTagIsUsed(findTag: string): string[] {
     const filesList: string[] = [];
@@ -10,19 +11,19 @@ export function filesWhereTagIsUsed(findTag: string): string[] {
     return filesList.sort((a: string, b: string) => a.localeCompare(b));
 }
 
-export function filesHeadersWhereTagIsUsed(findTag: string): NoteWithHeader[] {
+export function filesHeadersWhereTagIsUsed(app: App, findTag: string): NoteWithHeader[] {
     const fileList: string[] = filesWhereTagIsUsed(findTag);
     const resultList: NoteWithHeader[] = [];
     for (const filePath of fileList) {
-        const file = this.app.vault.getAbstractFileByPath(filePath) as TFile
-        const fileCache = this.app.metadataCache.getFileCache(file)
+        const file : TFile = app.vault.getAbstractFileByPath(filePath) as TFile
+        const fileCache = app.metadataCache.getFileCache(file)
         if (!fileCache) {
 
         } else if (!fileCache.headings) {
 
         } else {
             fileCache.headings.forEach(h => {
-                resultList.push({notePath: filePath, header: "#" + h.heading, startLine: h.position.start.line})
+                resultList.push({notePath: filePath, header: "#" + h.heading, startLine: h.position.start.line, noteType: null})
             })
         }   
     }

@@ -4,7 +4,7 @@ import { addTextToNotes } from "selfutil/addlinktonotes";
 import { getAllHeaders } from "selfutil/getAllHeaders";
 import { getAllNoteTags } from "selfutil/getAllNoteTags";
 import { getAllNotes, getRecentNotes } from "selfutil/getRecentNotes";
-import { getNoteType } from "selfutil/getTaskTag";
+import { NoteType, getNoteType } from "selfutil/getTaskTag";
 import { NoteWithHeader } from "selfutil/noteWithHeader";
 
 export class AddTextToNotesModal extends FuzzySuggestModal<NoteWithHeader> {
@@ -14,6 +14,7 @@ export class AddTextToNotesModal extends FuzzySuggestModal<NoteWithHeader> {
   description: string
   insertFromBeginning: boolean
   postAction: () => void
+  items: NoteWithHeader[]
 
   constructor(app: App, linkToAdd: string, description: string, insertFromBeginning: boolean, postAction: () => void)
   {
@@ -29,15 +30,20 @@ export class AddTextToNotesModal extends FuzzySuggestModal<NoteWithHeader> {
         purpose: `Which notes with tags do you want to ${description} to ${insertFromBeginning ? "beginning" : "end"} of the notes?`
       }
     ]);
+    this.items = this.prepareItems()
   }
 
   getItems() : NoteWithHeader[] {
+    return this.items
+  }
+
+  prepareItems() : NoteWithHeader[] {
     const allNotesPath = getAllNotes(this.app)
     const allHeader = getAllHeaders(this.app, allNotesPath)
-		const l = [...[{notePath: 'I/Inbox.md', header: "", startLine: -1}],
-               ...getRecentNotes(this.app, 50).map(s => { return {notePath: s, header: "", startLine: -1} }),
-               ...getAllNoteTags(this.app).map(s => s.replace(/^#/, "@")).map(s => { return {notePath: s, header: "", startLine: -1} }),
-               ...allNotesPath.map(s => { return {notePath: s, header: "", startLine: -1} }),
+		const l = [...[{notePath: 'I/Inbox.md', header: "", startLine: -1, noteType: getNoteType('I/Inbox.md')}],
+               ...getRecentNotes(this.app, 50).map(s => { return {notePath: s, header: "", startLine: -1, noteType: getNoteType(s)} }),
+               ...getAllNoteTags(this.app).map(s => s.replace(/^#/, "@")).map(s => { return {notePath: s, header: "", startLine: -1, noteType: null} }),
+               ...allNotesPath.map(s => { return {notePath: s, header: "", startLine: -1, noteType: getNoteType(s)} }),
                ...allHeader
               ];
     // remove duplicate for l
@@ -52,11 +58,13 @@ export class AddTextToNotesModal extends FuzzySuggestModal<NoteWithHeader> {
   // Renders each suggestion item.
   renderSuggestion(value: FuzzyMatch<NoteWithHeader>, el: HTMLElement) {
     const item = value.item
-    let prefix = ""
+    let prefix = item.noteType ? (item.noteType.prefix ? item.noteType.prefix + " " : "") : ""
+    /*
     if (!item.notePath.startsWith("@")) {
-      const noteType = getNoteType(item.notePath)
+      const noteType : NoteType | null = getNoteType(item.notePath)
       prefix = noteType ? noteType.prefix + " " : ""
     }
+    */
     el.createEl("div", { text: prefix + item.notePath})// + item.header})
     if (item.header.length > 0) {
       el.createEl("small", { text: item.header})
