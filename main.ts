@@ -900,7 +900,7 @@ this.addCommand({
 			text += fm
 		}
 		text += c
-		text = text.replace(/^---\n+---\n/m, "---\ntags: b/n/c\n---\n").replace(/\n$/, "")
+		text = text.replace(/^---\n+---\n/m, "---\ntags: b/n/s\n---\n").replace(/\n$/, "")
 		editor.setValue(text)
 		editor.setCursor({line: getParentLine(text), ch: 0})
 		app.vault.rename(view.file, "C/" + view.file.name)
