@@ -260,7 +260,7 @@ export default class MyPlugin extends Plugin {
 				}
 				v = v.replace(/, $/, "")
 				if (v !== "") {
-					console.log(key + ' -> [' + v + ']')
+					//console.log(key + ' -> [' + v + ']')
 					result += "- [[" + key.replace(/\.md$/,"") + ']]'// : [' + v + ']'
 					result += "\n"
 					for (const [k2, v2] of Object.entries(value)) {
