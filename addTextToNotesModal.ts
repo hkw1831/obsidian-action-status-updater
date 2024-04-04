@@ -69,7 +69,7 @@ export class AddTextToNotesModal extends FuzzySuggestModal<NoteWithHeader> {
     this.inputEl.trigger("input");
 
     this.inputEl.addEventListener('input', () => {
-      if (this.inputEl.value.length > 4 && this.inputEl.value.startsWith('@')) {
+      if (this.inputEl.value.startsWith('@') && (this.inputEl.value.length > 4 || this.inputEl.value.contains('#')) ) {
         this.inputEl.value = this.inputEl.value.substring(1);
       }
     });
