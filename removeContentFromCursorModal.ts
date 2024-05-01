@@ -1,14 +1,15 @@
 import { App, Editor, FuzzySuggestModal, FuzzyMatch, TFile } from "obsidian";
-import { removeContentFromCursorToEndOfNote, removeContentFromStartOfNoteToCursor, removeContentLeftSameLine, removeContentRightSameLine } from "selfutil/removeContentFromCursor";
+import { copyContentFromCursorToEndOfNote, removeContentFromCursorToEndOfNote, removeContentFromStartOfNoteToCursor, removeContentLeftSameLine, removeContentRightSameLine } from "selfutil/removeContentFromCursor";
 
 export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
 
+  copyContentFromCursorToEndOfNote: string = "Copy content from cursor to end of note"
   removeContentLeftSameLine : string = "Remove content left same line"
   removeContentRightSameLine : string = "Remove content right same line"
   removeContentFromStartOfNoteToCursor: string = "Remove content from start of note to cursor"
   removeContentFromCursorToEndOfNote: string = "Remove content from cursor to end of note"
 
-  options: string[] = [this.removeContentLeftSameLine, this.removeContentRightSameLine, this.removeContentFromStartOfNoteToCursor, this.removeContentFromCursorToEndOfNote]
+  options: string[] = [this.copyContentFromCursorToEndOfNote, this.removeContentLeftSameLine, this.removeContentRightSameLine, this.removeContentFromStartOfNoteToCursor, this.removeContentFromCursorToEndOfNote]
   editor: Editor;
 
   constructor(app: App, editor: Editor)
@@ -42,6 +43,8 @@ export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
       removeContentFromStartOfNoteToCursor(this.editor)
     } else if (choosenOption === this.removeContentFromCursorToEndOfNote) {
       removeContentFromCursorToEndOfNote(this.editor)
+    } else if (choosenOption === this.copyContentFromCursorToEndOfNote) {
+      copyContentFromCursorToEndOfNote(this.editor)
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Editor } from "obsidian"
+import { Editor, Notice } from "obsidian"
 
 export function removeContentFromStartOfNoteToCursor(editor: Editor) {
     const cursor = editor.getCursor()
@@ -30,6 +30,23 @@ export function removeContentFromCursorToEndOfNote(editor: Editor) {
     cursor.line = line
     cursor.ch = ch
     editor.setCursor(cursor)
+}
+
+export function copyContentFromCursorToEndOfNote(editor: Editor) {
+    const cursor = editor.getCursor()
+    const line = cursor.line
+    const ch = cursor.ch
+    const lineContent = editor.getLine(line)
+    let newContent = ""
+    newContent += lineContent.substring(ch)
+    for (let i = line + 1; i < editor.lineCount(); i++) {
+        newContent += "\n" + editor.getLine(i)
+    }
+    navigator.clipboard.writeText(newContent).then(function () {
+        new Notice(`Copied content from cursor to end of note to clipboard!`);
+    }, function (error) {
+        new Notice(`error when copy to clipboard!`);
+    });
 }
 
 export function removeContentLeftSameLine(editor: Editor) {
