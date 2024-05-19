@@ -126,6 +126,36 @@ export const ALL_TYPES = [
       prefix: "👤",
     },
     {
+      type: "b/t/a",
+      description: "Atomic Essay Template",
+      prefix: "✍🏻",
+    },
+    {
+      type: "b/t/p",
+      description: "ChatGPT Prompt Template",
+      prefix: "🪄",
+    },
+    {
+      type: "c/a/d",
+      description: "Atomic Essay drafting",
+      prefix: "🆕",
+    },
+    {
+      type: "c/a/r",
+      description: "Atomic Essay ready to post",
+      prefix: "🆗",
+    },
+    {
+      type: "c/a/p",
+      description: "Atomic Essay published",
+      prefix: "🆙",
+    },
+    {
+      type: "c/a/a",
+      description: "Atomic Essay abandoned",
+      prefix: "🗑️",
+    },
+    {
       type: "c/b/r",
       description: "Blog post ready to publish",
       prefix: "🆗",
