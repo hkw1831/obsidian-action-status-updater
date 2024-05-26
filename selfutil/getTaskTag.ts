@@ -63,6 +63,11 @@ export const ALL_TYPES = [
       prefix: "🔖",
     },
     {
+      type: "b/n/p",
+      description: "Framework - Try to put the stuff into a a framework and find the missing puzzle",
+      prefix: "🧩",
+    },
+    {
       type: "c/t/d",
       description: "Threads post draft",
       prefix: "🆕",

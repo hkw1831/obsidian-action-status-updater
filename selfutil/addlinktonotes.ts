@@ -40,6 +40,7 @@ export function addTextToNotes(textToAdd: string, toPath: string, app: App, inse
                 getNoteValueInsertingTextFromStartOfNotes(value, link) : 
                 getNoteValueInsertingTextFromEndOfNotes(value, link)
                 markdownView.setViewData(newValue, false)
+                editor.setValue(newValue.value)
                 if (insertFromBeginning) {
                     const frontMatterRegex = /^(---\n[\s\S]*?\n---\n)/gm
                     if (frontMatterRegex.test(value)) {
@@ -61,6 +62,7 @@ export function addTextToNotes(textToAdd: string, toPath: string, app: App, inse
                 getNoteValueInsertingTextFromStartOfNotesHeading(value, link, headingLine) : 
                 getNoteValueInsertingTextFromEndOfNotesHeading(value, link, headingLine)
                 markdownView.setViewData(newValue.value, false)
+                editor.setValue(newValue.value)
                 editor.setCursor({line: newValue.line, ch: 0})
                 editor.scrollIntoView({from: {line: newValue.line, ch: 0}, to: {line: newValue.line, ch: 0}}, true)
                 new Notice(`Added link to ${insertFromBeginning ? "beginning" : "end"} of Section of ${toPath}!`);
