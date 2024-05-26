@@ -40,7 +40,7 @@ export function addTextToNotes(textToAdd: string, toPath: string, app: App, inse
                 getNoteValueInsertingTextFromStartOfNotes(value, link) : 
                 getNoteValueInsertingTextFromEndOfNotes(value, link)
                 markdownView.setViewData(newValue, false)
-                editor.setValue(newValue.value)
+                editor.setValue(newValue)
                 if (insertFromBeginning) {
                     const frontMatterRegex = /^(---\n[\s\S]*?\n---\n)/gm
                     if (frontMatterRegex.test(value)) {
