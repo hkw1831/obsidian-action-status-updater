@@ -601,6 +601,14 @@ export default class MyPlugin extends Plugin {
 			},
 		})
 
+		this.addCommand({
+			id: "open-notice",
+			name: "Open Notice",
+			callback: () => {
+				new Notice("Test Test", 0)
+			},
+		})
+
 		/*
 		this.addCommand({
 			id: "open-actions",
