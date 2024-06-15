@@ -3138,6 +3138,7 @@ this.addCommand({
 											.replace(/https[^\n]+\.jpeg/g, "")									
 											.replace(/^\s+$/g, "")
 											.replace(/^- /, "• ")
+											.replace(/^#+ /, "")
 					if (!/^\d+\. /.test(modifiedLine) && !/^• /.test(modifiedLine)) {
 						modifiedLine = modifiedLine.replace(/？([^】」\n])/g, "？\n\n$1")
 											.replace(/。([^】」\n])/g, "。\n\n$1")
