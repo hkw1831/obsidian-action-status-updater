@@ -54,8 +54,13 @@ export const ALL_TYPES = [
     },
     {
       type: "b/n/s",
-      description: "Zettelkasten - Source notes (like books / video / thoughts / conversation)",
+      description: "Zettelkasten - Source notes snippets from content",
       prefix: "📨",
+    },
+    {
+      type: "b/n/r",
+      description: "Zettelkasten - Reference notes (like books / video / thoughts / conversation)",
+      prefix: "📖",
     },
     {
       type: "b/n/c",
@@ -63,27 +68,15 @@ export const ALL_TYPES = [
       prefix: "🔖",
     },
     {
-      type: "b/n/p",
+      type: "b/n/f",
       description: "Framework - Try to put the stuff into a a framework and find the missing puzzle",
       prefix: "🧩",
-    },
-    {
-      type: "c/t/d",
-      description: "Threads post draft",
-      prefix: "🆕",
     },
     {
       type: "c/b/d",
       description: "Blog post draft",
       prefix: "📄",
     },
-    /*
-    {
-      type: "b/n/u",
-      description: "Zettelkasten - Unprocessed material like an inbox",
-      prefix: "📥",
-    },
-    */
     {
       type: "b/n/j",
       description: "Journal / events",
@@ -101,8 +94,13 @@ export const ALL_TYPES = [
     },
     {
       type: "b/n/i",
-      description: "Index Notes for self framework",
+      description: "Index Notes for others framework",
       prefix: "📉",
+    },
+    {
+      type: "b/n/t",
+      description: "Placeholder Notes for Target Audience (Notes starts with TA)",
+      prefix: "👤",
     },
     /*
     {
@@ -125,11 +123,13 @@ export const ALL_TYPES = [
       prefix: "📖",
     },
     */
+    /*
     {
-      type: "b/n/t",
-      description: "Placeholder Notes for Target Audience (Notes starts with TA)",
-      prefix: "👤",
+      type: "b/n/u",
+      description: "Zettelkasten - Unprocessed material like an inbox",
+      prefix: "📥",
     },
+    */
     {
       type: "b/t/a",
       description: "Atomic Essay Template",
@@ -174,6 +174,11 @@ export const ALL_TYPES = [
       type: "c/b/a",
       description: "Blog post abandoned",
       prefix: "🗑️",
+    },
+    {
+      type: "c/t/d",
+      description: "Threads post draft",
+      prefix: "🆕",
     },
     {
       type: "c/t/r",
