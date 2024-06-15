@@ -191,6 +191,9 @@ export default class MyPlugin extends Plugin {
 			.replace(/大佬/g, "大腦")
 			.replace(/ *, */g, "，")
 			.replace(/ *\? */g, "？")
+			.replace(/ *: */g, "：")
+			.replace(/ *; */g, "；")
+			.replace(/ *! */g, "！")
 
 			// then add spaces between english and chinese if no space
 			modifiedValue = modifiedValue
