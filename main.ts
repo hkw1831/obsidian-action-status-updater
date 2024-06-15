@@ -2126,9 +2126,9 @@ this.addCommand({
 				})
 				.then((foundTag) => {
 					if (foundTag) {
-						new Notice(`Update notes type from tag="${beforeTag}" to tag="${afterTag}!\nCopied thread content to clipboard!`);
+						new Notice(`Update notes type from tag="${beforeTag}" to tag="${afterTag}!\nCopied thread content\n\`\`\`\n${text}\n\`\`\`\nto clipboard!`);
 					} else {
-						new Notice(`Tag "${beforeTag}" not found\nCopied thread content to clipboard!`);
+						new Notice(`Tag "${beforeTag}" not found\nCopied thread content\n\`\`\`\n${text}\n\`\`\`\nto clipboard!`);
 					}
 				});
 			},
@@ -2348,6 +2348,7 @@ this.addCommand({
 			icon: `twitter-segment-to-clipboard`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const threadSegment = this.getTwitterSegment(editor)
+
 				const beforeTag = "c/x/r"
 				const afterTag = "c/x/p"
 				navigator.clipboard.writeText(threadSegment)
@@ -3061,11 +3062,14 @@ this.addCommand({
 					modifiedLine = modifiedLine.replace(/^\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
 											.replace(/[^!]\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
 											.replace(/https[^\n]+\.jpeg/g, "")
-											.replace(/？([^】」\n])/g, "？\n\n$1")
+											.replace(/^\s+$/g, "")
+											.replace(/^- /, "• ")
+					if (!/^\d+\. /.test(modifiedLine) && !/^• /.test(modifiedLine)) {
+						modifiedLine = modifiedLine.replace(/？([^】」\n])/g, "？\n\n$1")
 											.replace(/。([^】」\n])/g, "。\n\n$1")
 											.replace(/！([^】」\n])/g, "！\n\n$1")
 											.replace(/～([^】」\n])/g, "～\n\n$1")
-											.replace(/^\s+$/, "")
+					}
 				}
 				text = text + modifiedLine + "\n"
 			}
@@ -3131,12 +3135,15 @@ this.addCommand({
 											.replace(/^\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
 											.replace(/[^!]\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
 											.replace(/!\[.*\]\(https[^\n]+\.jpeg\)/g, "")
-											.replace(/https[^\n]+\.jpeg/g, "")
-											.replace(/？([^】」\n])/g, "？\n\n$1")
+											.replace(/https[^\n]+\.jpeg/g, "")									
+											.replace(/^\s+$/g, "")
+											.replace(/^- /, "• ")
+					if (!/^\d+\. /.test(modifiedLine) && !/^• /.test(modifiedLine)) {
+						modifiedLine = modifiedLine.replace(/？([^】」\n])/g, "？\n\n$1")
 											.replace(/。([^】」\n])/g, "。\n\n$1")
 											.replace(/！([^】」\n])/g, "！\n\n$1")
 											.replace(/～([^】」\n])/g, "～\n\n$1")
-											.replace(/^\s+$/, "")
+					}
 				}
 				text = text + modifiedLine + "\n"
 			}
