@@ -2717,7 +2717,7 @@ this.addCommand({
 			const tweet = tweets[i].replace(/(https:|http:|www\.)\S*/gm, "").replace(/^\n+/m, "").replace(/\n+$/m, "")
 			if (tweet.length > 140)
 			{
-				new Notice("```\n" + tweet + "\n```\n\nexceed 140 characters. Probably cannot post in twitter. Please refine the tweet. Aborting")
+				new Notice("```\n" + tweet + "\n```\n\nexceed 140 characters (currently " + tweet.length + " characters). Probably cannot post in twitter. Please refine the tweet. Aborting")
 				return false;
 			}
 		}
