@@ -185,15 +185,32 @@ export default class MyPlugin extends Plugin {
 		icon: "auto-correct",
 		editorCallback: (editor: Editor, view: MarkdownView) => {
 			const value = editor.getValue()
-			let modifiedValue = value
-			.replace(/10分/g, "十分")
-			.replace(/裏/g, "裡")
-			.replace(/大佬/g, "大腦")
-			.replace(/ *, */g, "，")
-			.replace(/ *\? */g, "？")
-			.replace(/ *: */g, "：")
-			.replace(/ *; */g, "；")
-			.replace(/ *! */g, "！")
+			let modifiedValue = value.split("\n").map(line => {
+				var l2 = line.replace(/10分/g, "十分")
+							.replace(/裏/g, "裡")
+							.replace(/大佬/g, "大腦")
+				if (/[[\u4E00-\u9FFF]]/.test(l2)) {
+					l2 = l2.replace(/ *, */g, "，")
+							.replace(/ *\? */g, "？")
+							.replace(/ *: */g, "：")
+							.replace(/ *; */g, "；")
+							.replace(/ *! */g, "！")
+				}
+				return l2
+			}).join("\n")
+			
+			//let modifiedValue = value
+			//.replace(/10分/g, "十分")
+			//.replace(/裏/g, "裡")
+			//.replace(/大佬/g, "大腦")
+			//.replace(/ *, */g, "，")
+			//.replace(/ *\? */g, "？")
+			//.replace(/ *: */g, "：")
+			//.replace(/ *; */g, "；")
+			//.replace(/ *! */g, "！")
+			//.replace(/tags：/g, "tags: ")
+			//.replace(/tag：/g, "tags: ")
+			
 
 			// then add spaces between english and chinese if no space
 			modifiedValue = modifiedValue
