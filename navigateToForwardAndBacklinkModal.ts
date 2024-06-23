@@ -1,4 +1,5 @@
-import { App, FuzzySuggestModal, FuzzyMatch, TFile, MarkdownView, Notice, Editor, SuggestModal, CachedMetadata, FrontMatterCache } from "obsidian"
+import { App, FuzzySuggestModal, FuzzyMatch, TFile, MarkdownView, Notice, Editor, SuggestModal, CachedMetadata, FrontMatterCache, parseFrontMatterTags } from "obsidian"
+import { filesWhereTagIsUsed } from "selfutil/findNotesFromTag";
 import { getNoteType } from "selfutil/getTaskTag";
 import { LinkType } from "selfutil/linkType";
 
@@ -117,6 +118,29 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
        })
   }
 
+  getSameTagItems(): LinkType[] {
+    let items: LinkType[] = []
+    let { frontmatter } = app.metadataCache.getFileCache(this.view.file) || {};
+    const fmtags = (parseFrontMatterTags(frontmatter) || [])//.filter(t => t == "tags");
+    //console.log(fmtags)
+    var tag = ""
+    for (let i = 0; i < fmtags.length; i++) {
+      if (/#[a-z]\/[a-z]\/[a-z]/.test(fmtags[i])) {
+        tag = fmtags[i]
+        break
+      }
+    }
+    //console.log("found tag = " + tag)
+    if (tag !== "") {
+      const filePaths : string[] = filesWhereTagIsUsed(tag)
+      //console.log("filePaths: " + filePaths)
+      for (let i = 0; i < filePaths.length; i++) {
+        items.push({path: filePaths[i], type: "@ ", index: "", line: 0, ch: 0}) 
+      }
+    }
+    return items
+  }
+
   getContentItems(): LinkType[] {
     const value = this.editor.getValue()
     const lines = value.split("\n")
@@ -175,6 +199,8 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
   prepareItems(): LinkType[] {
     return [...this.getLinkItems(),
       ...[{path: "------------------", type: "", index: "", line: 0, ch: 0}],
+      ...this.getSameTagItems(),
+      ...[{path: "------------------", type: "", index: "", line: 0, ch: 0}],
       ...this.getContentItems(),      
     ]
   }
@@ -197,7 +223,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
   }
 
   getTaskTag(type: string, path: string): string {
-    if (type === "> " || type === "< ") {
+    if (type === "> " || type === "< " || type === "v " || type === "^ " || type === "@ ") {
       const noteType = getNoteType(path)
       return noteType ? " " + noteType.prefix + " " : ""
     }
@@ -209,7 +235,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     if (l.type === "") {
       return
     }
-    if (l.type === "< " || l.type === "> " || l.type === "v " || l.type === "^ ") {
+    if (l.type === "< " || l.type === "> " || l.type === "v " || l.type === "^ " || l.type === "@ ") {
         const { vault, workspace } = this.app;
         const leaf = workspace.getLeaf(false);
         const line = l.line
