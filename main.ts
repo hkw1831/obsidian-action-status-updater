@@ -1892,7 +1892,9 @@ this.addCommand({
 			icon: `threads-to-twitter`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const { vault } = this.app;
-				const v = editor.getValue()
+				let v = editor.getValue()
+				v = v.replace(/---\n+## [Rr]eferences?\:([\n]*.*)*$/, "");
+				v = v.replace(/---\n+## [Rr]eferences?([\n]*.*)*$/, "");
 				const path = view.file.path
 				if (!path.match(/.\/Threads \d\d\d\d\d\d\d\d/)) {
 					new Notice(`Will not proceed. It is not a threads post.`);
@@ -2285,6 +2287,7 @@ this.addCommand({
 				let text = this.convertThreadsContentToFormatForFacebookApp(editor)
 				text = text.replace(/ᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳ\n+## [Rr]eferences?\:([\n]*.*)*$/, "");
 				text = text.replace(/ᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳᅳ\n+## [Rr]eferences?([\n]*.*)*$/, "");
+				text = text.replace(/\n#+ /mg, "\n")
 			
 				const beforeTag = "c/t/t"
 				const afterTag = "c/t/p"
