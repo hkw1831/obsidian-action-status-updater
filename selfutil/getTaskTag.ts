@@ -196,6 +196,11 @@ export const ALL_TYPES = [
       prefix: "🆙",
     },
     {
+      type: "c/t/o",
+      description: "Threads post old (rewritten somewhere",
+      prefix: "👴🏻",
+    },
+    {
       type: "c/t/a",
       description: "Threads post abandoned",
       prefix: "🗑️",

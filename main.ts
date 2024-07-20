@@ -24,6 +24,7 @@ import { NavigateToForwardAndBacklinkTagModal } from 'navigateToForwardAndBackli
 import { NoteType, getNoteType } from 'selfutil/getTaskTag';
 import { getChildlinkItems } from 'selfutil/getChildLink';
 import { getAllNotesWithoutMetadata } from 'selfutil/getRecentNotes';
+import { NavigateRewritableThreadsModal } from 'navigateRewritableThreadsModal';
 
 // Remember to rename these classes and interfaces!
 
@@ -1930,6 +1931,79 @@ this.addCommand({
 				}, reason => {})
 				.then(() => {
 					new Notice(`Created and opened Twitter notes!`);
+				});
+			}
+		})
+
+		this.addObsidianIcon('find-threads-to-rewrite', 'FR');
+		this.addCommand({
+			id: "find-threads-to-rewrite",
+			name: "FR Find Threads To Rewrite",
+			icon: "hafind-threads-to-rewritesh",
+			callback: () => {
+				new NavigateRewritableThreadsModal(app).open()
+			}
+		})
+
+		this.addObsidianIcon('rewrite-threads', 'TR');
+		this.addCommand({
+			id: "rewrite-threads",
+			name: "TR Rewrite Threads",
+			icon: `rewrite-threads`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const { vault } = this.app;
+				let v = "---\ntags: c/t/d\n---\n\n🧵 \n\n\n---\n\n## References\n\n- \n\n"
+
+				const path = view.file.path
+				if (!path.match(/.\/Threads \d\d\d\d\d\d\d\d/)) {
+					new Notice(`Will not proceed. It is not a threads post.`);
+					return;
+				}
+				
+				const todayYYYYMMDD = moment().format('YYYYMMDD');
+				const newPath = path.replace(/^(.\/Threads) \d\d\d\d\d\d\d\d (.*)/, "$1 " + todayYYYYMMDD + " $2")
+				const newNoteName = newPath.replace(/^.\//, "").replace(/.md$/, "")
+
+				const { workspace } = this.app;
+				const leaf = workspace.getLeaf(false);
+				Promise.resolve()
+				.then(() => {
+					return vault.adapter.exists(newPath);
+				})
+				.then((fileExists) => {
+					if (fileExists) {
+						new Notice(`Will not proceed. Rewritten Thread post post already exist.`);
+						return Promise.reject("Threads post already exist")
+					}
+				}).then(function () {
+					const beforeTag = "c/t/p"
+					const afterTag = "c/t/o"
+					return renameTag(view.file, beforeTag, afterTag)
+				}, function (error) {
+					new Notice(`error when rename tag!`);
+				})
+				.then((renameSuccess) => {
+					if (!renameSuccess) {
+						new Notice(`Will not proceed. The old post not published (not c/t/p).`);
+						return Promise.reject("Will not proceed. The old post not published (not c/t/p).")
+					}
+					const value = editor.getValue();
+					let modifiedValue
+					if (/---\n\n## [Rr]eference[s]*[:]*\n\n/m.test(value)) {
+						modifiedValue = value.replace(/(## [Rr]eference[s]*[:]*\n\n)/m, "$1- Rewrite: [[" + newNoteName + "]]\n")
+					} else if (/---[\n\s]*$/.test(value)) { // end with ---
+						modifiedValue = value + "\n\n## References\n\n- Rewrite: [[" + newNoteName + "]]\n"
+					} else {
+						modifiedValue = value + "\n---\n\n## References\n\n- Rewrite: [[" + newNoteName + "]]\n"
+					}
+					editor.setValue(modifiedValue)
+					return vault.create(newPath, v);
+				})
+				.then((tFile) => {
+					return leaf.openFile(tFile, { active : true});
+				}, reason => {})
+				.then(() => {
+					new Notice(`Created and opened Threads notes for rewrite!`);
 				});
 			}
 		})
