@@ -25,6 +25,7 @@ import { NoteType, getNoteType } from 'selfutil/getTaskTag';
 import { getChildlinkItems } from 'selfutil/getChildLink';
 import { getAllNotesWithoutMetadata } from 'selfutil/getRecentNotes';
 import { NavigateRewritableThreadsModal } from 'navigateRewritableThreadsModal';
+import { RewriteThreadsModal } from 'rewriteThreads';
 
 // Remember to rename these classes and interfaces!
 
@@ -1935,6 +1936,16 @@ this.addCommand({
 			}
 		})
 
+		this.addObsidianIcon('threads-rewrite-modal', 'TR');
+		this.addCommand({
+			id: "threads-rewrite-modal",
+			name: "TR Threads Rewrite Modal",
+			icon: "threads-rewrite-modal",
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				new RewriteThreadsModal(app, editor, view).open()
+			}
+		})
+
 		this.addObsidianIcon('find-threads-to-rewrite', 'FR');
 		this.addCommand({
 			id: "find-threads-to-rewrite",
@@ -1945,11 +1956,11 @@ this.addCommand({
 			}
 		})
 
-		this.addObsidianIcon('rewrite-threads', 'TR');
+		this.addObsidianIcon('rewrite-current-threads', 'TR');
 		this.addCommand({
-			id: "rewrite-threads",
-			name: "TR Rewrite Threads",
-			icon: `rewrite-threads`,
+			id: "rewrite-current-threads",
+			name: "TR Rewrite Current Threads",
+			icon: `rewrite-current-threads`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const { vault } = this.app;
 				let v = "---\ntags: c/t/d\n---\n\n🧵 \n\n\n---\n\n## References\n\n- \n\n"
