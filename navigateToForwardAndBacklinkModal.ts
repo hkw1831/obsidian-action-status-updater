@@ -1,4 +1,4 @@
-import { App, FuzzySuggestModal, FuzzyMatch, TFile, MarkdownView, Notice, Editor, SuggestModal, CachedMetadata, FrontMatterCache, parseFrontMatterTags } from "obsidian"
+import { App, FuzzySuggestModal, FuzzyMatch, TFile, MarkdownView, Notice, Editor, SuggestModal, CachedMetadata, FrontMatterCache, parseFrontMatterTags, Scope } from "obsidian"
 import { filesWhereTagIsUsed } from "selfutil/findNotesFromTag";
 import { getNoteType } from "selfutil/getTaskTag";
 import { LinkType } from "selfutil/linkType";
@@ -36,6 +36,12 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
         this.close();
       } else if (event.ctrlKey && event.metaKey && event.shiftKey && event.key === 'O') { // macos
         this.close();
+      } else if (event.metaKey || event.ctrlKey) {
+        const key = parseInt(event.key, 10);
+        if (key >= 1 && key <= 9) {
+          event.preventDefault(); // Prevent default action
+          this.selectElement(key - 1); // Select the element (index key - 1)
+        }
       }
     };
 
@@ -44,10 +50,20 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
 
   }
 
+  selectElement(index: number) {
+    const elements = this.resultContainerEl.querySelectorAll('.suggestion-item');
+    if (elements.length > index) {
+      const element = elements[index] as HTMLElement;
+      element.click(); // Simulate a click to select the element
+      console.log(`Element ${index + 1} selected`); // Log the selection
+    }
+  }
+
   onClose() {
     super.onClose();
     // Stop listening for keydown events when the modal is closed
     document.removeEventListener('keydown', this.keydownHandler);
+    //this.scope.unregister(); // Unregister the scope when the modal is closed
   }
 
   getLinkItems(): LinkType[] {
@@ -219,7 +235,8 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
   // Renders each suggestion item.
   renderSuggestion(ll: LinkType, el: HTMLElement) {
     //const ll: LinkType = l.item
-    el.createEl("div", { text: ll.type + this.getTaskTag(ll.type, ll.path) + ll.path + ll.index});
+    const index = this.resultContainerEl.querySelectorAll('.suggestion-item').length;
+    el.createEl("div", { text: index + ". " + ll.type + this.getTaskTag(ll.type, ll.path) + ll.path + ll.index});
   }
 
   getTaskTag(type: string, path: string): string {
