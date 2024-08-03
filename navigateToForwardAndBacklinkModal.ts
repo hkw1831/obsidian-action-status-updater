@@ -55,7 +55,6 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     if (elements.length > index) {
       const element = elements[index] as HTMLElement;
       element.click(); // Simulate a click to select the element
-      console.log(`Element ${index + 1} selected`); // Log the selection
     }
   }
 
@@ -236,7 +235,8 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
   renderSuggestion(ll: LinkType, el: HTMLElement) {
     //const ll: LinkType = l.item
     const index = this.resultContainerEl.querySelectorAll('.suggestion-item').length;
-    el.createEl("div", { text: index + ". " + ll.type + this.getTaskTag(ll.type, ll.path) + ll.path + ll.index});
+    const itemIndex = index < 10 ? index + ". " : "    "
+    el.createEl("div", { text: itemIndex + ll.type + this.getTaskTag(ll.type, ll.path) + ll.path + ll.index});
   }
 
   getTaskTag(type: string, path: string): string {
