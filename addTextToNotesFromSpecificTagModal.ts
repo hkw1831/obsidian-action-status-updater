@@ -19,6 +19,8 @@ export class AddTextToNotesFromSpecificTagModal extends FuzzySuggestModal<NoteWi
 
   postAction: () => void
 
+  keydownHandler: (event: KeyboardEvent) => void;
+
   constructor(app: App, linkToAdd: string, tagToFind: string, description: string, insertFromBeginning: boolean, postAction: () => void)
   {
     super(app)
@@ -34,8 +36,33 @@ export class AddTextToNotesFromSpecificTagModal extends FuzzySuggestModal<NoteWi
         purpose: `Which notes with tag ${tagToFind} do you want to ${description} to ${insertFromBeginning ? "beginning" : "end"} of the notes?`
       }
     ]);
+    this.keydownHandler = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey) {
+        const key = parseInt(event.key, 10);
+        if (key >= 1 && key <= 9) {
+          event.preventDefault(); // Prevent default action
+          this.selectElement(key - 1); // Select the element (index key - 1)
+        }
+      }
+    };
+
+    // Listen for keydown events at the document level
+    document.addEventListener('keydown', this.keydownHandler);
   }
 
+  selectElement(index: number) {
+    const elements = this.resultContainerEl.querySelectorAll('.suggestion-item');
+    if (elements.length > index) {
+      const element = elements[index] as HTMLElement;
+      element.click(); // Simulate a click to select the element
+    }
+  }
+
+  onClose() {
+    super.onClose();
+    // Stop listening for keydown events when the modal is closed
+    document.removeEventListener('keydown', this.keydownHandler);
+  }
 
   getItems(): NoteWithHeader[] {
     const filePaths = filesWhereTagIsUsed(this.tagToFind)
@@ -64,9 +91,11 @@ export class AddTextToNotesFromSpecificTagModal extends FuzzySuggestModal<NoteWi
     }
     */
     //el.createEl("div", { text: prefix + pathItem + path.item.header});
-    el.createEl("div", { text: prefix + item.notePath})// + item.header})
+    const index = this.resultContainerEl.querySelectorAll('.suggestion-item').length;
+    const itemIndex = index < 10 ? index + ". " : "    "
+    el.createEl("div", { text: itemIndex + prefix + item.notePath})// + item.header})
     if (path.item.header.length > 0) {
-      el.createEl("small", { text: item.header})
+      el.createEl("small", { text: "     " + item.header})
     }
   }
 
