@@ -6,6 +6,7 @@ export class QueryOrphanNotesByTagModal extends FuzzySuggestModal<string> {
 
   editor: Editor
   view: MarkdownView
+  keydownHandler: (event: KeyboardEvent) => void;
 
   constructor(app: App, editor: Editor, view: MarkdownView)
   {
@@ -19,6 +20,32 @@ export class QueryOrphanNotesByTagModal extends FuzzySuggestModal<string> {
     ]);
     this.editor = editor
     this.view = view
+    this.keydownHandler = (event: KeyboardEvent) => {
+     if (event.metaKey || event.ctrlKey) {
+        const key = parseInt(event.key, 10);
+        if (key >= 1 && key <= 9) {
+          event.preventDefault(); // Prevent default action
+          this.selectElement(key - 1); // Select the element (index key - 1)
+        }
+      }
+    };
+
+    // Listen for keydown events at the document level
+    document.addEventListener('keydown', this.keydownHandler);
+  }
+
+  selectElement(index: number) {
+    const elements = this.resultContainerEl.querySelectorAll('.suggestion-item');
+    if (elements.length > index) {
+      const element = elements[index] as HTMLElement;
+      element.click(); // Simulate a click to select the element
+    }
+  }
+
+  onClose() {
+    super.onClose();
+    // Stop listening for keydown events when the modal is closed
+    document.removeEventListener('keydown', this.keydownHandler);
   }
 
   getItems() : string[] {
@@ -34,7 +61,9 @@ export class QueryOrphanNotesByTagModal extends FuzzySuggestModal<string> {
   // Renders each suggestion item.
   renderSuggestion(value: FuzzyMatch<string>, el: HTMLElement) {
     const item = value.item
-    el.createEl("div", { text: item })
+    const index = this.resultContainerEl.querySelectorAll('.suggestion-item').length;
+    const itemIndex = index < 10 ? index + ". " : "    "
+    el.createEl("div", { text: itemIndex + item })
   }
 
   // Perform action on the selected suggestion.
