@@ -34,11 +34,25 @@ export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<NoteWi
         this.close();
       } else if (event.ctrlKey && event.metaKey && event.shiftKey && event.key === ';') { // macos
         this.close();
+      } else if (event.metaKey || event.ctrlKey) {
+        const key = parseInt(event.key, 10);
+        if (key >= 1 && key <= 9) {
+          event.preventDefault(); // Prevent default action
+          this.selectElement(key - 1); // Select the element (index key - 1)
+        }
       }
     };
 
     // Listen for keydown events at the document level
     document.addEventListener('keydown', this.keydownHandler);
+  }
+
+  selectElement(index: number) {
+    const elements = this.resultContainerEl.querySelectorAll('.suggestion-item');
+    if (elements.length > index) {
+      const element = elements[index] as HTMLElement;
+      element.click(); // Simulate a click to select the element
+    }
   }
 
   onClose() {
@@ -88,9 +102,11 @@ export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<NoteWi
       prefix = noteType ? noteType.prefix + " " : ""
     }
     */
-    el.createEl("div", { text: prefix + pathItem });
+    const index = this.resultContainerEl.querySelectorAll('.suggestion-item').length;
+    const itemIndex = index < 10 ? index + ". " : "    "
+    el.createEl("div", { text: itemIndex + prefix + pathItem });
     if (path.item.header.length > 0) {
-      el.createEl("small", { text: item.header})
+      el.createEl("small", { text: "     " + item.header})
     }
   }
 
