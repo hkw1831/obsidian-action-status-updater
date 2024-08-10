@@ -54,15 +54,16 @@ export class TagSearchModal extends FuzzySuggestModal<string> {
 	}
 
 	onChooseItem(item: string, evt: MouseEvent | KeyboardEvent): void {
-		const defaultTagSearchString = `tag:${item}`;
-        //this.search.openGlobalSearch(defaultTagSearchString);
-		//console.log(this.plugin)
-		//console.log(this.plugin.notesTypeView)
-		
-		this.plugin.notesTypeView.notesTypeTag = item;
-		this.plugin.activateNoteListView()
-		this.plugin.notesTypeView.redraw();
-	
+		if (/^#[a-z]$/.test(item) || /^#[a-z]\/[a-z]$/.test(item) || /^#[a-z]\/[a-z]\/[a-z]$/.test(item)) {
+			// note type tag
+			this.plugin.notesTypeView.notesTypeTag = item;
+			this.plugin.activateNoteListView()
+			this.plugin.notesTypeView.redraw();
+		} else {
+			// in text tag
+			const defaultTagSearchString = `tag:${item}`;
+			this.search.openGlobalSearch(defaultTagSearchString);
+		}
 	}
 
 	onClose() {
