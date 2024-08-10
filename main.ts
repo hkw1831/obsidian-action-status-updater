@@ -81,8 +81,14 @@ export default class MyPlugin extends Plugin {
 		);
 	
 		this.addRibbonIcon('hash', 'Open Note List View', () => {
+		
+	});
+
+	/*
+	this.app.workspace.onLayoutReady(() => {
 		this.activateNoteListView();
 	});
+	*/
 		
 
 		/*
