@@ -1,3 +1,5 @@
+import MyPlugin from "main";
+import { NotesTypeView } from "notesTypeView";
 import { App, FuzzyMatch, FuzzySuggestModal } from "obsidian";
 import { getAllTagsWithFilter } from "selfutil/getAllNoteTags";
 
@@ -9,8 +11,10 @@ interface Search {
 export class TagSearchModal extends FuzzySuggestModal<string> {
 
 	keydownHandler: (event: KeyboardEvent) => void;
+	
+	plugin: MyPlugin;
 
-	constructor(public app: App, private search: Search) {
+	constructor(public app: App, private search: Search, plugin: MyPlugin) {
 		super(app);
 		this.search = search;
 		this.keydownHandler = (event: KeyboardEvent) => {
@@ -29,6 +33,8 @@ export class TagSearchModal extends FuzzySuggestModal<string> {
 	  
 		  // Listen for keydown events at the document level
 		  document.addEventListener('keydown', this.keydownHandler);
+		this.plugin = plugin;
+		//console.log("plugin: " + plugin)
 	}
 
 	selectElement(index: number) {
@@ -49,7 +55,14 @@ export class TagSearchModal extends FuzzySuggestModal<string> {
 
 	onChooseItem(item: string, evt: MouseEvent | KeyboardEvent): void {
 		const defaultTagSearchString = `tag:${item}`;
-        this.search.openGlobalSearch(defaultTagSearchString);
+        //this.search.openGlobalSearch(defaultTagSearchString);
+		//console.log(this.plugin)
+		//console.log(this.plugin.notesTypeView)
+		
+		this.plugin.notesTypeView.notesTypeTag = item;
+		this.plugin.activateNoteListView()
+		this.plugin.notesTypeView.redraw();
+	
 	}
 
 	onClose() {

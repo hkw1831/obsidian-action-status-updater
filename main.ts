@@ -1,5 +1,5 @@
 import { UpdateNoteTypeModal } from 'updateNoteTypeModal';
-import { App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, Vault, EditorSelection, Workspace, parseFrontMatterTags } from 'obsidian';
+import { App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, Vault, EditorSelection, Workspace, parseFrontMatterTags, WorkspaceLeaf } from 'obsidian';
 import { AddFootnoteTagModal } from 'addCommentTagModal';
 import { AddTaskTagModal } from 'addTaskTagModal';
 import { renameBlogTitle, renameTag, renameThreadsTitle } from 'tagrenamer/renaming';
@@ -26,6 +26,7 @@ import { getChildlinkItems } from 'selfutil/getChildLink';
 import { getAllNotesWithoutMetadata } from 'selfutil/getRecentNotes';
 import { NavigateRewritableThreadsModal } from 'navigateRewritableThreadsModal';
 import { RewriteThreadsModal } from 'rewriteThreads';
+import { NotesTypeView, VIEW_TYPE_NOTE_LIST } from 'notesTypeView';
 
 // Remember to rename these classes and interfaces!
 
@@ -39,12 +40,50 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 
 const clipboardHistory: string[] = []
 
+
+
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
 	view: MarkdownView;
+	public notesTypeView: NotesTypeView;
+	public notesTypeTag : string = ""
+	public plugin: MyPlugin = this
+
+	public async activateNoteListView() {
+		/*
+		const leaf = this.app.workspace.getLeftLeaf(false);
+		await leaf.setViewState({
+		  type: VIEW_TYPE_NOTE_LIST,
+		  active: true,
+		});
+		this.app.workspace.revealLeaf(leaf);
+		*/
+		let leaf: WorkspaceLeaf | null;
+        [leaf] = this.app.workspace.getLeavesOfType(
+			VIEW_TYPE_NOTE_LIST,
+        );
+        if (!leaf) {
+          leaf = this.app.workspace.getLeftLeaf(false);
+          await leaf?.setViewState({ type: VIEW_TYPE_NOTE_LIST });
+        }
+
+        if (leaf) {
+          this.app.workspace.revealLeaf(leaf);
+        }
+	  }
 
 	async onload() {
 		await this.loadSettings();
+
+		this.registerView(
+			VIEW_TYPE_NOTE_LIST,
+			(leaf) => this.notesTypeView = new NotesTypeView(leaf, this.notesTypeTag)
+		);
+	
+		this.addRibbonIcon('hash', 'Open Note List View', () => {
+		this.activateNoteListView();
+	});
+		
 
 		/*
 		//function displayNoteInLeftView(app: App, notePath: string) {
@@ -389,7 +428,7 @@ export default class MyPlugin extends Plugin {
 				const search = searchPlugin && searchPlugin.instance;
 
 				if (searchPlugin && searchPlugin.instance) {
-					new TagSearchModal(this.app, search).open();
+					new TagSearchModal(this.app, search, this.plugin).open();
 				} else {
 					new Notice("Please enable the search core plugin!");
 				}
@@ -419,7 +458,7 @@ export default class MyPlugin extends Plugin {
 				const search = searchPlugin && searchPlugin.instance;
 
 				if (searchPlugin && searchPlugin.instance) {
-					new TagSearchModal(this.app, search).open();
+					new TagSearchModal(this.app, search, this.plugin).open();
 				} else {
 					new Notice("Please enable the search core plugin!");
 				}
@@ -3623,9 +3662,9 @@ this.addCommand({
 		}
 	}
 
-	onunload() {
-
-	}
+	async onunload() {
+		this.app.workspace.detachLeavesOfType(VIEW_TYPE_NOTE_LIST);
+	  }
 
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
