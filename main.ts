@@ -48,6 +48,7 @@ export default class MyPlugin extends Plugin {
 	public notesTypeView: NotesTypeView;
 	public notesTypeTag : string = ""
 	public plugin: MyPlugin = this
+	private lastActiveLeaf: WorkspaceLeaf | null = null;
 
 	public async activateNoteListView() {
 		/*
@@ -81,8 +82,20 @@ export default class MyPlugin extends Plugin {
 		);
 	
 		this.addRibbonIcon('hash', 'Open Note List View', () => {
-		
-	});
+			this.activateNoteListView();
+		});
+
+	this.registerEvent(
+		this.app.workspace.on('active-leaf-change', (leaf) => {
+		  if (leaf && leaf !== this.lastActiveLeaf) {
+			const view = leaf.view;
+			if (view instanceof NotesTypeView) {
+			  view.redraw()
+			}
+			this.lastActiveLeaf = leaf;
+		  }
+		})
+	  );
 
 	/*
 	this.app.workspace.onLayoutReady(() => {
