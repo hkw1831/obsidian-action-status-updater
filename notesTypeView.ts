@@ -40,6 +40,7 @@ class NotesTypeView extends ItemView {
     }
     
     this.containerEl.createDiv({ cls: 'nav-header', text: "Tags: " + this.notesTypeTag });
+    /*
     const button = this.containerEl.createEl('button', {
         text:'[Refresh]',
         cls: 'redraw-button'
@@ -48,7 +49,7 @@ class NotesTypeView extends ItemView {
       button.onclick = () => {
         this.redraw();
       };
-
+*/
     const rootEl = this.containerEl.createDiv({ cls: 'nav-folder mod-root scrollable' });
     const childrenEl = rootEl.createDiv({ cls: 'nav-folder-children' });
 

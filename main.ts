@@ -85,6 +85,7 @@ export default class MyPlugin extends Plugin {
 			this.activateNoteListView();
 		});
 
+		/*
 	this.registerEvent(
 		this.app.workspace.on('active-leaf-change', (leaf) => {
 		  if (leaf && leaf !== this.lastActiveLeaf) {
@@ -96,12 +97,19 @@ export default class MyPlugin extends Plugin {
 		  }
 		})
 	  );
+	  */
 
-	/*
+	
 	this.app.workspace.onLayoutReady(() => {
-		this.activateNoteListView();
+		//this.activateNoteListView();
+		this.app.metadataCache.on("changed", async (file) => {
+			if (this.notesTypeView) {
+				console.log("redrawing")
+				this.notesTypeView.redraw();
+			}
+		})
 	});
-	*/
+	
 		
 
 		/*
