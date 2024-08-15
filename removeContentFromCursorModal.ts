@@ -4,12 +4,13 @@ import { copyContentFromCursorToEndOfNote, removeContentFromCursorToEndOfNote, r
 export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
 
   copyContentFromCursorToEndOfNote: string = "Copy content from cursor to end of note"
+  cutContentFromCursorToEndOfNote: string = "Cut content from cursor to end of note"
   removeContentLeftSameLine : string = "Remove content left same line"
   removeContentRightSameLine : string = "Remove content right same line"
   removeContentFromStartOfNoteToCursor: string = "Remove content from start of note to cursor"
   removeContentFromCursorToEndOfNote: string = "Remove content from cursor to end of note"
 
-  options: string[] = [this.copyContentFromCursorToEndOfNote, this.removeContentLeftSameLine, this.removeContentRightSameLine, this.removeContentFromStartOfNoteToCursor, this.removeContentFromCursorToEndOfNote]
+  options: string[] = [this.copyContentFromCursorToEndOfNote, this.cutContentFromCursorToEndOfNote, this.removeContentLeftSameLine, this.removeContentRightSameLine, this.removeContentFromStartOfNoteToCursor, this.removeContentFromCursorToEndOfNote]
   editor: Editor;
   keydownHandler: (event: KeyboardEvent) => void;
 
@@ -79,6 +80,9 @@ export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
       removeContentFromCursorToEndOfNote(this.editor)
     } else if (choosenOption === this.copyContentFromCursorToEndOfNote) {
       copyContentFromCursorToEndOfNote(this.editor)
+    } else if (choosenOption === this.cutContentFromCursorToEndOfNote) {
+      copyContentFromCursorToEndOfNote(this.editor)
+      removeContentFromCursorToEndOfNote(this.editor)
     }
   }
 }
