@@ -1643,6 +1643,48 @@ this.addCommand({
 			
 		});
 
+		this.addObsidianIcon('action-to-fantastical-event-icon', 'AF');
+		this.addCommand({
+			id: "action-to-fantastical-event",
+			name: "AF Action to Fantastical Event",
+			icon: `action-to-fantastical-event-icon`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				let text = "";
+				const vault: Vault = this.app.vault;
+				const listSelections: EditorSelection[] = editor.listSelections();
+			  
+				for (const listSelection of listSelections) {
+					const a = listSelection.head.line;
+					const b = listSelection.anchor.line;
+					const fromLineNum = b > a ? a : b;
+					const toLineNum = b > a ? b : a;
+				
+					for (let i = fromLineNum; i <= toLineNum; i++) {
+						const line = editor.getLine(i);
+						text += line.trim() + "@@@";
+					}
+					text = text.replace(/@@@$/, "");
+				}
+
+				const vaultName = app.vault.getName();
+				const filePath = view.file.path;
+				const url = `obsidian://open?vault=${encodeURIComponent(vaultName)}&file=${encodeURIComponent(filePath)}`;
+				const encodedUrl = encodeURIComponent(url);
+				
+				const input = `{"tasks":"${text}","obsidianURL":"${encodedUrl}"}`;
+				//console.log(input)
+
+				
+				const shortcutUrl = `shortcuts://run-shortcut?name=${encodeURIComponent("Obsidian Action To Fantastical Push event")}&input=text&text=${encodeURIComponent(input)}&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://`
+				//console.log(shortcutUrl)
+
+				window.open(shortcutUrl);
+			  },
+			  
+			
+		});
+
+		
 		/*
 		this.addCommand({
 			id: "remove-first-tab-from-selected-lines",
