@@ -65,6 +65,38 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     //this.scope.unregister(); // Unregister the scope when the modal is closed
   }
 
+  getTFileByPath(path: string): TFile | null {
+    const file = this.app.vault.getAbstractFileByPath(path);
+    if (file instanceof TFile) {
+      return file;
+    }
+    return null;
+  }
+
+  getHeadingForLine(path: string, lineNumber: number): string {
+    const file = this.getTFileByPath(path);
+    if (!file) {
+      return "";
+    }
+    const fileCache = this.app.metadataCache.getFileCache(file);
+    if (!fileCache || !fileCache.headings) {
+      return "";
+    }
+  
+    const headings = fileCache.headings;
+    let currentHeading = "";
+  
+    for (const heading of headings) {
+      if (heading.position.start.line <= lineNumber) {
+        currentHeading = "#" + heading.heading;
+      } else {
+        break;
+      }
+    }
+  
+    return currentHeading;
+  }
+
   getLinkItems(): LinkType[] {
     const forwardLinkItems = this.getForwardlinkItems()
     let backLinkItems = []
@@ -83,9 +115,15 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
             //console.log(backlinksData[i][j])
             const key = backlinksData[i][j]['key']
             if (key) {
-              childLinkItems.push({path: i, type: "v ", index: index, line: 0, ch: 0})  
+              childLinkItems.push({path: i, type: "v ", index: index, heading: "", line: 0, ch: 0})  
             } else {
-              backLinkItems.push({path: i, type: "< ", index: index, line: backlinksData[i][j]['position']['start']['line'], ch: backlinksData[i][j]['position']['start']['col']})
+              const position = backlinksData[i][j]['position']
+              //console.log(position)
+              //console.log(position['start']['line'])
+              const line = position['start']['line']
+              const heading = this.getHeadingForLine(i, line)
+              //console.log(heading)
+              backLinkItems.push({path: i, type: "< ", index: index, heading: heading, line: backlinksData[i][j]['position']['start']['line'], ch: backlinksData[i][j]['position']['start']['col']})
             }
           }
         }
@@ -109,7 +147,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
               //console.log(linkedFile)
               const tf = linkedFile ? this.app.vault.getAbstractFileByPath(linkedFile.path) : null
               if (tf) {
-                parentLinkItems.push({path: tf.path, type: "^ ", index: "", line: 0, ch: 0}) 
+                parentLinkItems.push({path: tf.path, type: "^ ", index: "", heading: "", line: 0, ch: 0}) 
               }
             }
           }
@@ -129,7 +167,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
       return tf ? tf.path : ""
     }).filter(path => path !== "")
        : []).map(p => {
-          return {path: p, type: "> ", index: "", line: 0, ch: 0}
+          return {path: p, type: "> ", index: "", heading: "", line: 0, ch: 0}
        })
   }
 
@@ -150,7 +188,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
       const filePaths : string[] = filesWhereTagIsUsed(tag)
       //console.log("filePaths: " + filePaths)
       for (let i = 0; i < filePaths.length; i++) {
-        items.push({path: filePaths[i], type: "@ ", index: "", line: 0, ch: 0}) 
+        items.push({path: filePaths[i], type: "@ ", index: "", heading: "", line: 0, ch: 0}) 
       }
     }
     return items
@@ -170,29 +208,29 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
       const line = lines[i].trim()
       if (line != "---" && line !== "" && !/^tags: [a-z]\/[a-z]\/[a-z]/.test(line)) {
         if (/^[#]{1,6} /.test(line)) {
-          resultAsHeader.push({path: line.replace(/^[#]{1,6}/, ""), type: line.replace(/^([#]{1,6} ).*/, "$1"), index: "", line: i, ch: 0})
+          resultAsHeader.push({path: line.replace(/^[#]{1,6}/, ""), type: line.replace(/^([#]{1,6} ).*/, "$1"), index: "", heading: "", line: i, ch: 0})
         } else if (/#[wnt][nlwdatme] /.test(line) || / #[wnt][nlwdatme]/.test(line)) {
           if (/#[wn][da] /.test(line) || / #[wn][da]/.test(line)) {
-            resultAsFinishedAction.push({path: line, type: "x ", index: "", line: i, ch: 0})
+            resultAsFinishedAction.push({path: line, type: "x ", index: "", heading: "", line: i, ch: 0})
           } else {
-            resultAsUnfinishedAction.push({path: line, type: "z ", index: "", line: i, ch: 0})
+            resultAsUnfinishedAction.push({path: line, type: "z ", index: "", heading: "", line: i, ch: 0})
           }
         } else {
-          resultAsContent.push({path: line, type: "c ", index: "", line: i, ch: 0})
+          resultAsContent.push({path: line, type: "c ", index: "", heading: "", line: i, ch: 0})
         }
       }
       const urlRegex = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/g;
       const matches = line.match(urlRegex)
       if (matches) {
         for (let j = 0; j < matches.length; j++) {
-          resultAsExternalLinks.push({path: matches[j], type: "w ", index: "", line: i, ch: 0})
+          resultAsExternalLinks.push({path: matches[j], type: "w ", index: "", heading: "", line: i, ch: 0})
         }
       } else {
         const jiraLinkRegex = /([A-Z]+-[0-9]+)/g
         const jiraMatches = line.match(jiraLinkRegex)
         if (jiraMatches) {
           for (let j = 0; j < jiraMatches.length; j++) {
-            resultAsJiraLink.push({path: "https://jira.orcsoftware.com/browse/" + jiraMatches[j], type: "j ", index: "", line: i, ch: 0})
+            resultAsJiraLink.push({path: "https://jira.orcsoftware.com/browse/" + jiraMatches[j], type: "j ", index: "", heading: "", line: i, ch: 0})
           }
         }
       }
@@ -213,9 +251,9 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
 
   prepareItems(): LinkType[] {
     return [...this.getLinkItems(),
-      ...[{path: "------------------", type: "", index: "", line: 0, ch: 0}],
+      ...[{path: "------------------", type: "", index: "", heading: "", line: 0, ch: 0}],
       ...this.getSameTagItems(),
-      ...[{path: "------------------", type: "", index: "", line: 0, ch: 0}],
+      ...[{path: "------------------", type: "", index: "", heading: "", line: 0, ch: 0}],
       ...this.getContentItems(),      
     ]
   }
@@ -237,6 +275,9 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     const index = this.resultContainerEl.querySelectorAll('.suggestion-item').length;
     const itemIndex = index < 10 ? index + ". " : "    "
     el.createEl("div", { text: itemIndex + ll.type + this.getTaskTag(ll.type, ll.path) + ll.path + ll.index});
+    if (ll.heading !== "") {
+      el.createEl("small", { text: "               " + ll.heading });
+    }
   }
 
   getTaskTag(type: string, path: string): string {

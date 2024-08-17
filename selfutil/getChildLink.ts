@@ -14,7 +14,7 @@ export function getChildlinkItems(app: App, file : TFile): LinkType[] {
         if (i != file.path) {
           const key = backlinksData[i][j]['key']
           if (key) {
-            childLinkResult.push({path: i, type: "v ", index: index, line: 0, ch: 0})  
+            childLinkResult.push({path: i, type: "v ", index: index, heading: "", line: 0, ch: 0})  
           }
         }
       }
