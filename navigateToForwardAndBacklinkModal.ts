@@ -311,8 +311,40 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
               return Promise.reject(errorReason)
           }
           editor.setCursor({line: line, ch: ch})
+          const ch2 = editor.getLine(line).length
+          if (ch != 0)
+          {
+            editor.setSelection({line: line, ch: 0}, {line: line, ch: ch2})
+          }
           editor.scrollIntoView({from: {line: line, ch: ch}, to: {line: line, ch: ch}}, true)
           //editor.markText({line: line, ch: ch}, {line: line + 1, ch: ch + 3}, {className: "my-highlight"})
+
+          // POC testing highlight the line if selected, but failed
+          /*
+          const lineContent = editor.getLine(line);
+          const lineElements = document.querySelectorAll('.CodeMirror-line');
+          let lineElement: HTMLElement | null = null;
+
+          lineElements.forEach((el) => {
+              console.log(el)
+              if (el.textContent === lineContent) {
+                  lineElement = el as HTMLElement;
+                  // Add the "is-flashing" class to the line element
+                  lineElement.classList.add('is-flashing');
+
+                  // Remove the highlight when clicking elsewhere
+                  const removeHighlight = (event: MouseEvent) => {
+                      if (lineElement != null && !lineElement.contains(event.target as Node)) {
+                          lineElement.classList.remove('is-flashing');
+                          document.removeEventListener('click', removeHighlight);
+                      }
+                  };
+                  document.addEventListener('click', removeHighlight);
+              }
+          });
+          */
+         
+          // finish test
           return Promise.resolve()
       })
       .catch((reason) => { 
