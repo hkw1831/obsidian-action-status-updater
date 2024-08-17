@@ -1610,7 +1610,7 @@ this.addCommand({
 			  
 					let tFile = vault.getAbstractFileByPath(path);
 					if (tFile == null) {
-					  tFile = await vault.create(path, lineToAdd);
+					  tFile = await vault.create(path, "---\ntags: b/n/j\n---\n\n" + lineToAdd);
 					} else {
 					  const tFileOriginalValue = await vault.read(tFile as TFile);
 					  await vault.modify(tFile as TFile, tFileOriginalValue + "\n" + lineToAdd);
