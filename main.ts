@@ -104,7 +104,6 @@ export default class MyPlugin extends Plugin {
 		//this.activateNoteListView();
 		this.app.metadataCache.on("changed", async (file) => {
 			if (this.notesTypeView) {
-				console.log("redrawing")
 				this.notesTypeView.redraw();
 			}
 		})
