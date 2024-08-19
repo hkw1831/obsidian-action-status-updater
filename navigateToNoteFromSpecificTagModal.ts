@@ -81,13 +81,14 @@ async getSuggestions(query: string): Promise<NoteWithHeader[]> {
         const fileLines = content.split('\n');
         for (const tag of fileCache.tags) {
           if (tag.tag === this.tagToFind) {
+            const heading = this.getHeadingForLine(fileCache, tag.position.start.line);
             const lineContent = fileLines[tag.position.start.line].trim();
             if ((filePath + lineContent).toLowerCase().includes(query.toLowerCase()))
             // if (this.fuzzyMatch((filePath + lineContent).toLowerCase(), query.toLowerCase()))
             {
               lines.push({
                 notePath: filePath,
-                header: lineContent,
+                header: (heading ? heading + "\n     " : "") + lineContent,
                 startLine: tag.position.start.line,
                 noteType: null
               });
@@ -127,6 +128,26 @@ async getSuggestions(query: string): Promise<NoteWithHeader[]> {
     { notePath: SEPARATOR, header: "", startLine: 0, noteType: null },
     ...headers
   ]
+}
+
+
+getHeadingForLine(fileCache: CachedMetadata, lineNumber: number): string {
+  if (!fileCache || !fileCache.headings) {
+    return "";
+  }
+
+  const headings = fileCache.headings;
+  let currentHeading = "";
+
+  for (const heading of headings) {
+    if (heading.position.start.line <= lineNumber) {
+      currentHeading = "# " + heading.heading;
+    } else {
+      break;
+    }
+  }
+
+  return currentHeading;
 }
 
 fuzzyMatch(str: string, pattern: string): boolean {
