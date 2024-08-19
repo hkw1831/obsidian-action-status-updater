@@ -1,13 +1,14 @@
 import { NavigateToNoteFromTagModal } from "navigateToNoteFromTagModal"
-import { App, FuzzySuggestModal, FuzzyMatch, Notice, CachedMetadata, parseFrontMatterTags, parseFrontMatterAliases, TFile, MarkdownView } from "obsidian"
+import { App, FuzzySuggestModal, FuzzyMatch, Notice, CachedMetadata, parseFrontMatterTags, parseFrontMatterAliases, TFile, MarkdownView, SuggestModal } from "obsidian"
 import { filesWhereTagIsUsed } from "selfutil/findNotesFromTag"
 import { getNoteType } from "selfutil/getTaskTag"
 import { NoteWithHeader, SEPARATOR } from "selfutil/noteWithHeader"
 
+
 const BACK_TO_SELECT_TAG = "Back to select tag"
 const OPEN_IN_SEARCH_MODE = "Open in search mode"
 
-export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<NoteWithHeader> {
+export class NavigateToNoteFromSpecificTagModal extends SuggestModal<NoteWithHeader> {
 
   tagToFind: string
   keydownHandler: (event: KeyboardEvent) => void;
@@ -60,39 +61,88 @@ export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<NoteWi
     // Stop listening for keydown events when the modal is closed
     document.removeEventListener('keydown', this.keydownHandler);
   }
+async getSuggestions(query: string): Promise<NoteWithHeader[]> {
+  const filePaths: string[] = filesWhereTagIsUsed(this.tagToFind);
+  const headers: NoteWithHeader[] = [];
+  const lines: NoteWithHeader[] = [];
 
+  const isActionTag = !/^#[a-z]\/[a-z]\/[a-z]$/.test(this.tagToFind)
+  && !/^#[a-z]\/[a-z]$/.test(this.tagToFind)
+  && !/^#[a-z]$/.test(this.tagToFind)
 
-  getItems(): NoteWithHeader[] {
-    const filePaths : string[] = filesWhereTagIsUsed(this.tagToFind)
-    const headers : NoteWithHeader[] = []
-    filePaths.forEach(n => {
-      const file = this.app.vault.getAbstractFileByPath(n) as TFile
-      const fileCache = this.app.metadataCache.getFileCache(file)
-      if (!fileCache) {
-        return
+  const readPromises = filePaths.map(async (filePath) => {
+    const file = this.app.vault.getAbstractFileByPath(filePath) as TFile;
+    const fileCache = this.app.metadataCache.getFileCache(file);
+    if (!fileCache) return;
+
+    if (isActionTag) {
+      if (fileCache.tags) {
+        const content = await this.app.vault.read(file);
+        const fileLines = content.split('\n');
+        for (const tag of fileCache.tags) {
+          if (tag.tag === this.tagToFind) {
+            const lineContent = fileLines[tag.position.start.line].trim();
+            if ((filePath + lineContent).toLowerCase().includes(query.toLowerCase()))
+            // if (this.fuzzyMatch((filePath + lineContent).toLowerCase(), query.toLowerCase()))
+            {
+              lines.push({
+                notePath: filePath,
+                header: lineContent,
+                startLine: tag.position.start.line,
+                noteType: null
+              });
+            }
+          }
+        }
       }
-      if (!fileCache.headings) {
-        return
+    } else {
+      if (fileCache.headings) {
+        fileCache.headings.forEach(h => {
+          headers.push({
+            notePath: filePath,
+            header: "#" + h.heading,
+            startLine: h.position.start.line,
+            noteType: null
+          });
+        });
       }
-      fileCache.headings.forEach(h => {
-        headers.push({notePath: n, header: "#" + h.heading, startLine: h.position.start.line, noteType: null})
-      })
-    })
-    return [...[{notePath: BACK_TO_SELECT_TAG, header: "", startLine: 0, noteType: null}],
-            ...[{notePath: OPEN_IN_SEARCH_MODE, header: "", startLine: 0, noteType: null}],
-            ...filePaths.map(f => { return {notePath: f, header: "", startLine: 0, noteType: getNoteType(f)} }),
-            ...[{notePath: SEPARATOR, header: "", startLine: 0, noteType: null }],
-            ...headers
-          ];
+    }
+  });
+
+  await Promise.all(readPromises);
+
+  if (isActionTag) {
+    return [
+      { notePath: BACK_TO_SELECT_TAG, header: "", startLine: 0, noteType: null },
+      { notePath: OPEN_IN_SEARCH_MODE, header: "", startLine: 0, noteType: null },
+      ...lines
+    ];
   }
+
+  return [
+    { notePath: BACK_TO_SELECT_TAG, header: "", startLine: 0, noteType: null },
+    { notePath: OPEN_IN_SEARCH_MODE, header: "", startLine: 0, noteType: null },
+    ...filePaths.filter(f => f.toLowerCase().includes(query.toLowerCase())).map(f => ({ notePath: f, header: "", startLine: 0, noteType: getNoteType(f) })),
+    //    ...filePaths.filter(f => this.fuzzyMatch(f.toLowerCase(), query.toLowerCase())).map(f => ({ notePath: f, header: "", startLine: 0, noteType: getNoteType(f) })),
+    { notePath: SEPARATOR, header: "", startLine: 0, noteType: null },
+    ...headers
+  ]
+}
+
+fuzzyMatch(str: string, pattern: string): boolean {
+  if (!pattern) return true;
+  pattern = pattern.split('').reduce((a, b) => `${a}.*${b}`);
+  return new RegExp(pattern).test(str);
+}
 
   getItemText(path: NoteWithHeader): string {
     return path.notePath + path.header;
   }
 
   // Renders each suggestion item.
-  renderSuggestion(path: FuzzyMatch<NoteWithHeader>, el: HTMLElement) {
-    const item: NoteWithHeader = path.item
+  //renderSuggestion(path: FuzzyMatch<NoteWithHeader>, el: HTMLElement) {
+    renderSuggestion(item: NoteWithHeader, el: HTMLElement) {
+    //const item: NoteWithHeader = path.item
     const pathItem: string = item.notePath
     let prefix = item.noteType ? (item.noteType.prefix ? item.noteType.prefix + " " : "") : ""
     /*
@@ -105,13 +155,16 @@ export class NavigateToNoteFromSpecificTagModal extends FuzzySuggestModal<NoteWi
     const index = this.resultContainerEl.querySelectorAll('.suggestion-item').length;
     const itemIndex = index < 10 ? index + ". " : "    "
     el.createEl("div", { text: itemIndex + prefix + pathItem });
-    if (path.item.header.length > 0) {
+    //if (path.item.header.length > 0) {
+    if (item.header.length > 0) {
       el.createEl("small", { text: "     " + item.header})
     }
   }
 
+  onChooseSuggestion(path: NoteWithHeader, evt: MouseEvent | KeyboardEvent) {
+    
   // Perform action on the selected suggestion.
-  onChooseItem(path: NoteWithHeader, evt: MouseEvent | KeyboardEvent) {
+  //onChooseItem(path: NoteWithHeader, evt: MouseEvent | KeyboardEvent) {
     if (BACK_TO_SELECT_TAG === path.notePath) {
       new NavigateToNoteFromTagModal(this.app).open()
     } else if (OPEN_IN_SEARCH_MODE === path.notePath) {
