@@ -236,6 +236,11 @@ export const ALL_TYPES = [
       prefix: "🟣",
     },
     {
+      type: "a/n/o",
+      description: "N Others' Task",
+      prefix: "🟤",
+    },
+    {
       type: "a/w/w",
       description: "W Waiting Task",
       prefix: "🔵",
@@ -249,6 +254,11 @@ export const ALL_TYPES = [
       type: "a/w/a",
       description: "W Archive Task",
       prefix: "🟣",
+    },
+    {
+      type: "a/w/o",
+      description: "W Others' Task",
+      prefix: "🟤",
     },
 ];
 
