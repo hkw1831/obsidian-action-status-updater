@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf, TFile, Keymap, PaneType, Notice, Menu, MarkdownView } from 'obsidian';
+import { ItemView, WorkspaceLeaf, TFile, Keymap, PaneType, Notice, Menu, MarkdownView, CachedMetadata } from 'obsidian';
 import { filesWhereTagIsUsed } from 'selfutil/findNotesFromTag';
 import { getNoteType } from 'selfutil/getTaskTag';
 
@@ -60,9 +60,33 @@ class NotesTypeView extends ItemView {
       let noteType = getNoteType(f.path)
       let prefix = noteType ? noteType.prefix + " " : ""
 
+      const isActionTag = !/^#[a-z]\/[a-z]\/[a-z]$/.test(this.notesTypeTag)
+      && !/^#[a-z]\/[a-z]$/.test(this.notesTypeTag)
+      && !/^#[a-z]$/.test(this.notesTypeTag)
+
+      let lineInfo: LineInfo[] = []
+
+      if (isActionTag) {
+        const fileCache = this.app.metadataCache.getFileCache(f);
+        if (fileCache && fileCache.tags) {
+          const content = await this.app.vault.read(f);
+          const fileLines = content.split('\n');
+          for (const tag of fileCache.tags) {
+            if (tag.tag === this.notesTypeTag) {
+              const heading = this.getHeadingForLine(fileCache, tag.position.start.line);
+              const lineContent = fileLines[tag.position.start.line].trim();
+              lineInfo.push({
+                content: heading + (heading.length != 0 ? "\n" : "" ) + lineContent,
+                line: tag.position.start.line
+              });
+            }
+          }
+        }
+      }
+
       return {
         title: prefix + f.basename,
-        lineInfo: [],
+        lineInfo: lineInfo,
         file: f
       };
     }))
@@ -76,10 +100,9 @@ class NotesTypeView extends ItemView {
         cls: 'tree-item-self is-clickable nav-file-title recent-files-title',
       });
       const navFileTitleContent = navFileTitle.createDiv({
-        cls: 'tree-item-inner nav-file-title-content recent-files-title-content internal-link',
+        cls: 'tree-item-inner nav-file-title-content recent-files-title-content internal-link self-wrap-content',
       });
 
-      
       navFileTitleContent.setText(data.title);
 
       navFileTitle.addEventListener('mouseover', (event: MouseEvent) => {
@@ -123,6 +146,66 @@ class NotesTypeView extends ItemView {
         const newLeaf = Keymap.isModEvent(event)
         this.focusFileAtLine(data.file, newLeaf, 0);
       });
+
+      // =============
+
+      for (const lineInfo of data.lineInfo) {
+        const navFileLine = navFile.createDiv({
+          //cls: 'tree-item nav-file recent-files-file',
+          cls: 'tree-item-self is-clickable nav-file-title recent-files-title',
+        });
+        const navFileLineContent = navFileLine.createDiv({
+          cls: 'tree-item-inner nav-file-title-content recent-files-title-content internal-link self-wrap-content self-padding-left-10',
+        });
+
+        navFileLineContent.setText(lineInfo.content);
+
+        navFileLine.addEventListener('mouseover', (event: MouseEvent) => {
+          if (!data.file?.path) return;
+
+          this.app.workspace.trigger('hover-link', {
+            event,
+            source: VIEW_TYPE_NOTE_LIST,
+            hoverParent: rootEl,
+            targetEl: navFileLine,
+            linktext: data.file.path,
+          });
+        });
+
+        navFileLine.addEventListener('contextmenu', (event: MouseEvent) => {
+          if (!data.file?.path) return;
+
+          const menu = new Menu();
+          menu.addItem((item) =>
+            item
+              .setSection('action')
+              .setTitle('Open in new tab')
+              .setIcon('file-plus')
+              .onClick(() => {
+                this.focusFileAtLine(data.file, 'tab', lineInfo.line);
+              })
+          );
+          const file = this.app.vault.getAbstractFileByPath(data.file?.path);
+          this.app.workspace.trigger(
+            'file-menu',
+            menu,
+            file,
+            'link-context-menu',
+          );
+          menu.showAtPosition({ x: event.clientX, y: event.clientY });
+        });
+
+        navFileLine.addEventListener('click', (event: MouseEvent) => {
+          if (!data) return;
+
+          const newLeaf = Keymap.isModEvent(event)
+          this.focusFileAtLine(data.file, newLeaf, lineInfo.line);
+        });
+      }
+
+
+      // =================
+
     });
     
   }
@@ -142,12 +225,37 @@ class NotesTypeView extends ItemView {
         const view = this.app.workspace.getActiveViewOfType(MarkdownView);
         if (view) {
           view.editor.setCursor({ line: line, ch: 0 });
+          view.editor.scrollIntoView({from: {line: line, ch: 0}, to: {line: line, ch: 0}}, true)
+          if (line != 0) {
+            const ch = view.editor.getLine(line).length;
+            view.editor.setSelection({line: line, ch: 0}, {line: line, ch: ch});
+          }
         }
       });
     } else {
       new Notice('Cannot find a file with that name');
     }
   };
+
+
+getHeadingForLine(fileCache: CachedMetadata, lineNumber: number): string {
+  if (!fileCache || !fileCache.headings) {
+    return "";
+  }
+
+  const headings = fileCache.headings;
+  let currentHeading = "";
+
+  for (const heading of headings) {
+    if (heading.position.start.line <= lineNumber) {
+      currentHeading = "# " + heading.heading;
+    } else {
+      break;
+    }
+  }
+
+  return currentHeading;
+}
 }
 
 export { NotesTypeView, VIEW_TYPE_NOTE_LIST };

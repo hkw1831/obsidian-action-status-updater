@@ -3529,7 +3529,6 @@ this.addCommand({
 			name: `To w${t} or n${t}`,
 			icon: `${t}-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				console.log(editor.getSelection());
 				const cursor = editor.getCursor();
 				const lineNumber = editor.getCursor().line;
 				const line = editor.getLine(lineNumber);
