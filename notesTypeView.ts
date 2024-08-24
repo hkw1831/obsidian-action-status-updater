@@ -40,34 +40,13 @@ class NotesTypeView extends ItemView {
     }
     
     this.containerEl.createDiv({ cls: 'nav-header', text: "Tags: " + this.notesTypeTag });
-    /*
-    const button = this.containerEl.createEl('button', {
-        text:'[Refresh]',
-        cls: 'redraw-button'
-      });
-  
-      button.onclick = () => {
-        this.redraw();
-      };
-*/
+
     const rootEl = this.containerEl.createDiv({ cls: 'nav-folder mod-root scrollable' });
     const childrenEl = rootEl.createDiv({ cls: 'nav-folder-children' });
 
-    //const files = this.app.vault.getMarkdownFiles().filter((file) => {file.basename.startsWith("Threads")});
     const files : TFile[] = filesWhereTagIsUsed(this.notesTypeTag).map(filePath => this.app.vault.getAbstractFileByPath(filePath) as TFile)
-    //const headers : NoteWithHeader[] = []
-    //filePaths.forEach(n => {
-    //  const file = this.app.vault.getAbstractFileByPath(n) as TFile
-    //console.log(files.length)
+
     files.forEach(currentFile => {
-        //console.log(currentFile.basename);
-      //const link = this.containerEl.createEl('a', { text: currentFile.basename });
-      //link.href = `#${currentFile.path}`;
-      //link.onclick = (e) => {
-      //  e.preventDefault();
-      //  this.app.workspace.openLinkText(currentFile.path, currentFile.path, true);
-      //};
-      //this.containerEl.createEl('div', { cls: 'note-item' }).appendChild(link);
 
       const navFile = childrenEl.createDiv({
         cls: 'tree-item nav-file recent-files-file',
@@ -82,26 +61,6 @@ class NotesTypeView extends ItemView {
       let noteType = getNoteType(currentFile.path)
       let prefix = noteType ? noteType.prefix + " " : ""
       navFileTitleContent.setText(prefix + currentFile.basename);
-
-      //if (openFile && currentFile.path === openFile.path) {
-      //  navFileTitle.addClass('is-active');
-     // }
-/*
-      navFileTitle.setAttr('draggable', 'true');
-      navFileTitle.addEventListener('dragstart', (event: DragEvent) => {
-        if (!currentFile?.path) return;
-
-        const file = this.app.metadataCache.getFirstLinkpathDest(
-          currentFile.path,
-          '',
-        );
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const dragManager = (this.app as any).dragManager;
-        const dragData = dragManager.dragFile(event, file);
-        dragManager.onDragStart(event, dragData);
-      });
-*/
 
       navFileTitle.addEventListener('mouseover', (event: MouseEvent) => {
         if (!currentFile?.path) return;
@@ -145,34 +104,7 @@ class NotesTypeView extends ItemView {
         const newLeaf = Keymap.isModEvent(event)
         this.focusFile(currentFile, newLeaf);
       });
-/*
-      navFileTitleContent.addEventListener('mousedown', (event: MouseEvent) => {
-        if (!currentFile) return;
-
-        if (event.button === 1) {
-          event.preventDefault();
-          this.focusFile(currentFile, 'tab');
-        }
-      });
-*/
-/*
-      const navFileDelete = navFileTitle.createDiv({
-        cls: 'recent-files-file-delete menu-item-icon',
-      });
-      setIcon(navFileDelete, 'lucide-x');
-
-      navFileDelete.addEventListener('click', async (event) => {
-        event.stopPropagation();
-
-        await this.removeFile(currentFile);
-        this.redraw();
-      });
-      */
-     
     });
-
-    // this.contentEl.setChildrenInPlace([rootEl]);
-     //this.containerEl.setChildrenInPlace([rootEl]);
     
   }
 
@@ -190,13 +122,6 @@ class NotesTypeView extends ItemView {
       leaf.openFile(targetFile);
     } else {
       new Notice('Cannot find a file with that name');
-      /*
-      this.data.recentFiles = this.data.recentFiles.filter(
-        (fp) => fp.path !== file.path,
-      );
-      this.plugin.saveData();
-      this.redraw();
-      */
     }
   };
 }
