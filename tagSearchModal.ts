@@ -53,7 +53,7 @@ export class TagSearchModal extends FuzzySuggestModal<string> {
 		return item;
 	}
 
-	onChooseItem(item: string, evt: MouseEvent | KeyboardEvent): void {
+	async onChooseItem(item: string, evt: MouseEvent | KeyboardEvent): void {
 		if (/^#[a-z]$/.test(item) || /^#[a-z]\/[a-z]$/.test(item) || /^#[a-z]\/[a-z]\/[a-z]$/.test(item)) {
 			// note type tag
 			this.plugin.notesTypeView.notesTypeTag = item;

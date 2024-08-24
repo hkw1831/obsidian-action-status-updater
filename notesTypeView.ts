@@ -1,9 +1,19 @@
-import { ItemView, WorkspaceLeaf, TFile, Keymap, PaneType, Notice, Menu } from 'obsidian';
+import { ItemView, WorkspaceLeaf, TFile, Keymap, PaneType, Notice, Menu, MarkdownView } from 'obsidian';
 import { filesWhereTagIsUsed } from 'selfutil/findNotesFromTag';
 import { getNoteType } from 'selfutil/getTaskTag';
 
 const VIEW_TYPE_NOTE_LIST = 'note-list-view';
 
+interface NotesTypeViewData {
+  title: string;
+  lineInfo: LineInfo[];
+  file: TFile;
+}
+
+interface LineInfo {
+  content: string;
+  line: number;
+}
 
 class NotesTypeView extends ItemView {
   public notesTypeTag: string
@@ -28,7 +38,7 @@ class NotesTypeView extends ItemView {
     return 'hash';
   }
 
-  public readonly redraw = (): void => {
+  public readonly redraw = async (): Promise<void> => {
     //console.log("redraw()")
     //const tag = "#c/t/p"
     
@@ -46,7 +56,18 @@ class NotesTypeView extends ItemView {
 
     const files : TFile[] = filesWhereTagIsUsed(this.notesTypeTag).map(filePath => this.app.vault.getAbstractFileByPath(filePath) as TFile)
 
-    files.forEach(currentFile => {
+    const noteDatas: NotesTypeViewData[] = await Promise.all(files.map(async (f) => {
+      let noteType = getNoteType(f.path)
+      let prefix = noteType ? noteType.prefix + " " : ""
+
+      return {
+        title: prefix + f.basename,
+        lineInfo: [],
+        file: f
+      };
+    }))
+
+    noteDatas.forEach(data => {
 
       const navFile = childrenEl.createDiv({
         cls: 'tree-item nav-file recent-files-file',
@@ -58,25 +79,23 @@ class NotesTypeView extends ItemView {
         cls: 'tree-item-inner nav-file-title-content recent-files-title-content internal-link',
       });
 
-      let noteType = getNoteType(currentFile.path)
-      let prefix = noteType ? noteType.prefix + " " : ""
-      navFileTitleContent.setText(prefix + currentFile.basename);
+      
+      navFileTitleContent.setText(data.title);
 
       navFileTitle.addEventListener('mouseover', (event: MouseEvent) => {
-        if (!currentFile?.path) return;
+        if (!data.file?.path) return;
 
         this.app.workspace.trigger('hover-link', {
           event,
           source: VIEW_TYPE_NOTE_LIST,
           hoverParent: rootEl,
           targetEl: navFile,
-          linktext: currentFile.path,
+          linktext: data.file.path,
         });
       });
-      
 
       navFileTitle.addEventListener('contextmenu', (event: MouseEvent) => {
-        if (!currentFile?.path) return;
+        if (!data.file?.path) return;
 
         const menu = new Menu();
         menu.addItem((item) =>
@@ -85,10 +104,10 @@ class NotesTypeView extends ItemView {
             .setTitle('Open in new tab')
             .setIcon('file-plus')
             .onClick(() => {
-              this.focusFile(currentFile, 'tab');
+              this.focusFileAtLine(data.file, 'tab', 0);
             })
         );
-        const file = this.app.vault.getAbstractFileByPath(currentFile?.path);
+        const file = this.app.vault.getAbstractFileByPath(data.file?.path);
         this.app.workspace.trigger(
           'file-menu',
           menu,
@@ -99,10 +118,10 @@ class NotesTypeView extends ItemView {
       });
 
       navFileTitle.addEventListener('click', (event: MouseEvent) => {
-        if (!currentFile) return;
+        if (!data) return;
 
         const newLeaf = Keymap.isModEvent(event)
-        this.focusFile(currentFile, newLeaf);
+        this.focusFileAtLine(data.file, newLeaf, 0);
       });
     });
     
@@ -112,14 +131,19 @@ class NotesTypeView extends ItemView {
     // Cleanup if necessary
   }
 
-  private readonly focusFile = (file: TFile, newLeaf: boolean | PaneType): void => {
+  private readonly focusFileAtLine = (file: TFile, newLeaf: boolean | PaneType, line: number): void => {
     const targetFile = this.app.vault
       .getFiles()
       .find((f) => f.path === file.path);
 
     if (targetFile) {
       const leaf = this.app.workspace.getLeaf(newLeaf);
-      leaf.openFile(targetFile);
+      leaf.openFile(targetFile).then(() => {
+        const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+        if (view) {
+          view.editor.setCursor({ line: line, ch: 0 });
+        }
+      });
     } else {
       new Notice('Cannot find a file with that name');
     }
