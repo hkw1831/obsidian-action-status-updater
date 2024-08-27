@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf, TFile, Keymap, PaneType, Notice, Menu, MarkdownView, CachedMetadata } from 'obsidian';
+import { ItemView, WorkspaceLeaf, TFile, Keymap, PaneType, Notice, Menu, MarkdownView, CachedMetadata, Platform } from 'obsidian';
 import { filesWhereTagIsUsed } from 'selfutil/findNotesFromTag';
 import { getNoteType } from 'selfutil/getTaskTag';
 import * as os from 'os';
@@ -213,7 +213,7 @@ class NotesTypeView extends ItemView {
   }
 
   isWindows() {
-    return os.platform() === 'win32';
+    return !Platform.isAndroidApp && !Platform.isIosApp && !Platform.isMacOS && !Platform.isSafari
   }
 
   async onClose() {
