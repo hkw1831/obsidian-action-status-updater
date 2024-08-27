@@ -3,11 +3,16 @@ import { filesWhereTagIsUsed } from "selfutil/findNotesFromTag";
 import { getNoteType } from "selfutil/getTaskTag";
 import { LinkType } from "selfutil/linkType";
 
+interface PathWithContent {
+  path: string;
+  content : string;
+}
+
 export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType> {
 
   view: MarkdownView
   editor: Editor
-  items: LinkType[]
+  //items: LinkType[]
 
   keydownHandler: (event: KeyboardEvent) => void;
 
@@ -23,7 +28,6 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
         purpose: `Which link do you want to navigate to?`
       }
     ]);
-    this.items = this.prepareItems()
 
     this.keydownHandler = (event: KeyboardEvent) => {
       //console.log("ctrl " + event.ctrlKey)
@@ -97,8 +101,8 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     return currentHeading;
   }
 
-  getLinkItems(): LinkType[] {
-    const forwardLinkItems = this.getForwardlinkItems()
+  async getLinkItems(): Promise<LinkType[]> {
+    const forwardLinkItems = await this.getForwardlinkItems()
     let backLinkItems = []
     let childLinkItems = []
     let parentLinkItems = []
@@ -122,8 +126,14 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
               //console.log(position['start']['line'])
               const line = position['start']['line']
               const heading = this.getHeadingForLine(i, line)
-              //console.log(heading)
-              backLinkItems.push({path: i, type: "< ", index: index, heading: heading, line: backlinksData[i][j]['position']['start']['line'], ch: backlinksData[i][j]['position']['start']['col']})
+              const backlinkLineFile = this.app.vault.getAbstractFileByPath(i)
+              const backlinkLineFiles = backlinkLineFile ? await this.app.vault.read(backlinkLineFile as TFile) : ""
+              const backlinkLineFiles2 = backlinkLineFiles.split("\n")
+              const backlinkLine = backlinkLineFiles2[line].trim()
+              const backlinkLine2 = backlinkLine.replace(/^- /, "").replace(/^\d+\. /, "")
+              const backlinkLine3 = backlinkLine2 === backlinksData[i][j]['original'] ? "" : backlinkLine2
+              const aaa = this.getBacklinkHeading(heading, backlinkLine3);
+              backLinkItems.push({path: i, type: "< ", index: index, heading: aaa, line: backlinksData[i][j]['position']['start']['line'], ch: backlinksData[i][j]['position']['start']['col']})
             }
           }
         }
@@ -157,18 +167,59 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     return [...childLinkItems, ...parentLinkItems, ...backLinkItems, ...forwardLinkItems]
   }
 
-  getForwardlinkItems(): LinkType[] {
+  getBacklinkHeading(heading : string, line : string) {
+    if (heading !== "" && line !== "") {
+      return heading + "\n" + line
+    } else if (heading !== "" && line === "") {
+      return heading
+    } else if (heading === "" && line !== "") {
+      return line
+    } else {
+      return ""
+    }
+  }
+
+  async getForwardlinkItems(): Promise<LinkType[]> {
     const forwardlinks = this.app.metadataCache.getFileCache(this.view.file)?.links
 
+    if (!forwardlinks) {
+      return [];
+    }
+
+    const fileContent = this.view.file ? await this.app.vault.read(this.view.file) : "";
+    const lineContents = fileContent === "" ? [] : fileContent.split("\n")
+
+    const paths : PathWithContent[] = forwardlinks.map((link) => {
+      const linkedFile = this.app.metadataCache.getFirstLinkpathDest(link.link, this.view.file.path);
+      const tf = linkedFile ? this.app.vault.getAbstractFileByPath(linkedFile.path) : null;
+      //return {path: tf ? tf.path : "", content: ""};
+      // below works, just slow
+      
+      const lineContent = lineContents.length != 0 ? lineContents[link.position.start.line].trim() : "";
+      const content = lineContent.replace(/^- /, "").replace(/^\d+\. /, "") === link.original ? "" : lineContent;
+      return {path: tf ? tf.path : "", content: content};
+  });
+
+  return paths.filter(pc => pc.path !== "").map(pc => {
+      return {path: pc.path, type: "> ", index: "", heading: pc.content, line: 0, ch: 0};
+  });
+
+  /*
     // then resolve the path by the link name
-    return (forwardlinks ? forwardlinks.map(link => {
+    return (forwardlinks ? forwardlinks.map(async link => {
+      console.log(link.link)
+      console.log(link.displayText)
+      console.log(link.original)
+      console.log(link.position)
       const linkedFile = this.app.metadataCache.getFirstLinkpathDest(link.link, this.view.file.path);
       const tf = linkedFile ? this.app.vault.getAbstractFileByPath(linkedFile.path) : null
+      const content = linkedFile ? await this.app.vault.read(linkedFile) : "";
       return tf ? tf.path : ""
     }).filter(path => path !== "")
        : []).map(p => {
           return {path: p, type: "> ", index: "", heading: "", line: 0, ch: 0}
        })
+       */
   }
 
   getSameTagItems(): LinkType[] {
@@ -245,21 +296,28 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     ]
   }
 
+  /*
   getItems(): LinkType[] {
     return this.items
   }
+*/
+async prepareItems(): Promise<LinkType[]> {
+  const linkItems = await this.getLinkItems();
+  const sameTagItems = await this.getSameTagItems();
+  const contentItems = await this.getContentItems();
 
-  prepareItems(): LinkType[] {
-    return [...this.getLinkItems(),
-      ...[{path: "------------------", type: "", index: "", heading: "", line: 0, ch: 0}],
-      ...this.getSameTagItems(),
-      ...[{path: "------------------", type: "", index: "", heading: "", line: 0, ch: 0}],
-      ...this.getContentItems(),      
-    ]
-  }
+  return [
+      ...linkItems,
+      {path: "------------------", type: "", index: "", heading: "", line: 0, ch: 0},
+      ...sameTagItems,
+      {path: "------------------", type: "", index: "", heading: "", line: 0, ch: 0},
+      ...contentItems,
+  ];
+}
 
-  getSuggestions(query: string): LinkType[] | Promise<LinkType[]> {
-    return this.items.filter((i) => {
+  async getSuggestions(query: string): Promise<LinkType[]> {
+    const items = await this.prepareItems()
+    return items.filter((i) => {
       const lowerQuery = query.toLowerCase()
       return new RegExp(lowerQuery).test((i.type + i.path).toLowerCase())
     });
@@ -276,7 +334,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     const itemIndex = index < 10 ? index + ". " : "    "
     el.createEl("div", { text: itemIndex + ll.type + this.getTaskTag(ll.type, ll.path) + ll.path + ll.index});
     if (ll.heading !== "") {
-      el.createEl("small", { text: "               " + ll.heading });
+      el.createEl("small", { text: ll.heading, cls: 'self-padding-left-55' });
     }
   }
 
