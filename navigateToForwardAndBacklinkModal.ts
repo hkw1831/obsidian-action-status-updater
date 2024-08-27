@@ -167,17 +167,19 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     if (!forwardlinks) {
       return [];
     }
+    const fileContent = this.view.file ? await this.app.vault.read(this.view.file) : "";
+    const lineContents = fileContent === "" ? [] : fileContent.split("\n")
 
-    const paths : PathWithContent[] = await Promise.all(forwardlinks.map(async (link) => {
+    const paths : PathWithContent[] = forwardlinks.map((link) => {
       const linkedFile = this.app.metadataCache.getFirstLinkpathDest(link.link, this.view.file.path);
       const tf = linkedFile ? this.app.vault.getAbstractFileByPath(linkedFile.path) : null;
-      return {path: tf ? tf.path : "", content: ""};
+      //return {path: tf ? tf.path : "", content: ""};
       // below works, just slow
-      //const fileContent = this.view.file ? await this.app.vault.read(this.view.file) : "";
-      //const lineContent = fileContent === "" ? "" : fileContent.split("\n")[link.position.start.line].trim();
-      //const content = lineContent.trim().replace(/^- /, "").replace(/^\d+\. /, "") === link.original.trim() ? "" : lineContent;
-      //return {path: tf ? tf.path : "", content: content};
-  }));
+      
+      const lineContent = lineContents.length != 0 ? lineContents[link.position.start.line].trim() : "";
+      const content = lineContent.trim().replace(/^- /, "").replace(/^\d+\. /, "") === link.original.trim() ? "" : lineContent;
+      return {path: tf ? tf.path : "", content: content};
+  });
 
   return paths.filter(pc => pc.path !== "").map(pc => {
       return {path: pc.path, type: "> ", index: "", heading: pc.content, line: 0, ch: 0};
