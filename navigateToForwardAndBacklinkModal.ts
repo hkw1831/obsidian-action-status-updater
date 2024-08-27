@@ -167,6 +167,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     if (!forwardlinks) {
       return [];
     }
+
     const fileContent = this.view.file ? await this.app.vault.read(this.view.file) : "";
     const lineContents = fileContent === "" ? [] : fileContent.split("\n")
 
@@ -177,7 +178,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
       // below works, just slow
       
       const lineContent = lineContents.length != 0 ? lineContents[link.position.start.line].trim() : "";
-      const content = lineContent.trim().replace(/^- /, "").replace(/^\d+\. /, "") === link.original.trim() ? "" : lineContent;
+      const content = lineContent.replace(/^- /, "").replace(/^\d+\. /, "") === link.original ? "" : lineContent;
       return {path: tf ? tf.path : "", content: content};
   });
 
