@@ -132,7 +132,36 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
               const backlinkLine = backlinkLineFiles2[line].trim()
               const backlinkLine2 = backlinkLine.replace(/^- /, "").replace(/^\d+\. /, "")
               const backlinkLine3 = backlinkLine2 === backlinksData[i][j]['original'] ? "" : backlinkLine2
-              const aaa = this.getBacklinkHeading(heading, backlinkLine3);
+
+              // for ZK
+              let zkContent = ""
+              const backlinkNoteType = getNoteType(i)
+              console.log(backlinkNoteType)
+              if (backlinkNoteType && backlinkNoteType.type === "b/n/z")
+              {
+                if (line - 3 >= 0) {
+                  zkContent += backlinkLineFiles2[line - 3] + "\n"
+                }
+                if (line - 2 >= 0) {
+                  zkContent += backlinkLineFiles2[line - 2] + "\n"
+                }
+                if (line - 1 >= 0) {
+                  zkContent += backlinkLineFiles2[line - 1] + "\n"
+                }
+                zkContent += backlinkLineFiles2[line] + "\n"
+                if (line + 1 < backlinkLineFiles2.length) {
+                  zkContent += backlinkLineFiles2[line + 1] + "\n"
+                }
+                if (line + 2 < backlinkLineFiles2.length) {
+                  zkContent += backlinkLineFiles2[line + 2] + "\n"
+                }
+                if (line + 3 < backlinkLineFiles2.length) {
+                  zkContent += backlinkLineFiles2[line + 3] + "\n"
+                }
+                // remove end newline character
+                zkContent = zkContent.replace(/\n$/, "")
+              }
+              const aaa = this.getBacklinkHeading(heading, backlinkLine3, zkContent);
               backLinkItems.push({path: i, type: "< ", index: index, heading: aaa, line: backlinksData[i][j]['position']['start']['line'], ch: backlinksData[i][j]['position']['start']['col']})
             }
           }
@@ -167,13 +196,21 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     return [...childLinkItems, ...parentLinkItems, ...backLinkItems, ...forwardLinkItems]
   }
 
-  getBacklinkHeading(heading : string, line : string) {
-    if (heading !== "" && line !== "") {
-      return heading + "\n" + line
-    } else if (heading !== "" && line === "") {
+  getBacklinkHeading(heading : string, line : string, zkContent : string): string {
+    if (heading !== "" && line !== "" && zkContent !== "") {
+      return heading + "\n" + line + "\n" + zkContent
+    } else if (heading !== "" && line !== "" && zkContent === "") {
+        return heading + "\n" + line
+    } else if (heading !== "" && line === "" && zkContent !== "") {
+      return heading + "\n" + zkContent
+    } else if (heading !== "" && line === "" && zkContent === "") {
       return heading
-    } else if (heading === "" && line !== "") {
+    } else if (heading === "" && line !== "" && zkContent !== "") {
+      return line + "\n" + zkContent
+    } else if (heading === "" && line !== "" && zkContent === "") {
       return line
+    } else if (zkContent !== "") {
+      return zkContent
     } else {
       return ""
     }
