@@ -126,8 +126,14 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
               //console.log(position['start']['line'])
               const line = position['start']['line']
               const heading = this.getHeadingForLine(i, line)
-              //console.log(heading)
-              backLinkItems.push({path: i, type: "< ", index: index, heading: heading, line: backlinksData[i][j]['position']['start']['line'], ch: backlinksData[i][j]['position']['start']['col']})
+              const backlinkLineFile = this.app.vault.getAbstractFileByPath(i)
+              const backlinkLineFiles = backlinkLineFile ? await this.app.vault.read(backlinkLineFile as TFile) : ""
+              const backlinkLineFiles2 = backlinkLineFiles.split("\n")
+              const backlinkLine = backlinkLineFiles2[line].trim()
+              const backlinkLine2 = backlinkLine.replace(/^- /, "").replace(/^\d+\. /, "")
+              const backlinkLine3 = backlinkLine2 === backlinksData[i][j]['original'] ? "" : backlinkLine2
+              const aaa = this.getBacklinkHeading(heading, backlinkLine3);
+              backLinkItems.push({path: i, type: "< ", index: index, heading: aaa, line: backlinksData[i][j]['position']['start']['line'], ch: backlinksData[i][j]['position']['start']['col']})
             }
           }
         }
@@ -159,6 +165,18 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
       }
     }
     return [...childLinkItems, ...parentLinkItems, ...backLinkItems, ...forwardLinkItems]
+  }
+
+  getBacklinkHeading(heading : string, line : string) {
+    if (heading !== "" && line !== "") {
+      return heading + "\n" + line
+    } else if (heading !== "" && line === "") {
+      return heading
+    } else if (heading === "" && line !== "") {
+      return line
+    } else {
+      return ""
+    }
   }
 
   async getForwardlinkItems(): Promise<LinkType[]> {
@@ -316,7 +334,7 @@ async prepareItems(): Promise<LinkType[]> {
     const itemIndex = index < 10 ? index + ". " : "    "
     el.createEl("div", { text: itemIndex + ll.type + this.getTaskTag(ll.type, ll.path) + ll.path + ll.index});
     if (ll.heading !== "") {
-      el.createEl("small", { text: "               " + ll.heading });
+      el.createEl("small", { text: ll.heading, cls: 'self-padding-left-55' });
     }
   }
 
