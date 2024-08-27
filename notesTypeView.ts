@@ -1,6 +1,7 @@
 import { ItemView, WorkspaceLeaf, TFile, Keymap, PaneType, Notice, Menu, MarkdownView, CachedMetadata } from 'obsidian';
 import { filesWhereTagIsUsed } from 'selfutil/findNotesFromTag';
 import { getNoteType } from 'selfutil/getTaskTag';
+import * as os from 'os';
 
 const VIEW_TYPE_NOTE_LIST = 'note-list-view';
 
@@ -75,8 +76,9 @@ class NotesTypeView extends ItemView {
             if (tag.tag === this.notesTypeTag) {
               const heading = this.getHeadingForLine(fileCache, tag.position.start.line);
               const lineContent = fileLines[tag.position.start.line].trim();
+              const newLineIfNeeded = heading.length != 0 ? (this.isWindows() ? "\r\n" : "\n") : "" 
               lineInfo.push({
-                content: heading + (heading.length != 0 ? "\n" : "" ) + lineContent,
+                content: heading + newLineIfNeeded + lineContent, 
                 line: tag.position.start.line
               });
             }
@@ -158,7 +160,7 @@ class NotesTypeView extends ItemView {
           cls: 'tree-item-inner nav-file-title-content recent-files-title-content internal-link self-wrap-content self-padding-left-10',
         });
 
-        navFileLineContent.setText(lineInfo.content);
+        navFileLineContent.innerText = lineInfo.content;
 
         navFileLine.addEventListener('mouseover', (event: MouseEvent) => {
           if (!data.file?.path) return;
@@ -208,6 +210,10 @@ class NotesTypeView extends ItemView {
 
     });
     
+  }
+
+  isWindows() {
+    return os.platform() === 'win32';
   }
 
   async onClose() {
