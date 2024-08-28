@@ -652,6 +652,16 @@ export default class MyPlugin extends Plugin {
 				const inboxMd = "I/Inbox.md"
 				const leaf = workspace.getLeaf(false);
 				await leaf.openFile(vault.getAbstractFileByPath(inboxMd) as TFile, { active : true });
+
+				// Wait for the file to be fully loaded
+				const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+				if (view) {
+					const editor = view.editor;
+					const line = editor.lastLine();
+					const ch = editor.getLine(line).length;
+					editor.setCursor({ line: line, ch: ch }); // Move cursor to line 10, column 0
+					editor.scrollIntoView({ from: { line: line, ch: 0 }, to: { line: line, ch: 0 } }, true); // Scroll to the line
+				}
 			},
 		})
 
