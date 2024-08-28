@@ -54,18 +54,25 @@ export const ALL_TYPES = [
     },
     {
       type: "b/n/s",
-      description: "Zettelkasten - Source notes snippets from content",
+      description: "Zettelkasten - Source notes snippets from content or Reference notes (like books / video / thoughts / conversation)",
       prefix: "📨",
     },
+    /*
     {
       type: "b/n/r",
       description: "Zettelkasten - Reference notes (like books / video / thoughts / conversation)",
       prefix: "📖",
     },
+    */
     {
       type: "b/n/c",
       description: "Zettelkasten - Cards (With your own thought)",
       prefix: "🔖",
+    },
+    {
+      type: "b/n/p",
+      description: "Perspective - combine mulitple notes into a perspective e.g. solve a problem",
+      prefix: "🔍",
     },
     {
       type: "b/n/f",
