@@ -1,7 +1,6 @@
 import { ItemView, WorkspaceLeaf, TFile, Keymap, PaneType, Notice, Menu, MarkdownView, CachedMetadata, Platform } from 'obsidian';
 import { filesWhereTagIsUsed } from 'selfutil/findNotesFromTag';
 import { getNoteType } from 'selfutil/getTaskTag';
-import * as os from 'os';
 
 const VIEW_TYPE_NOTE_LIST = 'note-list-view';
 
