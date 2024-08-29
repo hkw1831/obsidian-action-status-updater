@@ -267,6 +267,31 @@ export const ALL_TYPES = [
       description: "W Others' Task",
       prefix: "🟤",
     },
+    {
+      type: "b/k/q",
+      description: "Expermential Knowledge Group - Dummy Question",
+      prefix: "0️⃣",
+    },
+    {
+      type: "b/k/d",
+      description: "Expermential Knowledge Group - Data",
+      prefix: "1️⃣",
+    },
+    {
+      type: "b/k/s",
+      description: "Expermential Knowledge Group - Subjective",
+      prefix: "2️⃣",
+    },
+    {
+      type: "b/k/p",
+      description: "Expermential Knowledge Group - Complete system to solve a Problem",
+      prefix: "3️⃣",
+    },
+    {
+      type: "b/k/c",
+      description: "Expermential Knowledge Group - Collections of Subjective / Problem",
+      prefix: "4️⃣",
+    },
 ];
 
 export function getNoteType(path:String) : NoteType | null {
