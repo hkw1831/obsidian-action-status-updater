@@ -7,6 +7,39 @@ interface FootnoteType {
 
 const ALL_TYPES = [
   {
+    type: "d/⏪",
+    description: "Idea/Task/Action Compass - Left - What are similar / supporting idea? OR Same Goal Different Task/Action?"
+  },
+  {
+    type: "d/⏩️",
+    description: "Idea/Task/Action Compass - Right - What are oppose idea? OR Same Task/Action Different Goal?"
+  },
+  {
+    type: "d/⏫",
+    description: "Idea/Task/Action Compass - Up - Where does this idea come from / Reason of this idea? OR What is the goal/prereq of this task/action?"
+  },
+  {
+    type: "d/⏬",
+    description: "Idea/Task/Action Compass - Down - Where does the idea lead to / It can solve what problem? OR What is the result/next task/action of this task/action?"
+  },
+  {
+    type: "d/⬅️",
+    description: "Previous version of this idea"
+  },
+  {
+    type: "d/➡️",
+    description: "Next version of this idea"
+  },
+  {
+    type: "d/🔄",
+    description: "Context"
+  },
+  {
+    type: "d/⏹️",
+    description: "A1 - my experience"
+  },
+  /*
+  {
     type: "d/question",
     description: "Question"
   },
@@ -31,29 +64,11 @@ const ALL_TYPES = [
     description: "Not sure"
   },
   {
-    type: "d/a1⏹️",
-    description: "A1 - my experience"
-  },
-  {
     type: "d/a2⏺️",
     description: "A2 - future action"
   },
-  {
-    type: "d/c🔄",
-    description: "Context"
-  },
-  {
-    type: "d/w⏪",
-    description: "Idea Compass - West - What are similar / supporting idea?"
-  },
-  {
-    type: "d/n⏫",
-    description: "Idea Compass - North - Where does this idea come from?"
-  },
-  {
-    type: "d/s⏬",
-    description: "Idea Compass - South - Where does the idea lead to?"
-  },
+  */
+  /*
   {
     type: "d/toMerge",
     description: "TODO - To Merge with another note"
@@ -70,16 +85,54 @@ const ALL_TYPES = [
     type: "d/toCard",
     description: "TODO - To Write card"
   },
+  */
 ];
 
 export class AddFootnoteTagModal extends FuzzySuggestModal<FootnoteType> {
 
   editor: Editor
+  keydownHandler: (event: KeyboardEvent) => void;
 
   constructor(app: App, editor: Editor)
   {
     super(app)
     this.editor = editor
+    this.keydownHandler = (event: KeyboardEvent) => {
+      //console.log("ctrl " + event.ctrlKey)
+      //console.log("alt " + event.altKey)
+      //console.log("meta " + event.metaKey)
+      //console.log("shift " + event.shiftKey)
+      //console.log("key " + event.key)
+      // Check if Ctrl + Q was pressed
+      if (event.ctrlKey && event.altKey && event.shiftKey && event.key === 'Z') { // windows
+        this.close();
+      } else if (event.ctrlKey && event.metaKey && event.shiftKey && event.key === 'Z') { // macos
+        this.close();
+      } else if (event.metaKey || event.ctrlKey) {
+        const key = parseInt(event.key, 10);
+        if (key >= 1 && key <= 9) {
+          event.preventDefault(); // Prevent default action
+          this.selectElement(key - 1); // Select the element (index key - 1)
+        }
+      }
+    };
+
+    // Listen for keydown events at the document level
+    document.addEventListener('keydown', this.keydownHandler);
+  }
+
+  selectElement(index: number) {
+    const elements = this.resultContainerEl.querySelectorAll('.suggestion-item');
+    if (elements.length > index) {
+      const element = elements[index] as HTMLElement;
+      element.click(); // Simulate a click to select the element
+    }
+  }
+
+  onClose() {
+    super.onClose();
+    // Stop listening for keydown events when the modal is closed
+    document.removeEventListener('keydown', this.keydownHandler);
   }
 
   getItems(): FootnoteType[] {
@@ -98,8 +151,10 @@ export class AddFootnoteTagModal extends FuzzySuggestModal<FootnoteType> {
   // Renders each suggestion item.
   renderSuggestion(choosenNoteTypeMatch: FuzzyMatch<FootnoteType>, el: HTMLElement) {
     const noteType = choosenNoteTypeMatch.item
-    el.createEl("div", { text: noteType.type });
-    el.createEl("small", { text: noteType.description });
+    const index = this.resultContainerEl.querySelectorAll('.suggestion-item').length;
+    const itemIndex = index < 10 ? index + ". " : "    "
+    el.createEl("div", { text: itemIndex + noteType.type });
+    el.createEl("small", { text: "     " + noteType.description });
   }
 
   containsType(line: String) : Boolean {
