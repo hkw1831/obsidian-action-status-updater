@@ -7,20 +7,20 @@ interface FootnoteType {
 
 const ALL_TYPES = [
   {
-    type: "d/⏪",
-    description: "Idea/Task/Action Compass - Left - What are similar / supporting idea? OR Same Goal Different Task/Action?"
-  },
-  {
-    type: "d/⏩️",
-    description: "Idea/Task/Action Compass - Right - What are oppose idea? OR Same Task/Action Different Goal?"
-  },
-  {
     type: "d/⏫",
     description: "Idea/Task/Action Compass - Up - Where does this idea come from / Reason of this idea? OR What is the goal/prereq of this task/action?"
   },
   {
     type: "d/⏬",
     description: "Idea/Task/Action Compass - Down - Where does the idea lead to / It can solve what problem? OR What is the result/next task/action of this task/action?"
+  },
+  {
+    type: "d/⏪",
+    description: "Idea/Task/Action Compass - Left - What are similar / supporting idea? OR Same Goal Different Task/Action?"
+  },
+  {
+    type: "d/⏩️",
+    description: "Idea/Task/Action Compass - Right - What are oppose idea? OR Same Task/Action Different Goal?"
   },
   {
     type: "d/⬅️",
