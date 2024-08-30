@@ -59,7 +59,7 @@ export class UpdateNoteTypeModal extends FuzzySuggestModal<NoteType> {
     const noteType = choosenNoteTypeMatch.item
     const index = this.resultContainerEl.querySelectorAll('.suggestion-item').length;
     const itemIndex = index < 10 ? index + ". " : "    "
-    el.createEl("div", { text: itemIndex + noteType.type });
+    el.createEl("div", { text: itemIndex + noteType.prefix + " " + noteType.type });
     el.createEl("small", { text: "     " + noteType.description });
   }
 
