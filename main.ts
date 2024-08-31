@@ -1690,7 +1690,16 @@ this.addCommand({
 
 				window.open(shortcutUrl);
 			  },
-			  
+			  hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `F`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `F`,
+				},
+			]
 			
 		});
 
