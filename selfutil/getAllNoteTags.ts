@@ -28,38 +28,44 @@ export function getAllTagsWithFilter(app: App, filter?: (tag: string) => boolean
 
 export function getAllTaskMixedWithActionTagsWithFilter(app: App) {
     const files = app.vault.getMarkdownFiles();
-    const taskTags: string[] = [];
-    const nonTaskTags: string[] = [];
-    const allTags: string[] = [];
+    const taskTags: Set<string> = new Set<string>();
+    const nonTaskTags: Set<string> = new Set<string>();
+    const taskAndActionTags: Set<string> = new Set<string>();
     for (const file of files) {
         const cache = app.metadataCache.getCache(file.path);
         if (cache === null) {
             continue;
         }
-        getAllTags(cache)?.forEach((tag) => {
+        const allTags = getAllTags(cache)
+        if (!allTags) {
+            continue;
+        }
+        const tts : Set<string> = new Set<string>();
+        const ats : Set<string> = new Set<string>();
+        allTags.forEach((tag) => {
             if (/^#[a-z]\/[a-z]\/[a-z]$/.test(tag)) {
                 const layerOfTag: string[] = getLayersOfTag(tag)
                 for (const layer of layerOfTag) {
-                    if (!taskTags.includes(layer)) {
-                        taskTags.push(layer);
-                    }
+                    tts.add(layer);
                 }
             } else {
-                if (!nonTaskTags.includes(tag)) {
-                    nonTaskTags.push(tag);
-                }
+                ats.add(tag);
             }
         });
-    }
-    const taskTagsSorted = taskTags.sort((a: string, b: string) => a.localeCompare(b));
-    const nonTaskTagsSorted = nonTaskTags.sort((a: string, b: string) => a.localeCompare(b));
-    allTags.push(...nonTaskTagsSorted, ...taskTagsSorted)
-    for (const tag of taskTagsSorted) {
-        for (const nonTaskTag of nonTaskTagsSorted) {
-            allTags.push(tag + " " + nonTaskTag)
+        for (const tt of tts) {
+            taskTags.add(tt)
+            for (const at of ats) {
+                const tag2 = tt + " " + at
+                taskAndActionTags.add(tag2)
+            }
+        }
+        for (const at of ats) {
+            nonTaskTags.add(at)
         }
     }
-    return allTags;
+    return [...Array.from(nonTaskTags).sort((a: string, b: string) => a.localeCompare(b)),
+        ...Array.from(taskTags).sort((a: string, b: string) => a.localeCompare(b)),
+        ...Array.from(taskAndActionTags).sort((a: string, b: string) => a.localeCompare(b))]
 }
 
 function getLayersOfTag(tag: string): string[] {
