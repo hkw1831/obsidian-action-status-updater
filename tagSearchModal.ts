@@ -1,15 +1,14 @@
 import MyPlugin from "main";
 import { NotesTypeView } from "notesTypeView";
-import { App, FuzzyMatch, FuzzySuggestModal } from "obsidian";
-import { getAllTagsWithFilter } from "selfutil/getAllNoteTags";
+import { App, FuzzyMatch, FuzzySuggestModal, SuggestModal } from "obsidian";
+import { getAllTagsWithFilter, getAllTaskMixedWithActionTagsWithFilter } from "selfutil/getAllNoteTags";
 
 interface Search {
 	openGlobalSearch(_: string): void;
 	getGlobalSearchQuery(): string;
 }
 
-export class TagSearchModal extends FuzzySuggestModal<string> {
-
+export class TagSearchModal extends SuggestModal<string> {
 	keydownHandler: (event: KeyboardEvent) => void;
 	
 	plugin: MyPlugin;
@@ -46,17 +45,23 @@ export class TagSearchModal extends FuzzySuggestModal<string> {
 	}
 
 	getItems(): string[] {
-		return getAllTagsWithFilter(this.app);
+		//return getAllTagsWithFilter(this.app);
+		return getAllTaskMixedWithActionTagsWithFilter(this.app);
 	}
 
 	getItemText(item: string): string {
 		return item;
 	}
 
-	async onChooseItem(item: string, evt: MouseEvent | KeyboardEvent): void {
+	//onChooseSuggestion(item: string, evt: MouseEvent | KeyboardEvent) {
+	//	throw new Error("Method not implemented.");
+	//}
+	//async onChooseItem(item: string, evt: MouseEvent | KeyboardEvent): void {
+	async onChooseSuggestion(item: string, evt: MouseEvent | KeyboardEvent) {
 		//if (/^#[a-z]$/.test(item) || /^#[a-z]\/[a-z]$/.test(item) || /^#[a-z]\/[a-z]\/[a-z]$/.test(item)) {
 			// note type tag
-			this.plugin.notesTypeView.notesTypeTag = item;
+			//this.plugin.notesTypeView.notesTypeTag = item.split(" ")[0];
+			this.plugin.notesTypeView.notesTypeTag = item
 			this.plugin.activateNoteListView()
 			this.plugin.notesTypeView.redraw();
 		/*} else {
@@ -73,11 +78,19 @@ export class TagSearchModal extends FuzzySuggestModal<string> {
 		//this.scope.unregister(); // Unregister the scope when the modal is closed
 	}
 
-	renderSuggestion(tag: FuzzyMatch<string>, el: HTMLElement) {
-		const noteType = tag.item
+	//getSuggestions(query: string): string[] | Promise<string[]> {
+	//	throw new Error("Method not implemented.");
+	//}
+	renderSuggestion(tag: string, el: HTMLElement) {
+		const noteType = tag
 		const index = this.resultContainerEl.querySelectorAll('.suggestion-item').length;
 		const itemIndex = index < 10 ? index + ". " : "    "
 		el.createEl("div", { text: itemIndex + noteType });
 	}
 
+	getSuggestions(query: string): string[] {
+		const tags = this.getItems();
+		const lowerQuery = query.toLowerCase();
+		return tags.filter((tag) => tag.replace(/\//g, "").replace(/#/g, "").toLowerCase().includes(lowerQuery.replace(/\//g, "").replace(/#/g, "")));
+	}
 }

@@ -7,7 +7,7 @@ const VIEW_TYPE_NOTE_LIST = 'note-list-view';
 interface NotesTypeViewData {
   title: string;
   lineInfo: LineInfo[];
-  file: TFile;
+  file: TFile | null;
 }
 
 interface LineInfo {
@@ -54,25 +54,30 @@ class NotesTypeView extends ItemView {
     const rootEl = this.containerEl.createDiv({ cls: 'nav-folder mod-root scrollable' });
     const childrenEl = rootEl.createDiv({ cls: 'nav-folder-children' });
 
-    const files : TFile[] = filesWhereTagIsUsed(this.notesTypeTag).map(filePath => this.app.vault.getAbstractFileByPath(filePath) as TFile)
+    const length = this.notesTypeTag.split(" ").length
+    const tag1 = this.notesTypeTag.split(" ")[0]
+    const tag2 = length > 1 ? this.notesTypeTag.split(" ")[1] : ""
 
-    const noteDatas: NotesTypeViewData[] = await Promise.all(files.map(async (f) => {
+    const files : TFile[] = filesWhereTagIsUsed(tag1).map(filePath => this.app.vault.getAbstractFileByPath(filePath) as TFile)
+
+    let noteDatas: NotesTypeViewData[] = await Promise.all(files.map(async (f) => {
       let noteType = getNoteType(f.path)
       let prefix = noteType ? noteType.prefix + " " : ""
 
-      const isActionTag = !/^#[a-z]\/[a-z]\/[a-z]$/.test(this.notesTypeTag)
-      && !/^#[a-z]\/[a-z]$/.test(this.notesTypeTag)
-      && !/^#[a-z]$/.test(this.notesTypeTag)
+      const isActionTag = (!/^#[a-z]\/[a-z]\/[a-z]$/.test(tag1)
+      && !/^#[a-z]\/[a-z]$/.test(tag1)
+      && !/^#[a-z]$/.test(tag1)) || tag2.length > 0
 
       let lineInfo: LineInfo[] = []
 
       if (isActionTag) {
+        const actionTag = tag2.length > 0 ? tag2 : tag1
         const fileCache = this.app.metadataCache.getFileCache(f);
         if (fileCache && fileCache.tags) {
           const content = await this.app.vault.read(f);
           const fileLines = content.split('\n');
           for (const tag of fileCache.tags) {
-            if (tag.tag === this.notesTypeTag) {
+            if (tag.tag === actionTag) {
               const heading = this.getHeadingForLine(fileCache, tag.position.start.line);
               const lineContent = fileLines[tag.position.start.line].trim();
               const newLineIfNeeded = heading.length != 0 ? (this.isWindows() ? "\r\n" : "\n") : "" 
@@ -85,14 +90,32 @@ class NotesTypeView extends ItemView {
         }
       }
 
+      if (tag2.length > 0) {
+        if (lineInfo.length > 0) {
+          return {
+            title: prefix + f.basename,
+            lineInfo: lineInfo,
+            file: f
+          };
+        } else {
+          return {
+            title: "invalid",
+            lineInfo: [],
+            file: null
+          }
+        }
+      }
       return {
         title: prefix + f.basename,
         lineInfo: lineInfo,
         file: f
       };
-    }))
+    }));
 
     noteDatas.forEach(data => {
+      if (data.file == null) {
+        return;
+      }
 
       const navFile = childrenEl.createDiv({
         cls: 'tree-item nav-file recent-files-file',
