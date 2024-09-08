@@ -165,7 +165,8 @@ fuzzyMatch(str: string, pattern: string): boolean {
     renderSuggestion(item: NoteWithHeader, el: HTMLElement) {
     //const item: NoteWithHeader = path.item
     const pathItem: string = item.notePath
-    let prefix = item.noteType ? (item.noteType.prefix ? item.noteType.prefix + " " : "") : ""
+    let noteType = getNoteType(item.notePath)
+    let prefix = noteType ? (noteType.prefix ? noteType.prefix + " " : "") : ""
     /*
     let prefix = ""
     if (pathItem !== BACK_TO_SELECT_TAG && pathItem !== OPEN_IN_SEARCH_MODE) {
