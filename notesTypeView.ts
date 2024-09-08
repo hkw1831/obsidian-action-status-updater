@@ -113,7 +113,7 @@ class NotesTypeView extends ItemView {
     }));
 
     noteDatas.forEach(data => {
-      if (data.file == null) {
+      if (data.file === null) {
         return;
       }
 
@@ -142,6 +142,9 @@ class NotesTypeView extends ItemView {
       });
 
       navFileTitle.addEventListener('contextmenu', (event: MouseEvent) => {
+        if (data.file === null) {
+          return;
+        }
         if (!data.file?.path) return;
 
         const menu = new Menu();
@@ -151,6 +154,9 @@ class NotesTypeView extends ItemView {
             .setTitle('Open in new tab')
             .setIcon('file-plus')
             .onClick(() => {
+              if (data.file === null) {
+                return;
+              }
               this.focusFileAtLine(data.file, 'tab', 0);
             })
         );
@@ -166,6 +172,9 @@ class NotesTypeView extends ItemView {
 
       navFileTitle.addEventListener('click', (event: MouseEvent) => {
         if (!data) return;
+        if (data.file === null) {
+          return;
+        }
 
         const newLeaf = Keymap.isModEvent(event)
         this.focusFileAtLine(data.file, newLeaf, 0);
@@ -206,6 +215,9 @@ class NotesTypeView extends ItemView {
               .setTitle('Open in new tab')
               .setIcon('file-plus')
               .onClick(() => {
+                if (data.file === null) {
+                  return;
+                }
                 this.focusFileAtLine(data.file, 'tab', lineInfo.line);
               })
           );
@@ -221,6 +233,9 @@ class NotesTypeView extends ItemView {
 
         navFileLine.addEventListener('click', (event: MouseEvent) => {
           if (!data) return;
+          if (data.file === null) {
+            return;
+          }
 
           const newLeaf = Keymap.isModEvent(event)
           this.focusFileAtLine(data.file, newLeaf, lineInfo.line);
