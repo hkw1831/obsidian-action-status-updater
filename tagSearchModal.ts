@@ -91,6 +91,6 @@ export class TagSearchModal extends SuggestModal<string> {
 	getSuggestions(query: string): string[] {
 		const tags = this.getItems();
 		const lowerQuery = query.toLowerCase();
-		return tags.filter((tag) => tag.replace(/\//g, "").replace(/#/g, "").replace(/ /g, "").toLowerCase().includes(lowerQuery.replace(/\//g, "").replace(/#/g, "").replace(/ /g, "")));
+		return tags.filter((tag) => tag.replace(/\//g, "").replace(/#/g, "").toLowerCase().includes(lowerQuery.replace(/\//g, "").replace(/#/g, "")));
 	}
 }

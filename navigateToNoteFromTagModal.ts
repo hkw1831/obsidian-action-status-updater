@@ -1,6 +1,6 @@
 import { NavigateToNoteFromSpecificTagModal } from "navigateToNoteFromSpecificTagModal";
-import { App, FuzzySuggestModal, FuzzyMatch, getAllTags, TFile, Notice, MarkdownView, SuggestModal } from "obsidian";
-import { getAllTagsWithFilter, getAllTaskMixedWithActionTagsWithFilter } from "selfutil/getAllNoteTags";
+import { App, FuzzySuggestModal, FuzzyMatch, getAllTags, TFile, Notice, MarkdownView } from "obsidian";
+import { getAllTagsWithFilter } from "selfutil/getAllNoteTags";
 import { getAllNotes, getRecentNotes } from "selfutil/getRecentNotes";
 import { getNoteType } from "selfutil/getTaskTag";
 import { Heading } from "selfutil/heading";
@@ -16,8 +16,8 @@ const history = "history"
 const tag = "tag"
 const heading = "heading"
 
-export class NavigateToNoteFromTagModal extends SuggestModal<Note> {
-  //items: Note[]
+export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
+  items: Note[]
   taskType: Note
   keydownHandler: (event: KeyboardEvent) => void;
 
@@ -53,7 +53,7 @@ export class NavigateToNoteFromTagModal extends SuggestModal<Note> {
 
     // Listen for keydown events at the document level
     document.addEventListener('keydown', this.keydownHandler);
-    //this.items = this.prepareItems()
+    this.items = this.prepareItems()
   }
 
   selectElement(index: number) {
@@ -70,68 +70,10 @@ export class NavigateToNoteFromTagModal extends SuggestModal<Note> {
     document.removeEventListener('keydown', this.keydownHandler);
   }
 
-  /*getItems() : Note[] {
+  getItems() : Note[] {
     return this.items
   }
-    */
 
-  getSuggestions(query: string): Note[]{
-    const allNotes = getAllNotes(this.app)
-    let headings: Heading[] = []
-    allNotes.forEach(n => {
-      const file = this.app.vault.getAbstractFileByPath(n) as TFile
-      const fileCache = this.app.metadataCache.getFileCache(file)
-      if (!fileCache) {
-        return
-      }
-      if (!fileCache.headings) {
-        return
-      }
-      fileCache.headings.forEach(h => {
-        headings.push({note: n, heading: h.heading, level: h.level, startLine: h.position.start.line})
-      })
-    })
-    const lowerQuery = query.toLowerCase()
-		return [
-      ...getRecentNotes(this.app, 50).map(n => {
-        return {search: n, secondary: "", type: history}
-      }),
-      /*
-      ...getAllTagsWithFilter(this.app).map(n => {
-        return {search: n.replace(/^#/, "@"), secondary: "", type: tag}
-      }),
-      */
-      ...getAllTaskMixedWithActionTagsWithFilter(this.app).map(n => {
-        return {search: n.replace(/#/g, "@"), secondary: "", type: tag}
-      }),
-      ...allNotes.map(n => {
-        return {search: n, secondary: "", type: note}
-      }),
-      ...headings.map(h => {
-        return {search: '#'.repeat(h.level) + " " + h.heading, secondary: h.note, type: heading}
-      })
-    ].filter((item) => {
-      if (query.startsWith("@"))
-      {
-        if (!item.search.startsWith("@")) {
-          return false
-        }
-        if (query.length === 1)
-        {
-          return true
-        }
-        if(query.charAt(1) !== item.search.charAt(1)) {
-          return false
-        }
-        const search = item.search.replace(/\//g, "").replace(/@/g, "").replace(/ /g, "").toLowerCase()
-        return search.includes(lowerQuery.replace(/\//g, "").replace(/@/g, "").replace(/ /g, ""));
-      }
-      return this.fuzzyMatch(item.search.toLowerCase(), lowerQuery)
-      //return this.fuzzyMatch(query.toLowerCase(), item.search.toLowerCase())
-    });
-  }
-
-  /*
   prepareItems() : Note[] {
     const allNotes = getAllNotes(this.app)
     let headings: Heading[] = []
@@ -152,12 +94,8 @@ export class NavigateToNoteFromTagModal extends SuggestModal<Note> {
       ...getRecentNotes(this.app, 50).map(n => {
         return {search: n, secondary: "", type: history}
       }),
-      
-      //...getAllTagsWithFilter(this.app).map(n => {
-      //  return {search: n.replace(/^#/, "@"), secondary: "", type: tag}
-      //}),
-      ...getAllTaskMixedWithActionTagsWithFilter(this.app).map(n => {
-        return {search: n.replace(/#/g, "@").replace(/ /, "\t\t"), secondary: "", type: tag}
+      ...getAllTagsWithFilter(this.app).map(n => {
+        return {search: n.replace(/^#/, "@"), secondary: "", type: tag}
       }),
       ...allNotes.map(n => {
         return {search: n, secondary: "", type: note}
@@ -167,15 +105,14 @@ export class NavigateToNoteFromTagModal extends SuggestModal<Note> {
       })
     ];
   }
-  */
 
   getItemText(value: Note): string {
     return value.search;
   }
 
   // Renders each suggestion item.
-  renderSuggestion(value: Note, el: HTMLElement) {
-    const item = value
+  renderSuggestion(value: FuzzyMatch<Note>, el: HTMLElement) {
+    const item = value.item
     let prefix = ""
     if (item.type === note || item.type === history) {
       const noteType = getNoteType(item.search)
@@ -193,7 +130,7 @@ export class NavigateToNoteFromTagModal extends SuggestModal<Note> {
     this.inputEl.trigger("input");
 
     this.inputEl.addEventListener('input', () => {
-      if (this.inputEl.value.startsWith('@') && (this.inputEl.value.length > 6 || this.inputEl.value.contains('#')) ) {
+      if (this.inputEl.value.startsWith('@') && (this.inputEl.value.length > 4 || this.inputEl.value.contains('#')) ) {
         this.inputEl.value = this.inputEl.value.substring(1);
       }
     });
@@ -215,9 +152,9 @@ export class NavigateToNoteFromTagModal extends SuggestModal<Note> {
   }
 
   // Perform action on the selected suggestion.
-  async onChooseSuggestion(choosenValue: Note, evt: MouseEvent | KeyboardEvent) {
+  async onChooseItem(choosenValue: Note, evt: MouseEvent | KeyboardEvent) {
     if (choosenValue.type == tag) {
-      new NavigateToNoteFromSpecificTagModal(this.app, choosenValue.search.replace(/@/g, "#")).open()
+      new NavigateToNoteFromSpecificTagModal(this.app, choosenValue.search.replace("@", "#")).open()
     } else if (choosenValue.type == note || choosenValue.type == history) {
       const { vault, workspace } = this.app;
       const leaf = workspace.getLeaf(false);
@@ -251,19 +188,5 @@ export class NavigateToNoteFromTagModal extends SuggestModal<Note> {
         }
       })
     }
-  }
-
- fuzzyMatch(search: string, query: string): boolean {
-    let queryIndex = 0;
-    let searchIndex = 0;
-  
-    while (queryIndex < query.length && searchIndex < search.length) {
-      if (query[queryIndex] === search[searchIndex]) {
-        queryIndex++;
-      }
-      searchIndex++;
-    }
-  
-    return queryIndex === query.length;
   }
 }
