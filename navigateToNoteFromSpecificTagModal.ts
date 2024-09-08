@@ -62,13 +62,19 @@ export class NavigateToNoteFromSpecificTagModal extends SuggestModal<NoteWithHea
     document.removeEventListener('keydown', this.keydownHandler);
   }
 async getSuggestions(query: string): Promise<NoteWithHeader[]> {
-  const filePaths: string[] = filesWhereTagIsUsed(this.tagToFind);
+  
   const headers: NoteWithHeader[] = [];
   const lines: NoteWithHeader[] = [];
 
-  const isActionTag = !/^#[a-z]\/[a-z]\/[a-z]$/.test(this.tagToFind)
-  && !/^#[a-z]\/[a-z]$/.test(this.tagToFind)
-  && !/^#[a-z]$/.test(this.tagToFind)
+  const length = this.tagToFind.split(" ").length
+  const tag1 = this.tagToFind.split(" ")[0]
+  const tag2 = length > 1 ? this.tagToFind.split(" ")[1] : ""
+
+  const filePaths: string[] = filesWhereTagIsUsed(tag1);
+  const isActionTag = (!/^#[a-z]\/[a-z]\/[a-z]$/.test(tag1)
+  && !/^#[a-z]\/[a-z]$/.test(tag1)
+  && !/^#[a-z]$/.test(tag1)) || tag2.length > 0
+  console.log(isActionTag)
 
   const readPromises = filePaths.map(async (filePath) => {
     const file = this.app.vault.getAbstractFileByPath(filePath) as TFile;
@@ -76,11 +82,12 @@ async getSuggestions(query: string): Promise<NoteWithHeader[]> {
     if (!fileCache) return;
 
     if (isActionTag) {
+      const actionTag = tag2.length > 0 ? tag2 : tag1
       if (fileCache.tags) {
         const content = await this.app.vault.read(file);
         const fileLines = content.split('\n');
         for (const tag of fileCache.tags) {
-          if (tag.tag === this.tagToFind) {
+          if (tag.tag === actionTag) {
             const heading = this.getHeadingForLine(fileCache, tag.position.start.line);
             const lineContent = fileLines[tag.position.start.line].trim();
             if ((filePath + lineContent).toLowerCase().includes(query.toLowerCase()))
