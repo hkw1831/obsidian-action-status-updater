@@ -139,7 +139,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
               // for ZK
               let zkContent = ""
               const backlinkNoteType = getNoteType(i)
-              console.log(backlinkNoteType)
+              // console.log(backlinkNoteType)
               if (backlinkNoteType && backlinkNoteType.type === "b/n/z")
               {
                 if (line - 3 >= 0) {
