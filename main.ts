@@ -1514,7 +1514,7 @@ this.addCommand({
 			name: `Toggle N W Task`,
 			icon: `toggle-n-w-task`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				console.log(editor.getSelection());
+				//console.log(editor.getSelection());
 				const cursor = editor.getCursor();
 				const lineNumber = editor.getCursor().line;
 				const line = editor.getLine(lineNumber);
@@ -3603,92 +3603,124 @@ this.addCommand({
 		});
 	}
 
+	processLineForActionTag(i: number, line: string, editor: Editor, app: App, view: MarkdownView, t: string, isOnlyOneLine: boolean) {
+		const cursor = editor.getCursor();
+		//const lineNumber = editor.getCursor().line;
+		//const line = editor.getLine(lineNumber);
+		const replacedLine = line.replace(/ a\/w\/./, ` a/w/${t}`)
+								.replace(/ a\/n\/./, ` a/n/${t}`)
+								.replace(/#w. /, `#w${t} `)
+								.replace(/#n. /, `#n${t} `)
+								.replace(/#w.$/, `#w${t}`)
+								.replace(/#n.$/, `#n${t}`)
+		if (line.contains(`#n${t} `) || line.contains(`#w${t} `)) {
+			const nt = `#n${t} `
+			const wt = `#w${t} `
+			
+			const replaceLineToRemoveTag = line.replace(`#n${t} `, ``).replace(`#w${t} `, ``)
+			editor.setLine(i, replaceLineToRemoveTag);
+			// lets say "#nt " is at 3 (char for #)
+			// if ch <= 3 no need to update
+			// if ch >= 7 then need to -4
+			// else ch == 3
+			if (isOnlyOneLine)
+			{
+				const ntIndex = line.indexOf(nt)
+				const wtIndex = line.indexOf(wt)
+				const index = ntIndex == -1 ? wtIndex : ntIndex
+				const newCh = cursor.ch <= index ? cursor.ch : (cursor.ch >= index + 4 ? cursor.ch - 4 : index)
+				cursor.ch = newCh
+				editor.setCursor(cursor);
+			}
+		} else if (line.contains(` #n${t}`) || line.contains(` #w${t}`)) {
+			const nt = `#n${t} `
+			const wt = `#w${t} `
+			
+			const replaceLineToRemoveTag = line.replace(` #n${t}`, ``).replace(` #w${t}`, ``)
+			editor.setLine(i, replaceLineToRemoveTag);
+			// lets say "#nt " is at 3 (char for #)
+			// if ch <= 3 no need to update
+			// if ch >= 7 then need to -4
+			// else ch == 3
+			if (isOnlyOneLine)
+			{
+				const ntIndex = line.indexOf(nt)
+				const wtIndex = line.indexOf(wt)
+				const index = ntIndex == -1 ? wtIndex : ntIndex
+				const newCh = cursor.ch <= index ? cursor.ch : (cursor.ch >= index + 4 ? cursor.ch - 4 : index)
+				cursor.ch = newCh
+				editor.setCursor(cursor);
+			}
+		} else if (line.contains(` a/n/${t}`) || line.contains(` a/w/${t}`)) {
+			// do nothing
+		} else if (replacedLine == line) { // no tag, to add tag
+			let { frontmatter } = app.metadataCache.getFileCache(view.file) || {};
+			const fmtags = (parseFrontMatterTags(frontmatter) || []);
+			for (const tag of fmtags) {
+				if (tag.contains(`#a/w/`)) {
+					let modifiedLine = line;
+					if (/^\t*- /.test(line)) {
+					modifiedLine = line.replace(/^(\t*- )/, `$1#w${t} `);
+					} else if (/^\t*\d+\. /.test(line)) {
+					modifiedLine = line.replace(/^(\t*\d+\. )/, `$1w${t} `);
+					} else {
+					modifiedLine = line.replace(/^/, `#w${t} `);
+					}
+					editor.setLine(i, modifiedLine);
+					if (isOnlyOneLine) {
+						cursor.ch = cursor.ch + 4;
+						editor.setCursor(cursor);
+					}
+					return
+				}
+				if (tag.contains(`#a/n/`)) {
+					let modifiedLine = line;
+					if (/^\t*- /.test(line)) {
+					modifiedLine = line.replace(/^(\t*- )/, `$1#n${t} `);
+					} else if (/^\t*\d+\. /.test(line)) {
+					modifiedLine = line.replace(/^(\t*\d+\. )/, `$1n${t} `);
+					} else {
+					modifiedLine = line.replace(/^/, `#n${t} `);
+					}
+					editor.setLine(i, modifiedLine);
+					if (isOnlyOneLine) {
+						cursor.ch = cursor.ch + 4;
+						editor.setCursor(cursor);
+					}
+					return
+				}
+			}
+			if (isOnlyOneLine) {
+				new AddTaskTagModal(this.app, editor, t).open();
+			} else {
+				new Notice("Please add #a/w/ or #a/n/ tag manually when want to add action tag in multiple lines");
+			}
+		} else {			 
+			editor.setLine(i, replacedLine);
+			if (isOnlyOneLine) {
+				editor.setCursor(cursor);
+			}
+		}
+	}
+
 	addActionCommand(t: string) {
 		this.addCommand({
 			id: `to-w${t}-n${t}`,
 			name: `To w${t} or n${t}`,
 			icon: `${t}-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				const cursor = editor.getCursor();
-				const lineNumber = editor.getCursor().line;
-				const line = editor.getLine(lineNumber);
-				const replacedLine = line.replace(/ a\/w\/./, ` a/w/${t}`)
-				                         .replace(/ a\/n\/./, ` a/n/${t}`)
-								 	 	 .replace(/#w. /, `#w${t} `)
-										 .replace(/#n. /, `#n${t} `)
-										 .replace(/#w.$/, `#w${t}`)
-										 .replace(/#n.$/, `#n${t}`)
-				if (line.contains(`#n${t} `) || line.contains(`#w${t} `)) {
-					const nt = `#n${t} `
-					const wt = `#w${t} `
-					
-					const replaceLineToRemoveTag = line.replace(`#n${t} `, ``).replace(`#w${t} `, ``)
-					editor.setLine(lineNumber, replaceLineToRemoveTag);
-					// lets say "#nt " is at 3 (char for #)
-					// if ch <= 3 no need to update
-					// if ch >= 7 then need to -4
-					// else ch == 3
-					const ntIndex = line.indexOf(nt)
-					const wtIndex = line.indexOf(wt)
-					const index = ntIndex == -1 ? wtIndex : ntIndex
-					const newCh = cursor.ch <= index ? cursor.ch : (cursor.ch >= index + 4 ? cursor.ch - 4 : index)
-					cursor.ch = newCh
-					editor.setCursor(cursor);
-				} else if (line.contains(` #n${t}`) || line.contains(` #w${t}`)) {
-					const nt = `#n${t} `
-					const wt = `#w${t} `
-					
-					const replaceLineToRemoveTag = line.replace(` #n${t}`, ``).replace(` #w${t}`, ``)
-					editor.setLine(lineNumber, replaceLineToRemoveTag);
-					// lets say "#nt " is at 3 (char for #)
-					// if ch <= 3 no need to update
-					// if ch >= 7 then need to -4
-					// else ch == 3
-					const ntIndex = line.indexOf(nt)
-					const wtIndex = line.indexOf(wt)
-					const index = ntIndex == -1 ? wtIndex : ntIndex
-					const newCh = cursor.ch <= index ? cursor.ch : (cursor.ch >= index + 4 ? cursor.ch - 4 : index)
-					cursor.ch = newCh
-					editor.setCursor(cursor);
-				} else if (line.contains(` a/n/${t}`) || line.contains(` a/w/${t}`)) {
-					// do nothing
-				} else if (replacedLine == line) { // no tag, to add tag
-					let { frontmatter } = app.metadataCache.getFileCache(view.file) || {};
-    				const fmtags = (parseFrontMatterTags(frontmatter) || []);
-					for (const tag of fmtags) {
-						if (tag.contains(`#a/w/`)) {
-							let modifiedLine = line;
-							if (/^\t*- /.test(line)) {
-							  modifiedLine = line.replace(/^(\t*- )/, `$1#w${t} `);
-							} else if (/^\t*\d+\. /.test(line)) {
-							  modifiedLine = line.replace(/^(\t*\d+\. )/, `$1w${t} `);
-							} else {
-							  modifiedLine = line.replace(/^/, `#w${t} `);
-							}
-							editor.setLine(cursor.line, modifiedLine);
-							cursor.ch = cursor.ch + 4;
-							editor.setCursor(cursor);
-							return
-						}
-						if (tag.contains(`#a/n/`)) {
-							let modifiedLine = line;
-							if (/^\t*- /.test(line)) {
-							  modifiedLine = line.replace(/^(\t*- )/, `$1#n${t} `);
-							} else if (/^\t*\d+\. /.test(line)) {
-							  modifiedLine = line.replace(/^(\t*\d+\. )/, `$1n${t} `);
-							} else {
-							  modifiedLine = line.replace(/^/, `#n${t} `);
-							}
-							editor.setLine(cursor.line, modifiedLine);
-							cursor.ch = cursor.ch + 4;
-							editor.setCursor(cursor);
-							return
-						}
+				const listSelections: EditorSelection[] = editor.listSelections();
+				for (const listSelection of listSelections) {
+					const a = listSelection.head.line;
+					const b = listSelection.anchor.line;
+					const fromLineNum = b > a ? a : b;
+					const toLineNum = b > a ? b : a;
+					const isOnlyOneLine = (fromLineNum == toLineNum);
+			  
+					for (let i = fromLineNum; i <= toLineNum; i++) {
+					  	const line = editor.getLine(i);
+						  this.processLineForActionTag(i, line, editor, app, view, t, isOnlyOneLine)
 					}
-					new AddTaskTagModal(this.app, editor, t).open();
-				} else {			 
-					editor.setLine(lineNumber, replacedLine);
-					editor.setCursor(cursor);
 				}
 			},
 			hotkeys: [
