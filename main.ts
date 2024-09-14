@@ -27,6 +27,7 @@ import { getAllNotesWithoutMetadata } from 'selfutil/getRecentNotes';
 import { NavigateRewritableThreadsModal } from 'navigateRewritableThreadsModal';
 import { RewriteThreadsModal } from 'rewriteThreads';
 import { NotesTypeView, VIEW_TYPE_NOTE_LIST } from 'notesTypeView';
+import { CurrentNoteOutstandingActionView, VIEW_TYPE_CURRENT_OURSTANDING_TASK } from 'currentNoteOutstandingActionView';
 
 // Remember to rename these classes and interfaces!
 
@@ -47,6 +48,7 @@ export default class MyPlugin extends Plugin {
 	view: MarkdownView;
 	public notesTypeView: NotesTypeView;
 	public notesTypeTag : string = ""
+	public currentNoteOutstandingActionView: CurrentNoteOutstandingActionView;
 	public plugin: MyPlugin = this
 	private lastActiveLeaf: WorkspaceLeaf | null = null;
 
@@ -73,6 +75,21 @@ export default class MyPlugin extends Plugin {
         }
 	  }
 
+	  public async activateCurrentNoteOutstandingActionView() {
+		let leaf: WorkspaceLeaf | null;
+        [leaf] = this.app.workspace.getLeavesOfType(
+			VIEW_TYPE_CURRENT_OURSTANDING_TASK,
+        );
+        if (!leaf) {
+          leaf = this.app.workspace.getLeftLeaf(false);
+          await leaf?.setViewState({ type: VIEW_TYPE_CURRENT_OURSTANDING_TASK });
+        }
+
+        if (leaf) {
+          this.app.workspace.revealLeaf(leaf);
+        }
+	}
+
 	async onload() {
 		await this.loadSettings();
 
@@ -85,6 +102,14 @@ export default class MyPlugin extends Plugin {
 			this.activateNoteListView();
 		});
 
+		this.registerView(
+			VIEW_TYPE_CURRENT_OURSTANDING_TASK,
+			(leaf) => this.currentNoteOutstandingActionView = new CurrentNoteOutstandingActionView(leaf, this.notesTypeTag)
+		);
+
+		this.addRibbonIcon('list-checks', 'Open Current Note Outstanding Action View', () => {
+			this.activateCurrentNoteOutstandingActionView();
+		});
 		/*
 	this.registerEvent(
 		this.app.workspace.on('active-leaf-change', (leaf) => {
@@ -106,8 +131,23 @@ export default class MyPlugin extends Plugin {
 			if (this.notesTypeView) {
 				this.notesTypeView.redraw();
 			}
+			if (this.currentNoteOutstandingActionView) {
+				this.currentNoteOutstandingActionView.redraw(true);
+			}
 		})
+
+		this.app.workspace.on("active-leaf-change", (leaf) => {
+			if (!leaf) {
+				return
+			}
+			if (leaf.view instanceof MarkdownView) {
+				if (this.currentNoteOutstandingActionView) {
+					this.currentNoteOutstandingActionView.redraw(false);
+				}
+			}
+        });
 	});
+	
 	
 		
 
@@ -179,7 +219,7 @@ export default class MyPlugin extends Plugin {
 			this.addActionCommand(t);
 		});
 
-		['t', 'm', 'e'].forEach(t => {
+		['m'].forEach(t => {
 			this.addActionIcon(t);
 			this.addFollowUpCommand(t);
 		});
@@ -497,6 +537,27 @@ export default class MyPlugin extends Plugin {
 				{
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
 					key: `s`,
+				},
+			]
+		});
+
+		this.addCommand({
+			id: "open-current-outstanding-action-view",
+			name: "Open Current Outstanding Action View",
+			icon: "list-checks",
+			callback: () => {
+			//editorCallback: (editor: Editor, view: MarkdownView) => {				
+				this.activateCurrentNoteOutstandingActionView()
+				this.currentNoteOutstandingActionView.redraw(true);
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `t`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `t`,
 				},
 			]
 		});
