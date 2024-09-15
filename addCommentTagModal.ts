@@ -7,6 +7,46 @@ interface FootnoteType {
 
 const ALL_TYPES = [
   {
+    type: "## Tips : ",
+    description: ""
+  },
+  {
+    type: "## Stats : ",
+    description: ""
+  },
+  {
+    type: "## Steps : ",
+    description: ""
+  },
+  {
+    type: "## Reasons : ",
+    description: ""
+  },
+  {
+    type: "## Mistakes : ",
+    description: ""
+  },
+  {
+    type: "## Benefits : ",
+    description: ""
+  },
+  {
+    type: "## Lessons : ",
+    description: ""
+  },
+  {
+    type: "## Examples : ",
+    description: ""
+  },
+  {
+    type: "## Questions : ",
+    description: ""
+  },
+  {
+    type: "## Personal Stories : ",
+    description: ""
+  },
+  {
     type: "d/⏫",
     description: "Idea/Task/Action Compass - Up - Where does this idea come from / Reason of this idea? OR What is the goal/prereq of this task/action?"
   },
@@ -154,7 +194,9 @@ export class AddFootnoteTagModal extends FuzzySuggestModal<FootnoteType> {
     const index = this.resultContainerEl.querySelectorAll('.suggestion-item').length;
     const itemIndex = index < 10 ? index + ". " : "    "
     el.createEl("div", { text: itemIndex + noteType.type });
-    el.createEl("small", { text: "     " + noteType.description });
+    if (noteType.description.length > 0) {
+      el.createEl("small", { text: "     " + noteType.description });
+    }
   }
 
   containsType(line: String) : Boolean {
@@ -164,7 +206,7 @@ export class AddFootnoteTagModal extends FuzzySuggestModal<FootnoteType> {
   // Perform action on the selected suggestion.
   onChooseItem(choosenNoteType: FootnoteType, evt: MouseEvent | KeyboardEvent) {
     const selection = this.editor.getSelection()
-    const replacedStr = `#${choosenNoteType.type} `
+    const replacedStr = choosenNoteType.type.startsWith("## ") ? `${choosenNoteType.type}\n\n` : `#${choosenNoteType.type} `
     if (selection.length != 0) {
         this.editor.replaceSelection(replacedStr);
     } else {
