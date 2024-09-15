@@ -47,28 +47,24 @@ const ALL_TYPES = [
     description: ""
   },
   {
+    type: "d/💫",
+    description: "Echo from"
+  },
+  {
     type: "d/⏫",
-    description: "Idea/Task/Action Compass - Up - Where does this idea come from / Reason of this idea? OR What is the goal/prereq of this task/action?"
+    description: "Idea/Task/Action Compass - Up - North - Where does this idea come from / Reason of this idea? OR What is the goal/prereq of this task/action?"
   },
   {
     type: "d/⏬",
-    description: "Idea/Task/Action Compass - Down - Where does the idea lead to / It can solve what problem? OR What is the result/next task/action of this task/action?"
+    description: "Idea/Task/Action Compass - Down - Sorth - Where does the idea lead to / It can solve what problem? OR What is the result/next task/action of this task/action?"
   },
   {
     type: "d/⏪",
-    description: "Idea/Task/Action Compass - Left - What are similar / supporting idea? OR Same Goal Different Task/Action?"
+    description: "Idea/Task/Action Compass - Right - East -What are similar / supporting idea? OR Same Goal Different Task/Action?"
   },
   {
     type: "d/⏩️",
-    description: "Idea/Task/Action Compass - Right - What are oppose idea? OR Same Task/Action Different Goal?"
-  },
-  {
-    type: "d/⬅️",
-    description: "Previous version of this idea"
-  },
-  {
-    type: "d/➡️",
-    description: "Next version of this idea"
+    description: "Idea/Task/Action Compass - Left - West - What are oppose idea? OR Same Task/Action Different Goal?"
   },
   {
     type: "d/🔄",
@@ -78,6 +74,14 @@ const ALL_TYPES = [
     type: "d/⏹️",
     description: "A1 - my experience"
   },
+  {
+    type: "d/⬅️",
+    description: "(Deprecated) Previous version of this idea"
+  },
+  {
+    type: "d/➡️",
+    description: "(deprecated) Next version of this idea"
+  }
   /*
   {
     type: "d/question",
@@ -180,7 +184,7 @@ export class AddFootnoteTagModal extends FuzzySuggestModal<FootnoteType> {
   }
 
   getItemText(noteType: FootnoteType): string {
-    return noteType.type;
+    return noteType.type + " " + noteType.description;
   }
 
   static removeTag(line: string): string {
