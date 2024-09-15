@@ -59,11 +59,11 @@ const ALL_TYPES = [
     description: "Idea/Task/Action Compass - Down - Sorth - Where does the idea lead to / It can solve what problem? OR What is the result/next task/action of this task/action?"
   },
   {
-    type: "d/⏪",
-    description: "Idea/Task/Action Compass - Right - East -What are similar / supporting idea? OR Same Goal Different Task/Action?"
+    type: "d/⏩️",
+    description: "Idea/Task/Action Compass - Right - East - What are similar / supporting idea? OR Same Goal Different Task/Action?"
   },
   {
-    type: "d/⏩️",
+    type: "d/⏪",
     description: "Idea/Task/Action Compass - Left - West - What are oppose idea? OR Same Task/Action Different Goal?"
   },
   {
