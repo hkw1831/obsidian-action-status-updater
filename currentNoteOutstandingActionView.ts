@@ -47,17 +47,17 @@ class CurrentNoteOutstandingActionView extends ItemView {
     }
     this.currentNotesPath = activeFile.path
 
-    //console.log("redraw()")
-    //const tag = "#c/t/p"
-    
-    this.containerEl.empty();
-
     const path = activeFile.path
 
     const f : TFile = this.app.vault.getAbstractFileByPath(path) as TFile
     if (!f) {
       return
     }
+    //console.log("redraw()")
+    //const tag = "#c/t/p"
+    
+    this.containerEl.empty();
+
     const fileCache = this.app.metadataCache.getFileCache(f);
     let lineInfos = []
     
