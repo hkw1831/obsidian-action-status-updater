@@ -1444,6 +1444,39 @@ this.addCommand({
 			}
 		});
 
+		this.addObsidianIcon('echo-notes-icon', 'EN');
+		this.addCommand({
+			id: "echo-notes",
+			name: "EN Echo notes",
+			icon: `echo-notes-icon`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				let text = ""
+				text += "---\ntags: b/k/s\n---\n\n\n"
+				text += "## References\n\n- #d/💫 ";
+				text += "[[" + view.file.basename + "]]\n"
+				const { vault } = this.app;
+				const path = view.file.path
+				const newPath = path.replace(/^([A-Z]\/)/, "$1Echo ")
+				const { workspace } = this.app;
+				const leaf = workspace.getLeaf(false);
+				Promise.resolve()
+				.then(() => {
+					return vault.adapter.exists(newPath);
+				})
+				.then((fileExists) => {
+					if (fileExists) {
+					new Notice(`Will not proceed. Thread post "${newPath}" already exist.`);
+					return Promise.reject("Thread post exist");
+					}
+					return vault.create(newPath, text);
+				})
+				.then((tFile) => {
+					return leaf.openFile(tFile, { active : true});
+				},
+				(rejectReason) => {})
+			}
+		});
+
 		/*
 		this.addObsidianIcon('chatgpt-prompt-for-generating-summary-to-clipboard', 'GS');
 		this.addCommand({
