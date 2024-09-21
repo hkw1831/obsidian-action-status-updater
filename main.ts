@@ -28,6 +28,7 @@ import { NavigateRewritableThreadsModal } from 'navigateRewritableThreadsModal';
 import { RewriteThreadsModal } from 'rewriteThreads';
 import { NotesTypeView, VIEW_TYPE_NOTE_LIST } from 'notesTypeView';
 import { CurrentNoteOutstandingActionView, VIEW_TYPE_CURRENT_OURSTANDING_TASK } from 'currentNoteOutstandingActionView';
+import { EchoModal } from 'echoModal';
 
 // Remember to rename these classes and interfaces!
 
@@ -1450,6 +1451,8 @@ this.addCommand({
 			name: "EN Echo notes",
 			icon: `echo-notes-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
+				new EchoModal(this.app, view.file).open();
+				/*
 				let text = ""
 				text += "---\ntags: b/k/s\n---\n\n\n"
 				text += "## References\n\n- #d/💫 ";
@@ -1474,6 +1477,7 @@ this.addCommand({
 					return leaf.openFile(tFile, { active : true});
 				},
 				(rejectReason) => {})
+				*/
 			}
 		});
 
