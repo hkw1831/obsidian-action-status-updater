@@ -71,6 +71,14 @@ const ALL_TYPES = [
     description: ""
   },
   {
+    type: "## Conclusions : ",
+    description: ""
+  },
+  {
+    type: "## References : ",
+    description: ""
+  },
+  {
     type: "d/💫",
     description: "Echo from"
   },
