@@ -47,6 +47,30 @@ const ALL_TYPES = [
     description: ""
   },
   {
+    type: "## Frameworks : ",
+    description: ""
+  },
+  {
+    type: "## Observations : ",
+    description: ""
+  },
+  {
+    type: "## Rules : ",
+    description: ""
+  },
+  {
+    type: "## Resources : ",
+    description: ""
+  },
+  {
+    type: "## Reflections : ",
+    description: ""
+  },
+  {
+    type: "## Tools : ",
+    description: ""
+  },
+  {
     type: "d/💫",
     description: "Echo from"
   },

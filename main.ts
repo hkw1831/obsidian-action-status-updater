@@ -1509,10 +1509,10 @@ this.addCommand({
 		});
 		*/
 
-		this.addObsidianIcon('add-comment-tag-icon', 'CT');
+		this.addObsidianIcon('add-comment-tag-icon', 'DT');
 		this.addCommand({
 			id: "add-comment-tag",
-			name: "CT Add Comment Tag",
+			name: "DT Add Comment Tag",
 			icon: `add-comment-tag-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 			  new AddFootnoteTagModal(this.app, editor).open();
