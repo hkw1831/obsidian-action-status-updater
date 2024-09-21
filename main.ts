@@ -1452,32 +1452,6 @@ this.addCommand({
 			icon: `echo-notes-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				new EchoModal(this.app, view.file).open();
-				/*
-				let text = ""
-				text += "---\ntags: b/k/s\n---\n\n\n"
-				text += "## References\n\n- #d/💫 ";
-				text += "[[" + view.file.basename + "]]\n"
-				const { vault } = this.app;
-				const path = view.file.path
-				const newPath = path.replace(/^([A-Z]\/)/, "$1Echo ")
-				const { workspace } = this.app;
-				const leaf = workspace.getLeaf(false);
-				Promise.resolve()
-				.then(() => {
-					return vault.adapter.exists(newPath);
-				})
-				.then((fileExists) => {
-					if (fileExists) {
-					new Notice(`Will not proceed. Thread post "${newPath}" already exist.`);
-					return Promise.reject("Thread post exist");
-					}
-					return vault.create(newPath, text);
-				})
-				.then((tFile) => {
-					return leaf.openFile(tFile, { active : true});
-				},
-				(rejectReason) => {})
-				*/
 			}
 		});
 
