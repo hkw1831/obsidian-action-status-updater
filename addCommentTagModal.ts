@@ -71,6 +71,10 @@ const ALL_TYPES = [
     description: ""
   },
   {
+    type: "## Hooks : ",
+    description: ""
+  },
+  {
     type: "## Conclusions : ",
     description: ""
   },
