@@ -79,6 +79,12 @@ async getSuggestions(query: string): Promise<EchoItem[]> {
   const filePaths: string[] = filesWhereTagIsUsed("#b/n/z");
   const items: EchoItem[] = [];
 
+  items.push({
+    notePath: "",
+    lineNumber: 0,
+    lineContent: ""
+  })
+
   // find zk content in each file
   const readPromises = filePaths.map(async (filePath) => {
     const file = this.app.vault.getAbstractFileByPath(filePath) as TFile;
@@ -179,35 +185,15 @@ async getSuggestions(query: string): Promise<EchoItem[]> {
    return items
 }
 
-
-getHeadingForLine(fileCache: CachedMetadata, lineNumber: number): string {
-  if (!fileCache || !fileCache.headings) {
-    return "";
+  fuzzyMatch(str: string, pattern: string): boolean {
+    if (!pattern) return true;
+    pattern = pattern.split('').reduce((a, b) => `${a}.*${b}`);
+    return new RegExp(pattern).test(str);
   }
 
-  const headings = fileCache.headings;
-  let currentHeading = "";
-
-  for (const heading of headings) {
-    if (heading.position.start.line <= lineNumber) {
-      currentHeading = "# " + heading.heading;
-    } else {
-      break;
-    }
+  getItemText(path: EchoItem): string {
+    return path.notePath + path.lineContent;
   }
-
-  return currentHeading;
-}
-
-fuzzyMatch(str: string, pattern: string): boolean {
-  if (!pattern) return true;
-  pattern = pattern.split('').reduce((a, b) => `${a}.*${b}`);
-  return new RegExp(pattern).test(str);
-}
-
-getItemText(path: EchoItem): string {
-  return path.notePath + path.lineContent;
-}
 
   // Renders each suggestion item.
   //renderSuggestion(path: FuzzyMatch<NoteWithHeader>, el: HTMLElement) {
@@ -225,7 +211,7 @@ getItemText(path: EchoItem): string {
     */
     const index = this.resultContainerEl.querySelectorAll('.suggestion-item').length;
     const itemIndex = index < 10 ? index + ". " : "    "
-    el.createEl("div", { text: itemIndex + prefix + pathItem });
+    el.createEl("div", { text: itemIndex + prefix + (pathItem === "" ? "NOT ADD TO ANY ZK" : pathItem)})
     //if (path.item.header.length > 0) {
     if (item.lineContent.length > 0) {
       el.createEl("small", { text: "     " + item.lineContent})
@@ -253,8 +239,9 @@ getItemText(path: EchoItem): string {
     const newFile = await vault.create(newPath, text);
 
     // Step 2: insert the echo link to the echoItem Path Line
+    if (echoItem.notePath === "") {
 
-    if (echoItem.lineContent === "") {
+    } else if (echoItem.lineContent === "") {
       const { vault } = this.app;
       const path = echoItem.notePath
       const zkFile : TFile = vault.getAbstractFileByPath(path) as TFile
