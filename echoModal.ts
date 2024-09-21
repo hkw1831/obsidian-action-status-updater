@@ -79,6 +79,7 @@ async getSuggestions(query: string): Promise<EchoItem[]> {
   const filePaths: string[] = filesWhereTagIsUsed("#b/n/z");
   const items: EchoItem[] = [];
 
+  // find zk content in each file
   const readPromises = filePaths.map(async (filePath) => {
     const file = this.app.vault.getAbstractFileByPath(filePath) as TFile;
     const content = await this.app.vault.read(file);
@@ -93,10 +94,20 @@ async getSuggestions(query: string): Promise<EchoItem[]> {
         })
       }
     }
-
   })
 
   await Promise.all(readPromises);
+
+  // Then add all zk files (add to end of file)
+  const readPromises2 = filePaths.map(async (filePath) => {
+    items.push({
+      notePath: filePath,
+      lineNumber: 0,
+      lineContent: ""
+    })
+  })
+
+  await Promise.all(readPromises2);
 /*
   const headers: NoteWithHeader[] = [];
   const lines: NoteWithHeader[] = [];
@@ -222,7 +233,6 @@ getItemText(path: EchoItem): string {
   }
 
   async onChooseSuggestion(echoItem: EchoItem, evt: MouseEvent | KeyboardEvent) {
-
     console.log(echoItem.notePath)
     // Step 1: create a new file with echo file
     let text = ""
@@ -244,29 +254,38 @@ getItemText(path: EchoItem): string {
 
     // Step 2: insert the echo link to the echoItem Path Line
 
-    const zkFile : TFile = vault.getAbstractFileByPath(echoItem.notePath) as TFile
-    await leaf.openFile(zkFile, {active: true});
-    const markdownView = app.workspace.getActiveViewOfType(MarkdownView);
-    const editor = markdownView?.editor
-    if (markdownView == null || editor == null) {
-      const errorReason = `editor or value ${path} not exist. Aborting...`
-      return;
-    }
+    if (echoItem.lineContent === "") {
+      const { vault } = this.app;
+      const path = echoItem.notePath
+      const zkFile : TFile = vault.getAbstractFileByPath(path) as TFile
+      const content = await vault.read(zkFile);
+      const text = content + "\n" + "- [[" + newFile.basename + "]]"
+      await vault.modify(zkFile, text)
+    } else {
+      const zkFile : TFile = vault.getAbstractFileByPath(echoItem.notePath) as TFile
+      await leaf.openFile(zkFile, {active: true});
+      const markdownView = app.workspace.getActiveViewOfType(MarkdownView);
+      const editor = markdownView?.editor
+      if (markdownView == null || editor == null) {
+        const errorReason = `editor or value ${path} not exist. Aborting...`
+        return;
+      }
 
-    let result = ""
-    for (let i = 0; i < editor.lineCount(); i++) {
-        if (i === echoItem.lineNumber) {
-          console.log("lineContent: " + editor.getLine(i))
-          result += editor.getLine(i) + "\n"
-          const lineContent = editor.getLine(i)
-          const prefix = lineContent.replace(/(\t*- ).*/, "$1")
-          result += "\t" + prefix + "[[" + newFile.basename + "]]" + "\n"
-        } else {
+      let result = ""
+      for (let i = 0; i < editor.lineCount(); i++) {
+          if (i === echoItem.lineNumber) {
+            console.log("lineContent: " + editor.getLine(i))
             result += editor.getLine(i) + "\n"
-        }
+            const lineContent = editor.getLine(i)
+            const prefix = lineContent.replace(/(\t*- ).*/, "$1")
+            result += "\t" + prefix + "[[" + newFile.basename + "]]" + "\n"
+          } else {
+              result += editor.getLine(i) + "\n"
+          }
+      }
+      result = result.replace(/\n$/, "")
+      editor.setValue(result)
     }
-    result = result.replace(/\n$/, "")
-    editor.setValue(result)
 
     // Step 3: open the newly created file
     await leaf.openFile(newFile, { active : true});
