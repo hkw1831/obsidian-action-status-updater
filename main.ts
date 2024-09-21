@@ -2357,7 +2357,17 @@ this.addCommand({
 				}, function (error) {
 					new Notice(`error when copy to clipboard!`);   
 				});   
-			},   
+			},  
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `g`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `g`,
+				},
+			] 
 		});   
 
 		this.addObsidianIcon('threads-to-gpt', 'TC');
