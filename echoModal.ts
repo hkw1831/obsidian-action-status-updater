@@ -222,9 +222,9 @@ async getSuggestions(query: string): Promise<EchoItem[]> {
     console.log(echoItem.notePath)
     // Step 1: create a new file with echo file
     let text = ""
-    text += "---\ntags: b/k/s\n---\n\n\n"
-    text += "## References\n\n- #d/💫 ";
-    text += "[[" + this.fileToEcho.basename + "]]\n"
+    text += "---\ntags: b/k/s\n---\n\n"
+    text += "#d/💫 ";
+    text += "[[" + this.fileToEcho.basename + "]]\n\n"
     const { vault } = this.app;
     const path = this.fileToEcho.path
     const newPath = path.replace(/^([A-Z]\/)/, "$1Echo ")
