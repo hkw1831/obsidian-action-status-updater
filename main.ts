@@ -613,7 +613,7 @@ export default class MyPlugin extends Plugin {
 		//this.updateSchedulingIcon()
 		this.addCommand({
 			id: "open-recent-days-schedule-with-updated-schedule",
-			name: "OR Open Recent Days Updated Schedule",
+			name: "OR 3 Days Open Recent Days Updated Schedule",
 			icon: "open-recent-day-schedule-icon",
 			callback: async () => {
 				// update scheduling part
@@ -638,17 +638,7 @@ export default class MyPlugin extends Plugin {
 				const mode = (this.app.vault as any).getConfig("defaultViewMode");
 				const leaf = workspace.getLeaf(false);
 				await leaf.openFile(vault.getAbstractFileByPath(dashboardCanvas) as TFile, { active : true,/* mode */});
-			},
-			hotkeys: [
-				{
-					modifiers: [`Ctrl`, `Meta`, `Shift`],
-					key: `q`,
-				},
-				{
-					modifiers: [`Ctrl`, `Alt`, `Shift`],
-					key: `q`,
-				},
-			]
+			}
 		})
 
 		this.addObsidianIcon('update-scheduling-icon', 'US');
@@ -1452,7 +1442,17 @@ this.addCommand({
 			icon: `echo-notes-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				new EchoModal(this.app, view.file).open();
-			}
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `q`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `q`,
+				},
+			]
 		});
 
 		/*

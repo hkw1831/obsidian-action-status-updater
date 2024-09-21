@@ -157,7 +157,7 @@ export class EchoModal extends SuggestModal<EchoItem> {
       const markdownView = app.workspace.getActiveViewOfType(MarkdownView);
       const editor = markdownView?.editor
       if (markdownView == null || editor == null) {
-        const errorReason = `editor or value ${path} not exist. Aborting...`
+        new Notice(`editor or value ${path} not exist. Aborting...`);
         return;
       }
 
