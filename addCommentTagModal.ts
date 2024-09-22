@@ -3,124 +3,153 @@ import { App, Editor, FuzzySuggestModal, FuzzyMatch } from "obsidian";
 interface FootnoteType {
   type: string;
   description: string;
+  additionalInfo: string;
 }
 
 const ALL_TYPES = [
   {
     type: "## Tips : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Stats : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Steps : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Reasons : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Mistakes : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Benefits : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Lessons : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Examples : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Questions : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Personal Stories : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Frameworks : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Observations : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Rules : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Resources : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Reflections : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Tools : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Problems : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Solutions : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Context : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Analogy : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Target Auduience : ",
-    description: ""
-  },
+    description: "",
+    additionalInfo: `This piece is about {Topic}.\n\nIt's written for {Audience} who have {Problem}.\n\nBy the time they finish, they will feel {Emotion}.\n\nAnd they will {learn, have, be able to} do {Benefit}.\n\nAfter reading this piece they will releaze {Point}, so they will {Next desired action, belief, or thought}.\n\nThe immediate next step the reader should take is {CTA}.`  },
   {
     type: "## Hooks : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## Conclusions : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "## References : ",
-    description: ""
+    description: "",
+    additionalInfo: ""
   },
   {
     type: "d/💫",
-    description: "Echo from"
+    description: "Echo from",
+    additionalInfo: ""
   },
   {
     type: "d/⏫",
-    description: "Idea/Task/Action Compass - Up - North - Where does this idea come from / Reason of this idea? OR What is the goal/prereq of this task/action?"
+    description: "Idea/Task/Action Compass - Up - North - Where does this idea come from / Reason of this idea? OR What is the goal/prereq of this task/action?",
+    additionalInfo: ""
   },
   {
     type: "d/⏬",
-    description: "Idea/Task/Action Compass - Down - Sorth - Where does the idea lead to / It can solve what problem? OR What is the result/next task/action of this task/action?"
+    description: "Idea/Task/Action Compass - Down - Sorth - Where does the idea lead to / It can solve what problem? OR What is the result/next task/action of this task/action?",
+    additionalInfo: ""
   },
   {
     type: "d/⏩️",
-    description: "Idea/Task/Action Compass - Right - East - What are similar / supporting idea? OR Same Goal Different Task/Action?"
+    description: "Idea/Task/Action Compass - Right - East - What are similar / supporting idea? OR Same Goal Different Task/Action?",
+    additionalInfo: ""
   },
   {
     type: "d/⏪",
-    description: "Idea/Task/Action Compass - Left - West - What are oppose idea? OR Same Task/Action Different Goal?"
+    description: "Idea/Task/Action Compass - Left - West - What are oppose idea? OR Same Task/Action Different Goal?",
+    additionalInfo: ""
   },
 ];
 
@@ -202,7 +231,10 @@ export class AddFootnoteTagModal extends FuzzySuggestModal<FootnoteType> {
   // Perform action on the selected suggestion.
   onChooseItem(choosenNoteType: FootnoteType, evt: MouseEvent | KeyboardEvent) {
     const selection = this.editor.getSelection()
-    const replacedStr = choosenNoteType.type.startsWith("## ") ? `${choosenNoteType.type}\n\n` : `#${choosenNoteType.type} `
+    let replacedStr = choosenNoteType.type.startsWith("## ") ? `${choosenNoteType.type}\n\n` : `#${choosenNoteType.type} `
+    if (choosenNoteType.additionalInfo.length > 0) {
+      replacedStr = replacedStr + choosenNoteType.additionalInfo + "\n\n"
+    }
     if (selection.length != 0) {
         this.editor.replaceSelection(replacedStr);
     } else {
