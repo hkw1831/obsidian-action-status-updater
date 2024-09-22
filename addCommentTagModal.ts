@@ -83,6 +83,10 @@ const ALL_TYPES = [
     description: ""
   },
   {
+    type: "## Analogy : ",
+    description: ""
+  },
+  {
     type: "## Target Auduience : ",
     description: ""
   },
@@ -118,70 +122,6 @@ const ALL_TYPES = [
     type: "d/⏪",
     description: "Idea/Task/Action Compass - Left - West - What are oppose idea? OR Same Task/Action Different Goal?"
   },
-  {
-    type: "d/🔄",
-    description: "Context"
-  },
-  {
-    type: "d/⏹️",
-    description: "A1 - my experience"
-  },
-  {
-    type: "d/⬅️",
-    description: "(Deprecated) Previous version of this idea"
-  },
-  {
-    type: "d/➡️",
-    description: "(deprecated) Next version of this idea"
-  }
-  /*
-  {
-    type: "d/question",
-    description: "Question"
-  },
-  {
-    type: "d/answer",
-    description: "Answer"
-  },
-  {
-    type: "d/solves",
-    description: "Solves some problem"
-  },
-  {
-    type: "d/ref",
-    description: "Reference"
-  },
-  {
-    type: "d/selfthink",
-    description: "Self think"
-  },
-  {
-    type: "d/notsure",
-    description: "Not sure"
-  },
-  {
-    type: "d/a2⏺️",
-    description: "A2 - future action"
-  },
-  */
-  /*
-  {
-    type: "d/toMerge",
-    description: "TODO - To Merge with another note"
-  },
-  {
-    type: "d/toMove",
-    description: "TODO - To Merge with another note"
-  },
-  {
-    type: "d/toSplit",
-    description: "ToDO - To Split to multiple note"
-  },
-  {
-    type: "d/toCard",
-    description: "TODO - To Write card"
-  },
-  */
 ];
 
 export class AddFootnoteTagModal extends FuzzySuggestModal<FootnoteType> {
