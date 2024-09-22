@@ -78,7 +78,14 @@ const ALL_TYPES = [
     type: "## Solutions : ",
     description: ""
   },
-  
+  {
+    type: "## Context : ",
+    description: ""
+  },
+  {
+    type: "## Target Auduience : ",
+    description: ""
+  },
   {
     type: "## Hooks : ",
     description: ""
