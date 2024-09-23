@@ -1513,9 +1513,8 @@ this.addCommand({
 					new Notice(`Error occurred when copying to clipboard: ${error}`);
 				}
 				if (text.length !== 0) {
-					const aaa = title + text
-					const textToWatch = encodeURI(aaa);
-					window.open(`shortcuts://run-shortcut?name=Add%20To%20TickTick&input=text&text=${textToWatch}&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://`);
+					const textToWatch = encodeURI(text);
+					window.open(`shortcuts://run-shortcut?name=Add%20To%20TickTick%20for%20TCP&input=text&text=${textToWatch}&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://`);
 				  }
 			}
 		});
