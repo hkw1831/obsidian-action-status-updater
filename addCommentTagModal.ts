@@ -108,6 +108,11 @@ const ALL_TYPES = [
     additionalInfo: ""
   },
   {
+    type: "## Comparison : ",
+    description: "",
+    additionalInfo: ""
+  },
+  {
     type: "## Target Auduience : ",
     description: "",
     additionalInfo: `This piece is about {Topic}.\n\nIt's written for {Audience} who have {Problem}.\n\nBy the time they finish, they will feel {Emotion}.\n\nAnd they will {learn, have, be able to} do {Benefit}.\n\nAfter reading this piece they will releaze {Point}, so they will {Next desired action, belief, or thought}.\n\nThe immediate next step the reader should take is {CTA}.`  },
