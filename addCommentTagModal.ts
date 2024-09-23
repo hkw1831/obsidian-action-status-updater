@@ -4,157 +4,189 @@ interface FootnoteType {
   type: string;
   description: string;
   additionalInfo: string;
+  chinese: string;
 }
 
-const ALL_TYPES = [
+export const ALL_FOOTNOTE_TYPES = [
   {
     type: "## Tips : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 訣竅："
   },
   {
     type: "## Stats : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 統計："
   },
   {
     type: "## Steps : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 步驟："
   },
   {
     type: "## Reasons : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 原因："
   },
   {
     type: "## Mistakes : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 錯誤："
   },
   {
     type: "## Benefits : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 好處："
   },
   {
     type: "## Lessons : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 教訓："
   },
   {
     type: "## Examples : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 例子："
   },
   {
     type: "## Questions : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 問題："
   },
   {
     type: "## Personal Stories : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 個人故事："
   },
   {
     type: "## Frameworks : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 框架："
   },
   {
     type: "## Observations : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 觀察："
   },
   {
     type: "## Rules : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 規則："
   },
   {
     type: "## Resources : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 資源："
   },
   {
     type: "## Reflections : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 反思："
   },
   {
     type: "## Tools : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 工具："
   },
   {
     type: "## Problems : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 問題："
   },
   {
     type: "## Solutions : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 解決方案："
   },
   {
     type: "## Context : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 情景："
   },
   {
     type: "## Analogy : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 類比："
   },
   {
     type: "## Comparison : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 比較："
   },
   {
     type: "## Target Auduience : ",
     description: "",
-    additionalInfo: `This piece is about {Topic}.\n\nIt's written for {Audience} who have {Problem}.\n\nBy the time they finish, they will feel {Emotion}.\n\nAnd they will {learn, have, be able to} do {Benefit}.\n\nAfter reading this piece they will releaze {Point}, so they will {Next desired action, belief, or thought}.\n\nThe immediate next step the reader should take is {CTA}.`  },
+    additionalInfo: `This piece is about {Topic}.\n\nIt's written for {Audience} who have {Problem}.\n\nBy the time they finish, they will feel {Emotion}.\n\nAnd they will {learn, have, be able to} do {Benefit}.\n\nAfter reading this piece they will releaze {Point}, so they will {Next desired action, belief, or thought}.\n\nThe immediate next step the reader should take is {CTA}.`,
+    chinese: "## 目標受眾："
+  },
   {
     type: "## Hooks : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 開頭："
   },
   {
     type: "## Conclusions : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 結論："
   },
   {
     type: "## References : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: "## 參考："
   },
   {
     type: "d/💫",
     description: "Echo from",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: ""
   },
   {
     type: "d/⏫",
     description: "Idea/Task/Action Compass - Up - North - Where does this idea come from / Reason of this idea? OR What is the goal/prereq of this task/action?",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: ""
   },
   {
     type: "d/⏬",
     description: "Idea/Task/Action Compass - Down - Sorth - Where does the idea lead to / It can solve what problem? OR What is the result/next task/action of this task/action?",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: ""
   },
   {
     type: "d/⏩️",
     description: "Idea/Task/Action Compass - Right - East - What are similar / supporting idea? OR Same Goal Different Task/Action?",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: ""
   },
   {
     type: "d/⏪",
     description: "Idea/Task/Action Compass - Left - West - What are oppose idea? OR Same Task/Action Different Goal?",
-    additionalInfo: ""
+    additionalInfo: "",
+    chinese: ""
   },
 ];
 
@@ -206,7 +238,7 @@ export class AddFootnoteTagModal extends FuzzySuggestModal<FootnoteType> {
   }
 
   getItems(): FootnoteType[] {
-    return ALL_TYPES;
+    return ALL_FOOTNOTE_TYPES;
   }
 
   getItemText(noteType: FootnoteType): string {
@@ -214,7 +246,7 @@ export class AddFootnoteTagModal extends FuzzySuggestModal<FootnoteType> {
   }
 
   static removeTag(line: string): string {
-    ALL_TYPES.forEach((noteType) => line = line.replace(`#${noteType.type} `, ''))
+    ALL_FOOTNOTE_TYPES.forEach((noteType) => line = line.replace(`#${noteType.type} `, ''))
     return line
   }
 
@@ -230,7 +262,7 @@ export class AddFootnoteTagModal extends FuzzySuggestModal<FootnoteType> {
   }
 
   containsType(line: String) : Boolean {
-    return ALL_TYPES.filter((noteType) => line.contains(noteType.type)).length > 0
+    return ALL_FOOTNOTE_TYPES.filter((noteType) => line.contains(noteType.type)).length > 0
   }
 
   // Perform action on the selected suggestion.

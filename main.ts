@@ -1,6 +1,6 @@
 import { UpdateNoteTypeModal } from 'updateNoteTypeModal';
 import { App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, Vault, EditorSelection, Workspace, parseFrontMatterTags, WorkspaceLeaf } from 'obsidian';
-import { AddFootnoteTagModal } from 'addCommentTagModal';
+import { ALL_FOOTNOTE_TYPES, AddFootnoteTagModal } from 'addCommentTagModal';
 import { AddTaskTagModal } from 'addTaskTagModal';
 import { renameBlogTitle, renameTag, renameThreadsTitle } from 'tagrenamer/renaming';
 import { ThreadsToImagesModal } from 'ThreadsToImagesModal';
@@ -1486,6 +1486,40 @@ this.addCommand({
 			}
 		});
 		*/
+		this.addObsidianIcon('export-header-to-clipboard', 'HW');
+		this.addCommand({
+			id: "export-header-to-clipboard",
+			name: "HW	 Export Header To Clipboard and TickTick Watch List",
+			icon: `export-header-to-clipboard`,
+			editorCallback: async (editor: Editor, view: MarkdownView) => {
+			  const title = "【" + view.file.basename + "】\n"
+			  let text = title
+			  for (let i = 0; i < editor.lineCount(); i++) {
+				const line = editor.getLine(i)
+				if (/^#+ /.test(line)) {
+				  let line2 = line
+				  for (const footNoteType of ALL_FOOTNOTE_TYPES) {
+					line2 = line2.replace(footNoteType.type.replace("## ", ""), footNoteType.chinese.replace("## ", ""))
+				  }
+				  const modifiedLine = line2.replace(/^#+ /, "- ")
+				  text += modifiedLine + "\n"
+				}
+			  }
+			  try {
+				this.addToClipboardHistory(text);
+				await navigator.clipboard.writeText(text);
+				new Notice(`Copied summary\n\`\`\`\n${text}\n\`\`\`\\nas link to clipboard!`);
+				} catch (error) {
+					new Notice(`Error occurred when copying to clipboard: ${error}`);
+				}
+				if (text.length !== 0) {
+					const aaa = title + text
+					const textToWatch = encodeURI(aaa);
+					console.log(aaa)
+					window.open(`shortcuts://run-shortcut?name=Add%20To%20TickTick%20Watch%20List&input=text&text=${textToWatch}&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://`);
+				  }
+			}
+		});
 
 		this.addObsidianIcon('add-comment-tag-icon', 'DT');
 		this.addCommand({
