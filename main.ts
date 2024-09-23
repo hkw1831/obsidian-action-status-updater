@@ -1515,7 +1515,6 @@ this.addCommand({
 				if (text.length !== 0) {
 					const aaa = title + text
 					const textToWatch = encodeURI(aaa);
-					console.log(aaa)
 					window.open(`shortcuts://run-shortcut?name=Add%20To%20TickTick%20Watch%20List&input=text&text=${textToWatch}&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://`);
 				  }
 			}
