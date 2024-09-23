@@ -1489,7 +1489,7 @@ this.addCommand({
 		this.addObsidianIcon('export-header-to-clipboard', 'HW');
 		this.addCommand({
 			id: "export-header-to-clipboard",
-			name: "HW Export Header To Clipboard and TickTick Watch List",
+			name: "HW Export Header To Clipboard and TickTick",
 			icon: `export-header-to-clipboard`,
 			editorCallback: async (editor: Editor, view: MarkdownView) => {
 			  const title = "【" + view.file.basename + "】\n"
@@ -1515,7 +1515,7 @@ this.addCommand({
 				if (text.length !== 0) {
 					const aaa = title + text
 					const textToWatch = encodeURI(aaa);
-					window.open(`shortcuts://run-shortcut?name=Add%20To%20TickTick%20Watch%20List&input=text&text=${textToWatch}&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://`);
+					window.open(`shortcuts://run-shortcut?name=Add%20To%20TickTick&input=text&text=${textToWatch}&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://`);
 				  }
 			}
 		});
