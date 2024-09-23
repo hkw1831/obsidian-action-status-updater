@@ -1489,7 +1489,7 @@ this.addCommand({
 		this.addObsidianIcon('export-header-to-clipboard', 'HW');
 		this.addCommand({
 			id: "export-header-to-clipboard",
-			name: "HW	 Export Header To Clipboard and TickTick Watch List",
+			name: "HW Export Header To Clipboard and TickTick Watch List",
 			icon: `export-header-to-clipboard`,
 			editorCallback: async (editor: Editor, view: MarkdownView) => {
 			  const title = "【" + view.file.basename + "】\n"
