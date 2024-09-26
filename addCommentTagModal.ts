@@ -153,6 +153,16 @@ export const ALL_FOOTNOTE_TYPES = [
     chinese: "## 結論："
   },
   {
+    type: "## Raw : ",
+    description: "",
+    additionalInfo: ""
+  },
+  {
+    type: "## GPT Summary : ",
+    description: "",
+    additionalInfo: ""
+  },
+  {
     type: "## References : ",
     description: "",
     additionalInfo: "",
