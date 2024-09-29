@@ -135,6 +135,30 @@ export const ALL_FOOTNOTE_TYPES = [
     chinese: "## 比較："
   },
   {
+    type: "## Application : ",
+    description: "",
+    additionalInfo: "",
+    chinese: "## 應用："
+  },
+  {
+    type: "## Action : ",
+    description: "",
+    additionalInfo: "",
+    chinese: "## 行動："
+  },
+  {
+    type: "## Counter Example : ",
+    description: "",
+    additionalInfo: "",
+    chinese: "## 反例："
+  },
+  {
+    type: "## Why Important : ",
+    description: "",
+    additionalInfo: "",
+    chinese: "## 為什麼重要："
+  },
+  {
     type: "## Target Auduience : ",
     description: "",
     additionalInfo: `This piece is about {Topic}.\n\nIt's written for {Audience} who have {Problem}.\n\nBy the time they finish, they will feel {Emotion}.\n\nAnd they will {learn, have, be able to} do {Benefit}.\n\nAfter reading this piece they will releaze {Point}, so they will {Next desired action, belief, or thought}.\n\nThe immediate next step the reader should take is {CTA}.`,
@@ -155,12 +179,14 @@ export const ALL_FOOTNOTE_TYPES = [
   {
     type: "## Raw : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "```\n\n```",
+    chinese: ""
   },
   {
     type: "## GPT Summary : ",
     description: "",
-    additionalInfo: ""
+    additionalInfo: "```\n\n```",
+    chinese: ""
   },
   {
     type: "## References : ",
