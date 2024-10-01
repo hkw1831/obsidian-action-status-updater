@@ -905,7 +905,7 @@ this.addCommand({
 					const previousLine = editor.getLine(line-1)
 					editor.replaceRange("", {line: line-1, ch: previousLine.length}, {line: line, ch: lineContent.length})
 				}
-				editor.setValue(editor.getValue().replace(/^---\n+---\n/, "---\ntags: b/n/c\n---\n").replace(/\n$/, ""))
+				editor.setValue(editor.getValue().replace(/^---\n+---\n/, "---\ntags: b/n/s\n---\n").replace(/\n$/, ""))
 				editor.setCursor({line: line, ch: ch > editor.getLine(line).length ? editor.getLine(line).length : ch})
 				new Notice("Copied to clipboard: " + parentLink)
 			})
@@ -978,7 +978,7 @@ this.addCommand({
 			text += fm
 		}
 		text += c
-		text = text.replace(/^---\n+---\n/m, "---\ntags: b/n/c\n---\n").replace(/\n$/, "")
+		text = text.replace(/^---\n+---\n/m, "---\ntags: b/n/s\n---\n").replace(/\n$/, "")
 		editor.setValue(text)
 		new Notice("Formatted tidy list note")
 	},
