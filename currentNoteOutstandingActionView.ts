@@ -11,6 +11,7 @@ interface LineInfo {
 
 class CurrentNoteOutstandingActionView extends ItemView {
   public currentNotesPath: string
+  filterStr: string = ''
   tagsToMatch = ["#wn", "#nn", "#wl", "#nl", "#ww", "#nw", "tm"];
   constructor(leaf: WorkspaceLeaf, notesTypeTag: string) {
     super(leaf);
@@ -72,12 +73,16 @@ class CurrentNoteOutstandingActionView extends ItemView {
             const heading = this.getHeadingForLine(fileCache, tagMetadata.position.start.line);
             const lineContent = fileLines[tagMetadata.position.start.line].trim();
             const newLineIfNeeded = heading.length != 0 ? (this.isWindows() ? "\r\n" : "\n") : "" 
+            const contentToDisplay = heading + newLineIfNeeded + lineContent
             
-            lineInfosInner.push({
-              content: heading + newLineIfNeeded + lineContent, 
-              line: tagMetadata.position.start.line,
-              tag: tagMetadata.tag
-            });
+            if (this.filterStr === "" || contentToDisplay.toLowerCase().includes(this.filterStr.toLowerCase()))
+            {
+              lineInfosInner.push({
+                content: contentToDisplay, 
+                line: tagMetadata.position.start.line,
+                tag: tagMetadata.tag
+              });
+            }
           }
         }
         if (lineInfosInner.length > 0) {
@@ -90,6 +95,51 @@ class CurrentNoteOutstandingActionView extends ItemView {
     for (let lineInfo of lineInfos){
       allActionCount += lineInfo.length
     }
+
+    // Create a container for the search field and button
+    const searchContainer = this.containerEl.createDiv({ cls: 'search-container' });
+
+    // Create the search field
+    const searchField = searchContainer.createEl('input', {
+      type: 'text',
+      placeholder: this.filterStr === '' ? 'Filter...' : this.filterStr,
+      cls: 'search-field'
+    });
+
+    // Add event listener to the search field
+    searchField.addEventListener('input', (event: Event) => {
+      this.filterStr = (event.target as HTMLInputElement).value.toLowerCase();
+    });
+
+    // Add event listener for Enter key on the search field
+    searchField.addEventListener('keydown', (event: KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        searchButton.click();
+      }
+    });
+
+    // Create the search button
+    const searchButton = searchContainer.createEl('button', {
+      text: 'Filter',
+      cls: 'search-button'
+    });
+
+    // Add event listener to the search button
+    searchButton.addEventListener('click', () => {
+      this.redraw(true);
+    });
+
+    // Create the clear button
+    const clearButton = searchContainer.createEl('button', {
+      text: 'Clear',
+      cls: 'clear-button'
+    });
+
+    // Add event listener to the search button
+    clearButton.addEventListener('click', () => {
+      this.filterStr = '';
+      this.redraw(true);
+    });
 
     //console.log(lineInfos)
     let noteType = getNoteType(path)
