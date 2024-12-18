@@ -86,10 +86,15 @@ class CurrentNoteOutstandingActionView extends ItemView {
       }
     }
 
+    let allActionCount = 0
+    for (let lineInfo of lineInfos){
+      allActionCount += lineInfo.length
+    }
+
     //console.log(lineInfos)
     let noteType = getNoteType(path)
     let prefix = noteType ? (noteType.prefix ? noteType.prefix + " " : "") : ""
-    this.containerEl.createDiv({ cls: 'nav-header', text: "Path: " + prefix + path });
+    this.containerEl.createDiv({ cls: 'nav-header', text: "Path: " + prefix + path + " ( " + allActionCount + " )" });
 
     const rootEl = this.containerEl.createDiv({ cls: 'nav-folder mod-root scrollable' });
     const childrenEl = rootEl.createDiv({ cls: 'nav-folder-children' });
@@ -98,7 +103,7 @@ class CurrentNoteOutstandingActionView extends ItemView {
       const navFile = childrenEl.createDiv({
         cls: 'tree-item nav-file recent-files-file',
       });
-      navFile.setText(lineInfo[0].tag)
+      navFile.setText(lineInfo[0].tag + " ( " + lineInfo.length + " )" )
       for (let lineInfoInner of lineInfo) {
         const navFile = childrenEl.createDiv({
           cls: 'tree-item nav-file recent-files-file',
