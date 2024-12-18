@@ -294,6 +294,16 @@ export const ALL_TYPES = [
     },
 ];
 
+// #a/a/p -> "Area of Responsibility - Primary"
+export function getNoteDescriptionByType(type: string): string {
+    for (const noteType of ALL_TYPES) {
+        if (type.replace("#", "") == noteType.type) {
+            return noteType.description;
+        }
+    }
+    return "";
+}
+
 export function getNoteType(path:String) : NoteType | null {
     const file = this.app.vault.getAbstractFileByPath(path);
     if (!file) {

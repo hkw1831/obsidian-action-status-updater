@@ -1,7 +1,7 @@
 import MyPlugin from "main";
-import { NotesTypeView } from "notesTypeView";
-import { App, FuzzyMatch, FuzzySuggestModal, SuggestModal } from "obsidian";
-import { getAllTagsWithFilter, getAllTaskMixedWithActionTagsWithFilter } from "selfutil/getAllNoteTags";
+import { App, SuggestModal } from "obsidian";
+import { getAllTaskMixedWithActionTagsWithFilter } from "selfutil/getAllNoteTags";
+import { getNoteDescriptionByType } from "selfutil/getTaskTag";
 
 interface Search {
 	openGlobalSearch(_: string): void;
@@ -86,6 +86,13 @@ export class TagSearchModal extends SuggestModal<string> {
 		const index = this.resultContainerEl.querySelectorAll('.suggestion-item').length;
 		const itemIndex = index < 10 ? index + ". " : "    "
 		el.createEl("div", { text: itemIndex + noteType });
+
+		const taskPlusAction = noteType.split(" ")
+
+		const description = getNoteDescriptionByType(taskPlusAction[0]);
+		if (description !== "") {
+			el.createEl("small", { text: "     " + description + (taskPlusAction.length > 1 ? " - " + taskPlusAction[1] : "") });
+		}
 	}
 
 	getSuggestions(query: string): string[] {
