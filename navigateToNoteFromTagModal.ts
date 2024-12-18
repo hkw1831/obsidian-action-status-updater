@@ -107,7 +107,7 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
   }
 
   getItemText(value: Note): string {
-    return value.search;
+    return value.type === heading ? value.secondary + value.search : value.search;
   }
 
   // Renders each suggestion item.
@@ -118,7 +118,7 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
       const noteType = getNoteType(item.search)
       prefix = noteType ? noteType.prefix + " " : ""
     }
-    const taskType = item.type == "tag" ? getNoteDescriptionByType(item.search) : "";
+    const taskType = item.type == tag ? getNoteDescriptionByType(item.search) : "";
     const index = this.resultContainerEl.querySelectorAll('.suggestion-item').length;
     const itemIndex = index < 10 ? index + ". " : "    "
     el.createEl("div", { text: itemIndex + prefix + item.search });
