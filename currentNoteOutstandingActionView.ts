@@ -110,7 +110,7 @@ class CurrentNoteOutstandingActionView extends ItemView {
     const searchField = searchContainer.createEl('input', {
       type: 'text',
       placeholder: this.filterStr === '' ? 'Filter...' : this.filterStr,
-      cls: 'search-field'
+      cls: 'width50'
     });
 
     // Add event listener to the search field
@@ -128,7 +128,7 @@ class CurrentNoteOutstandingActionView extends ItemView {
     // Create the search button
     const searchButton = searchContainer.createEl('button', {
       text: 'Filter',
-      cls: 'search-button'
+      cls: 'width25'
     });
 
     // Add event listener to the search button
@@ -139,7 +139,7 @@ class CurrentNoteOutstandingActionView extends ItemView {
     // Create the clear button
     const clearButton = searchContainer.createEl('button', {
       text: 'Clear',
-      cls: 'clear-button'
+      cls: 'width25'
     });
 
     // Add event listener to the search button
