@@ -144,7 +144,7 @@ class CurrentNoteOutstandingActionView extends ItemView {
 
     // Add event listener to the search button
     clearButton.addEventListener('click', () => {
-      this.filterStr = '';
+      this.clearFilter()
       this.redraw(true);
     });
 
