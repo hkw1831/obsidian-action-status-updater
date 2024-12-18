@@ -34,6 +34,10 @@ class CurrentNoteOutstandingActionView extends ItemView {
     return 'list-checks';
   }
 
+  clearFilter() {
+    this.filterStr = ''
+  }
+
   public readonly redraw = async (forceRedraw: boolean): Promise<void> => {
     const activeFile = app.workspace.getActiveFile();
     if (!activeFile) {
@@ -45,6 +49,9 @@ class CurrentNoteOutstandingActionView extends ItemView {
     if (!forceRedraw && activeFile.path === this.currentNotesPath) {
       //console.log("redraw() with same path")
       return;
+    }
+    if (activeFile.path !== this.currentNotesPath) {
+      this.clearFilter()
     }
     this.currentNotesPath = activeFile.path
 
