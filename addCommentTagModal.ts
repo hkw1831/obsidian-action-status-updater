@@ -9,6 +9,12 @@ interface FootnoteType {
 
 export const ALL_FOOTNOTE_TYPES = [
   {
+    type: "## Event Thought / Exp / Notes : ",
+    description: "",
+    additionalInfo: "",
+    chinese: ""
+  },
+  {
     type: "## Tips : ",
     description: "",
     additionalInfo: "",
