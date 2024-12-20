@@ -220,10 +220,10 @@ export default class MyPlugin extends Plugin {
 			this.addActionCommand(t);
 		});
 
-		['m'].forEach(t => {
-			this.addActionIcon(t);
-			this.addFollowUpCommand(t);
-		});
+//		['m'].forEach(t => {
+//			this.addActionIcon(t);
+//			this.addFollowUpCommand(t);
+//		});
 
 		['n', 'w'].forEach(t => {
 			this.addNewLaterActionIcon(t);
@@ -743,6 +743,29 @@ export default class MyPlugin extends Plugin {
 				{
 					modifiers: [`Ctrl`, `Alt`, `Shift`],
 					key: `p`,
+				},
+			]
+		})
+
+		this.addObsidianIcon('open-as-myself-icon', 'MY');
+		this.addCommand({
+			id: "open-as-myself",
+			name: "MY Open As Myself",
+			icon: "open-as-myself-icon",
+			callback: async () => {
+				const { vault, workspace } = this.app;
+				const inboxMd = "C/As Myself.md"
+				const leaf = workspace.getLeaf(false);
+				await leaf.openFile(vault.getAbstractFileByPath(inboxMd) as TFile, { active : true });
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `m`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `m`,
 				},
 			]
 		})
