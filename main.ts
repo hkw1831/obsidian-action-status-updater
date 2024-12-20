@@ -3723,11 +3723,11 @@ this.addCommand({
 				if (tag.contains(`#a/w/`)) {
 					let modifiedLine = line;
 					if (/^\t*- /.test(line)) {
-					modifiedLine = line.replace(/^(\t*- )/, `$1#w${t} `);
+						modifiedLine = line.replace(/^(\t*- )/, `$1#w${t} `);
 					} else if (/^\t*\d+\. /.test(line)) {
-					modifiedLine = line.replace(/^(\t*\d+\. )/, `$1w${t} `);
+						modifiedLine = line.replace(/^(\t*\d+\. )/, `$1#w${t} `);
 					} else {
-					modifiedLine = line.replace(/^/, `#w${t} `);
+						modifiedLine = line.replace(/^/, `#w${t} `);
 					}
 					editor.setLine(i, modifiedLine);
 					if (isOnlyOneLine) {
@@ -3739,11 +3739,11 @@ this.addCommand({
 				if (tag.contains(`#a/n/`)) {
 					let modifiedLine = line;
 					if (/^\t*- /.test(line)) {
-					modifiedLine = line.replace(/^(\t*- )/, `$1#n${t} `);
+						modifiedLine = line.replace(/^(\t*- )/, `$1#n${t} `);
 					} else if (/^\t*\d+\. /.test(line)) {
-					modifiedLine = line.replace(/^(\t*\d+\. )/, `$1n${t} `);
+						modifiedLine = line.replace(/^(\t*\d+\. )/, `$1#n${t} `);
 					} else {
-					modifiedLine = line.replace(/^/, `#n${t} `);
+						modifiedLine = line.replace(/^/, `#n${t} `);
 					}
 					editor.setLine(i, modifiedLine);
 					if (isOnlyOneLine) {
