@@ -29,6 +29,7 @@ import { RewriteThreadsModal } from 'rewriteThreads';
 import { NotesTypeView, VIEW_TYPE_NOTE_LIST } from 'notesTypeView';
 import { CurrentNoteOutstandingActionView, VIEW_TYPE_CURRENT_OURSTANDING_TASK } from 'currentNoteOutstandingActionView';
 import { EchoModal } from 'echoModal';
+import { CurrentNoteAllLineView, VIEW_TYPE_CURRENT_NOTE_ALL_LINE } from 'currentNoteSearchFilterView';
 
 // Remember to rename these classes and interfaces!
 
@@ -50,6 +51,7 @@ export default class MyPlugin extends Plugin {
 	public notesTypeView: NotesTypeView;
 	public notesTypeTag : string = ""
 	public currentNoteOutstandingActionView: CurrentNoteOutstandingActionView;
+	public currentNoteAllLineView: CurrentNoteAllLineView;
 	public plugin: MyPlugin = this
 	private lastActiveLeaf: WorkspaceLeaf | null = null;
 
@@ -91,6 +93,22 @@ export default class MyPlugin extends Plugin {
         }
 	}
 
+	public async activateCurrentNoteAllLineView() {
+		let leaf: WorkspaceLeaf | null;
+        [leaf] = this.app.workspace.getLeavesOfType(
+			VIEW_TYPE_CURRENT_NOTE_ALL_LINE,
+        );
+        if (!leaf) {
+          leaf = this.app.workspace.getLeftLeaf(false);
+          await leaf?.setViewState({ type: VIEW_TYPE_CURRENT_NOTE_ALL_LINE });
+        }
+
+        if (leaf) {
+          this.app.workspace.revealLeaf(leaf);
+        }
+	}
+
+
 	async onload() {
 		await this.loadSettings();
 
@@ -110,6 +128,15 @@ export default class MyPlugin extends Plugin {
 
 		this.addRibbonIcon('list-checks', 'Open Current Note Outstanding Action View', () => {
 			this.activateCurrentNoteOutstandingActionView();
+		});
+
+		this.registerView(
+			VIEW_TYPE_CURRENT_NOTE_ALL_LINE,
+			(leaf) => this.currentNoteAllLineView = new CurrentNoteAllLineView(leaf, this.notesTypeTag)
+		);
+
+		this.addRibbonIcon('bullet-list', 'Open Current File All Line View', () => {
+			this.activateCurrentNoteAllLineView();
 		});
 		/*
 	this.registerEvent(
@@ -135,6 +162,9 @@ export default class MyPlugin extends Plugin {
 			if (this.currentNoteOutstandingActionView) {
 				this.currentNoteOutstandingActionView.redraw(true);
 			}
+			if (this.currentNoteAllLineView) {
+				this.currentNoteAllLineView.redraw(true);
+			}
 		})
 
 		this.app.workspace.on("active-leaf-change", (leaf) => {
@@ -144,6 +174,9 @@ export default class MyPlugin extends Plugin {
 			if (leaf.view instanceof MarkdownView) {
 				if (this.currentNoteOutstandingActionView) {
 					this.currentNoteOutstandingActionView.redraw(false);
+				}
+				if (this.currentNoteAllLineView) {
+					this.currentNoteAllLineView.redraw(false);
 				}
 			}
         });
@@ -561,6 +594,18 @@ export default class MyPlugin extends Plugin {
 					key: `t`,
 				},
 			]
+		});
+
+
+		this.addCommand({
+			id: "open-current-file-all-line-view",
+			name: "Open Current File All Line View",
+			icon: "bullet-list",
+			callback: () => {
+			//editorCallback: (editor: Editor, view: MarkdownView) => {				
+				this.activateCurrentNoteAllLineView()
+				this.currentNoteAllLineView.redraw(true);
+			}
 		});
 
 		
