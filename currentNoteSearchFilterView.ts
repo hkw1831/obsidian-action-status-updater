@@ -82,7 +82,8 @@ class CurrentNoteAllLineView extends ItemView {
       
       }
       
-      
+    const label = this.containerEl.createDiv({ cls: 'nav-folder-children' });
+    label.setText("Current notes");
 
     // Create a container for the search field and button
     const searchContainer = this.containerEl.createDiv({ cls: 'search-container' });

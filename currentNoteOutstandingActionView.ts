@@ -103,6 +103,9 @@ class CurrentNoteOutstandingActionView extends ItemView {
       allActionCount += lineInfo.length
     }
 
+    const label = this.containerEl.createDiv({ cls: 'nav-folder-children' });
+    label.setText("Outstanding Actions");
+
     // Create a container for the search field and button
     const searchContainer = this.containerEl.createDiv({ cls: 'search-container' });
 
