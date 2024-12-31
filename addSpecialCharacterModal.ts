@@ -61,6 +61,12 @@ export const ALL_SPECIAL_CHARACTER_TYPE : SpecialCharacterType[] = [
     description: "Bullet 1",
     additionalInfo: "",
     chinese: ""
+  },
+  {
+    character: "• • •" + "\n" + "```" + "\n" + "標題使用方形括號：【新的標題】" + "\n" + "副標題用橫線：── 新的副標題" + "\n" + "大段落標題用方框：▋" + "\n" + "小段落標題用細框：▍" + "\n" + "常用符號：⤷ ▸ ➤ → •" + "\n" + "• • •" + "\n",
+    description: "All Characters",
+    additionalInfo: "",
+    chinese: ""
   }
 ];
 
