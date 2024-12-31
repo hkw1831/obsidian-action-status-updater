@@ -30,6 +30,7 @@ import { NotesTypeView, VIEW_TYPE_NOTE_LIST } from 'notesTypeView';
 import { CurrentNoteOutstandingActionView, VIEW_TYPE_CURRENT_OURSTANDING_TASK } from 'currentNoteOutstandingActionView';
 import { EchoModal } from 'echoModal';
 import { CurrentNoteAllLineView, VIEW_TYPE_CURRENT_NOTE_ALL_LINE } from 'currentNoteSearchFilterView';
+import { AddSpecialCharacterModal } from 'addSpecialCharacterModal';
 
 // Remember to rename these classes and interfaces!
 
@@ -1585,6 +1586,28 @@ this.addCommand({
 					window.open(`shortcuts://run-shortcut?name=Add%20To%20TickTick%20for%20TCP&input=text&text=${textToWatch}&x-success=obsidian://&x-cancel=obsidian://&x-error=obsidian://`);
 				  }
 			}
+		});
+
+		this.addObsidianIcon('add-special-character-icon', '.*');
+		this.addCommand({
+			id: "add-special-character",
+			name: ".* Add Special Character",
+			icon: `add-special-character-icon`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+			  new AddSpecialCharacterModal(this.app, editor).open();
+			},
+			/*
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `z`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `z`,
+				},
+			]
+			*/
 		});
 
 		this.addObsidianIcon('add-comment-tag-icon', 'DT');
