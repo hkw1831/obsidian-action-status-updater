@@ -37,6 +37,7 @@ class CurrentNoteAllLineView extends ItemView {
   }
 
   public readonly redraw = async (forceRedraw: boolean): Promise<void> => {
+    //console.log("redraw() with forceRedraw: " + forceRedraw)
     const activeFile = app.workspace.getActiveFile();
     if (!activeFile) {
       //console.log("redraw() with no active file")
@@ -59,31 +60,24 @@ class CurrentNoteAllLineView extends ItemView {
     if (!f) {
       return
     }
-    //console.log("redraw()")
-    //const tag = "#c/t/p"
     
     this.containerEl.empty();
 
-    const fileCache = this.app.metadataCache.getFileCache(f);
     let lineInfos : LineInfo[] = []
     
-    if (fileCache && fileCache.tags) {
-      const content = await this.app.vault.read(f);
-      const fileLines = content.split('\n');
-      //let lineInfosInner : LineInfo[] = []
-      for (let i = 0; i < fileLines.length; i++) {
-        const lineInfo = fileLines[i]
-        if (this.filterStr === "" || lineInfo.toLowerCase().includes(this.filterStr.toLowerCase()))
-          lineInfos.push({
-            content: lineInfo, 
-            line: i,
-          });
-        }
-      
-      }
-      
-    const label = this.containerEl.createDiv({ cls: 'nav-folder-children' });
-    label.setText("Current notes");
+    const content = await this.app.vault.read(f);
+    const fileLines = content.split('\n');
+    for (let i = 0; i < fileLines.length; i++) {
+      const lineInfo = fileLines[i]
+      if (this.filterStr === "" || lineInfo.toLowerCase().includes(this.filterStr.toLowerCase()))
+        lineInfos.push({
+          content: lineInfo, 
+          line: i,
+        });
+    }
+    
+  const label = this.containerEl.createDiv({ cls: 'nav-folder-children' });
+  label.setText("Current notes");
 
     // Create a container for the search field and button
     const searchContainer = this.containerEl.createDiv({ cls: 'search-container' });
@@ -154,7 +148,6 @@ class CurrentNoteAllLineView extends ItemView {
 
         navFileTitleContent.setText(lineInfo.line + " : " + lineInfo.content);
         navFileTitle.addEventListener('contextmenu', (event: MouseEvent) => {
-
           const menu = new Menu();
           menu.addItem((item) =>
             item
