@@ -1328,7 +1328,7 @@ this.addCommand({
 									actionTag += "d"
 								}
 								if (/ archive /.test(line) || / archine$/.test(line)) {
-									actionTag += "w"
+									actionTag += "a"
 								}
 								if (actionTag.length == 2) {
 									actionTag = "#" + actionTag + " "
