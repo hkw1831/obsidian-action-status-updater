@@ -816,6 +816,7 @@ export default class MyPlugin extends Plugin {
 			]
 		})
 
+		/*
 		this.addObsidianIcon('open-braindump-icon', 'OB');
 		this.addCommand({
 			id: "open-braindump",
@@ -827,6 +828,30 @@ export default class MyPlugin extends Plugin {
 				const leaf = workspace.getLeaf(false);
 				await leaf.openFile(vault.getAbstractFileByPath(inboxMd) as TFile, { active : true });
 			},
+		})
+		*/
+
+		this.addObsidianIcon('open-bored-icon', 'IB');
+		this.addCommand({
+			id: "open-board",
+			name: "IB Open When I am Bored",
+			icon: "open-bored-icon",
+			callback: async () => {
+				const { vault, workspace } = this.app;
+				const inboxMd = "I/When I am Bored.md"
+				const leaf = workspace.getLeaf(false);
+				await leaf.openFile(vault.getAbstractFileByPath(inboxMd) as TFile, { active : true });
+			},
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `b`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `b`,
+				}
+			]
 		})
 
 		this.addCommand({
