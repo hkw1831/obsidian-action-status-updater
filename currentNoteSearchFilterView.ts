@@ -69,7 +69,9 @@ class CurrentNoteAllLineView extends ItemView {
     const fileLines = content.split('\n');
     for (let i = 0; i < fileLines.length; i++) {
       const lineInfo = fileLines[i]
-      if (this.filterStr === "" || lineInfo.toLowerCase().includes(this.filterStr.toLowerCase()))
+      const lineInfoLower = lineInfo.toLowerCase()
+      const filterStrLower = this.filterStr.toLowerCase()
+      if (this.filterStr === "" || lineInfoLower.includes(filterStrLower) || lineInfoLower.match(new RegExp(filterStrLower)))
         lineInfos.push({
           content: lineInfo, 
           line: i,

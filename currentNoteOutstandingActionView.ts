@@ -82,7 +82,9 @@ class CurrentNoteOutstandingActionView extends ItemView {
             const newLineIfNeeded = heading.length != 0 ? (this.isWindows() ? "\r\n" : "\n") : "" 
             const contentToDisplay = heading + newLineIfNeeded + lineContent
             
-            if (this.filterStr === "" || contentToDisplay.toLowerCase().includes(this.filterStr.toLowerCase()))
+            const contentToDisplayLower = contentToDisplay.toLowerCase()
+            const filterStrLower = this.filterStr.toLowerCase()
+            if (this.filterStr === "" || contentToDisplayLower.includes(filterStrLower) || contentToDisplayLower.match(new RegExp(filterStrLower)))
             {
               lineInfosInner.push({
                 content: contentToDisplay, 
