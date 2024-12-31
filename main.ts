@@ -816,7 +816,6 @@ export default class MyPlugin extends Plugin {
 			]
 		})
 
-		/*
 		this.addObsidianIcon('open-braindump-icon', 'OB');
 		this.addCommand({
 			id: "open-braindump",
@@ -829,7 +828,6 @@ export default class MyPlugin extends Plugin {
 				await leaf.openFile(vault.getAbstractFileByPath(inboxMd) as TFile, { active : true });
 			},
 		})
-		*/
 
 		this.addObsidianIcon('open-bored-icon', 'IB');
 		this.addCommand({
