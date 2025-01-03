@@ -61,6 +61,7 @@ class CurrentNoteAllLineView extends ItemView {
       return
     }
     
+    
     this.containerEl.empty();
 
     let lineInfos : LineInfo[] = []

@@ -31,6 +31,7 @@ import { CurrentNoteOutstandingActionView, VIEW_TYPE_CURRENT_OURSTANDING_TASK } 
 import { EchoModal } from 'echoModal';
 import { CurrentNoteAllLineView, VIEW_TYPE_CURRENT_NOTE_ALL_LINE } from 'currentNoteSearchFilterView';
 import { AddSpecialCharacterModal } from 'addSpecialCharacterModal';
+import { RecentFilesView, VIEW_TYPE_RECENT_FILE } from 'recentFilesView';
 
 // Remember to rename these classes and interfaces!
 
@@ -53,6 +54,7 @@ export default class MyPlugin extends Plugin {
 	public notesTypeTag : string = ""
 	public currentNoteOutstandingActionView: CurrentNoteOutstandingActionView;
 	public currentNoteAllLineView: CurrentNoteAllLineView;
+	public recentFilesView: RecentFilesView;
 	public plugin: MyPlugin = this
 	private lastActiveLeaf: WorkspaceLeaf | null = null;
 
@@ -109,6 +111,21 @@ export default class MyPlugin extends Plugin {
         }
 	}
 
+	public async activateRecentFilesView() {
+		let leaf: WorkspaceLeaf | null;
+        [leaf] = this.app.workspace.getLeavesOfType(
+			VIEW_TYPE_RECENT_FILE,
+        );
+        if (!leaf) {
+          leaf = this.app.workspace.getLeftLeaf(false);
+          await leaf?.setViewState({ type: VIEW_TYPE_RECENT_FILE });
+        }
+
+        if (leaf) {
+          this.app.workspace.revealLeaf(leaf);
+        }
+	}
+
 
 	async onload() {
 		await this.loadSettings();
@@ -138,6 +155,15 @@ export default class MyPlugin extends Plugin {
 
 		this.addRibbonIcon('bullet-list', 'Open Current File All Line View', () => {
 			this.activateCurrentNoteAllLineView();
+		});
+
+		this.registerView(
+			VIEW_TYPE_RECENT_FILE,
+			(leaf) => this.recentFilesView = new RecentFilesView(leaf, this.notesTypeTag)
+		);
+
+		this.addRibbonIcon('lucide-pencil', 'Open Recent Files View', () => {
+			this.activateRecentFilesView();
 		});
 		/*
 	this.registerEvent(
@@ -178,6 +204,9 @@ export default class MyPlugin extends Plugin {
 				}
 				if (this.currentNoteAllLineView) {
 					this.currentNoteAllLineView.redraw(false);
+				}
+				if (this.recentFilesView) {
+					this.recentFilesView.redraw(false);
 				}
 			}
         });
