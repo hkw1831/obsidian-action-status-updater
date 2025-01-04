@@ -8,11 +8,11 @@ export function getChildlinkItems(app: App, file : TFile): LinkType[] {
       return []
     }
     let childLinkResult = []
-    for (let i in backlinksData) {
-      for (let j = 0; j < backlinksData[i].length; j++) {
-        const index = backlinksData[i].length > 1 ? "[" + j + "]" : ""
+    for (let [i, v] of backlinksData.entries()) {
+      for (let j = 0; j < v.length; j++) {
+        const index = v.length > 1 ? "[" + j + "]" : ""
         if (i != file.path) {
-          const key = backlinksData[i][j]['key']
+          const key = v[j]['key']
           if (key) {
             childLinkResult.push({path: i, type: "v ", index: index, heading: "", line: 0, ch: 0})  
           }

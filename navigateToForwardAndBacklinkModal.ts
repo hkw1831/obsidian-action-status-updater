@@ -111,20 +111,23 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
     let parentLinkItems = []
 
     const backlinks = this.app.metadataCache.getBacklinksForFile(this.view.file)
+    //console.log(backlinks)
     const backlinksData = backlinks?.data
+    //console.log(backlinksData)
     if (backlinksData) {
-      for (let i in backlinksData) {
-        for (let j = 0; j < backlinksData[i].length; j++) {
-          const index = backlinksData[i].length > 1 ? "[" + j + "]" : ""
+      for (let [i, v] of backlinksData.entries()) {
+        //console.log("i = " + i + " : " + v)
+        for (let j = 0; j < v.length; j++) {
+          const index = v.length > 1 ? "[" + j + "]" : ""
           if (i != this.view.file.path) {
             //console.log("@@")
             //console.log(i)
-            //console.log(backlinksData[i][j])
-            const key = backlinksData[i][j]['key']
+            //console.log(v[j])
+            const key = v[j]['key']
             if (key) {
               childLinkItems.push({path: i, type: "v ", index: index, heading: "", line: 0, ch: 0})  
             } else {
-              const position = backlinksData[i][j]['position']
+              const position = v[j]['position']
               //console.log(position)
               //console.log(position['start']['line'])
               const line = position['start']['line']
@@ -134,7 +137,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
               const backlinkLineFiles2 = backlinkLineFiles.split("\n")
               const backlinkLine = backlinkLineFiles2[line].trim()
               const backlinkLine2 = backlinkLine.replace(/^- /, "").replace(/^\d+\. /, "")
-              const backlinkLine3 = backlinkLine2 === backlinksData[i][j]['original'] ? "" : backlinkLine2
+              const backlinkLine3 = backlinkLine2 === v[j]['original'] ? "" : backlinkLine2
 
               // for ZK
               let zkContent = ""
@@ -165,7 +168,7 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
                 zkContent = zkContent.replace(/\n$/, "")
               }
               const aaa = this.getBacklinkHeading(heading, backlinkLine3, zkContent);
-              backLinkItems.push({path: i, type: "< ", index: index, heading: aaa, line: backlinksData[i][j]['position']['start']['line'], ch: backlinksData[i][j]['position']['start']['col']})
+              backLinkItems.push({path: i, type: "< ", index: index, heading: aaa, line: v[j]['position']['start']['line'], ch: v[j]['position']['start']['col']})
             }
           }
         }
