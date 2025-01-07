@@ -17,6 +17,8 @@ export class AddTextToNotesFromSpecificTagModal extends FuzzySuggestModal<NoteWi
 
   insertFromBeginning: boolean
 
+  modalValueSelected: boolean
+
   postAction: () => void
 
   keydownHandler: (event: KeyboardEvent) => void;
@@ -28,6 +30,7 @@ export class AddTextToNotesFromSpecificTagModal extends FuzzySuggestModal<NoteWi
     this.tagToFind = tagToFind
     this.insertFromBeginning = insertFromBeginning
     this.description = description
+    this.modalValueSelected = false
     this.postAction = postAction
     this.setPlaceholder(`Which notes with tag ${tagToFind} do you want to ${description} to ${insertFromBeginning ? "beginning" : "end"} of the notes?`)
     this.setInstructions([
@@ -62,6 +65,9 @@ export class AddTextToNotesFromSpecificTagModal extends FuzzySuggestModal<NoteWi
     super.onClose();
     // Stop listening for keydown events when the modal is closed
     document.removeEventListener('keydown', this.keydownHandler);
+    if (!this.modalValueSelected) {
+      this.postAction()
+    }
   }
 
   getItems(): NoteWithHeader[] {
@@ -100,14 +106,15 @@ export class AddTextToNotesFromSpecificTagModal extends FuzzySuggestModal<NoteWi
   }
 
   // Perform action on the selected suggestion.
-  onChooseItem(path: NoteWithHeader, evt: MouseEvent | KeyboardEvent) {
+  async onChooseItem(path: NoteWithHeader, evt: MouseEvent | KeyboardEvent) {
+    this.modalValueSelected = true
     if (BACK_TO_SELECT_TAG == path.notePath) {
       new AddTextToNotesModal(this.app, this.linkToAdd, this.description, this.insertFromBeginning, this.postAction).open()
     } else if (SEPARATOR === path.notePath) {
       // do nothing
     } else {
-      addTextToNotes(this.linkToAdd, path.notePath, this.app, this.insertFromBeginning, path.startLine)
-      this.postAction()
+      await addTextToNotes(this.linkToAdd, path.notePath, this.app, this.insertFromBeginning, path.startLine)
+      //this.postAction()
     }
   }
 }

@@ -1,5 +1,5 @@
 import { AddTextToNotesFromSpecificTagModal } from "addTextToNotesFromSpecificTagModal";
-import { App, FuzzySuggestModal, FuzzyMatch, getAllTags } from "obsidian";
+import { App, FuzzySuggestModal, FuzzyMatch, getAllTags, TFile } from "obsidian";
 import { addTextToNotes } from "selfutil/addlinktonotes";
 import { getAllHeaders } from "selfutil/getAllHeaders";
 import { getAllNoteTags } from "selfutil/getAllNoteTags";
@@ -13,6 +13,7 @@ export class AddTextToNotesModal extends FuzzySuggestModal<NoteWithHeader> {
   taskType: String
   description: string
   insertFromBeginning: boolean
+  modalValueSelected: boolean
   postAction: () => void
   items: NoteWithHeader[]
   keydownHandler: (event: KeyboardEvent) => void;
@@ -23,6 +24,7 @@ export class AddTextToNotesModal extends FuzzySuggestModal<NoteWithHeader> {
     this.linkToAdd = linkToAdd
     this.description = description
     this.insertFromBeginning = insertFromBeginning
+    this.modalValueSelected = false
     this.postAction = postAction
     this.setPlaceholder(`Which notes with tags do you want to ${description} to ${insertFromBeginning ? "beginning" : "end"} of the notes?`)
     this.setInstructions([
@@ -76,6 +78,10 @@ export class AddTextToNotesModal extends FuzzySuggestModal<NoteWithHeader> {
     super.onClose();
     // Stop listening for keydown events when the modal is closed
     document.removeEventListener('keydown', this.keydownHandler);
+    if (!this.modalValueSelected)
+    {
+      //this.postAction()
+    }
   }
 
   getItemText(value: NoteWithHeader): string {
@@ -96,7 +102,7 @@ export class AddTextToNotesModal extends FuzzySuggestModal<NoteWithHeader> {
     const itemIndex = index < 10 ? index + ". " : "    "
     el.createEl("div", { text: itemIndex + prefix + item.notePath})// + item.header})
     if (item.header.length > 0) {
-      el.createEl("small", { text: "     " + item.header})
+      el.createEl("small", { text: "     " + item.header + " " + item.startLine})
     }
   }
 
@@ -129,11 +135,16 @@ export class AddTextToNotesModal extends FuzzySuggestModal<NoteWithHeader> {
 
   // Perform action on the selected suggestion.
   async onChooseItem(choosenValue: NoteWithHeader, evt: MouseEvent | KeyboardEvent) {
+    this.modalValueSelected = true
     if (choosenValue.notePath.startsWith("@")) {
       new AddTextToNotesFromSpecificTagModal(this.app, this.linkToAdd, choosenValue.notePath.replace(/^@/, "#"), this.description, this.insertFromBeginning, this.postAction).open()
     } else {
-      addTextToNotes(this.linkToAdd, choosenValue.notePath, this.app, this.insertFromBeginning, choosenValue.startLine)
-      this.postAction()
+      const tFile: TFile = app.vault.getAbstractFileByPath(choosenValue.notePath) as TFile
+      const value = await app.vault.read(tFile)
+      //console.log("haha")
+      //console.log(value)
+      await addTextToNotes(this.linkToAdd, choosenValue.notePath, this.app, this.insertFromBeginning, choosenValue.startLine)
+      //this.postAction()
     }
   }
 }

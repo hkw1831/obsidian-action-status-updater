@@ -2,15 +2,24 @@ import { App, Editor, MarkdownView, Notice, TFile, TextFileView, Vault, Workspac
 
 // if headingLine < 0, meaning insert first or last of notes
 // else insert first or last of heading line
-export function addTextToNotes(textToAdd: string, toPath: string, app: App, insertFromBeginning: boolean, headingLine: number) {
+export async function addTextToNotes(textToAdd: string, toPath: string, app: App, insertFromBeginning: boolean, headingLine: number) {
     const vault: Vault = this.app.vault;
     const workspace: Workspace = this.app.workspace
     const leaf = workspace.getLeaf(false);
     const tFile: TFile = vault.getAbstractFileByPath(toPath) as TFile
+    //console.log(tFile.path)
     const link = textToAdd
     Promise.resolve()
     .then(() => {
         return leaf.openFile(tFile, { active: true });
+    })
+    .then(() => {
+        // read tFile value
+        return vault.read(tFile)
+    })
+    .then((value) => {
+        //console.log(value)
+        return vault.modify(tFile, value)
     })
     .then(() => {
         //const editor = app.workspace.getActiveViewOfType(TextFileView);
@@ -21,6 +30,7 @@ export function addTextToNotes(textToAdd: string, toPath: string, app: App, inse
             const errorReason = `editor or value ${toPath} not exist. Aborting...`
             return Promise.reject(errorReason)
         }
+        console.log(editor.getValue())
         const trimmedLink = link.trim().replace(/^- /, '')
         if (editor.getValue().includes(trimmedLink)) {
             const errorReason = `Link ${trimmedLink} already exists in ${toPath}!`

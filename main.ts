@@ -2054,7 +2054,8 @@ this.addCommand({
 			id: "move-current-selection-to-beginning-of-notes",
 			name: "MB << Move current selection to beginning of notes",
 			icon: `move-current-selection-to-beginning-of-notes`,
-			editorCallback: (editor: Editor, view: MarkdownView) => {
+			editorCallback: async (editor: Editor, view: MarkdownView) => {
+				const oldContent = editor.getValue()
 				let selection = exportCurrentSelection(editor)
 				if (/^    +- /m.test(selection)
 				  || /^- /m.test(selection)
@@ -2075,8 +2076,19 @@ this.addCommand({
 						newContent = newContent + editor.getLine(i) + "\n"
 					}
 				}
-				
-				new AddTextToNotesModal(this.app, selection, "move the selected text", true, () => editor.setValue(newContent.replace(/\n$/m, ""))).open()
+				await this.app.vault.modify(view.file, newContent);
+
+				// Trigger metadata refresh
+				this.app.metadataCache.trigger("changed", view.file);
+
+				await new Promise(resolve => setTimeout(resolve, 100)); // Small delay to ensure metadata update
+
+				//console.log(view.file.path)
+				const updatedContent = await this.app.vault.read(view.file);
+				//console.log("Updated Content:", updatedContent);
+
+				//new AddTextToNotesModal(this.app, selection, "move the selected text", true, () => editor.setValue(newContent.replace(/\n$/m, ""))).open()
+				new AddTextToNotesModal(this.app, selection, "move the selected text", true, () => editor.setValue(oldContent)).open()
 			},
 			hotkeys: [
 				{
@@ -2095,7 +2107,7 @@ this.addCommand({
 			id: "move-current-selection-to-end-of-notes",
 			name: "ME >> Move current selection to beginning of notes",
 			icon: `move-current-selection-to-end-of-notes`,
-			editorCallback: (editor: Editor, view: MarkdownView) => {
+			editorCallback: async (editor: Editor, view: MarkdownView) => {
 				let selection = exportCurrentSelection(editor)
 				if (/^    +- /m.test(selection)
 				  || /^- /m.test(selection)
@@ -2116,6 +2128,15 @@ this.addCommand({
 						newContent = newContent + editor.getLine(i) + "\n"
 					}
 				}
+				await this.app.vault.modify(view.file, newContent);
+
+				// Trigger metadata refresh
+				this.app.metadataCache.trigger("changed", view.file);
+
+				await new Promise(resolve => setTimeout(resolve, 100)); // Small delay to ensure metadata update
+
+				//console.log(view.file.path)
+				const updatedContent = await this.app.vault.read(view.file);
 				
 				new AddTextToNotesModal(this.app, selection, "move the selected text", false, () => editor.setValue(newContent.replace(/\n$/m, ""))).open()
 			},
