@@ -102,7 +102,8 @@ export class AddTextToNotesModal extends FuzzySuggestModal<NoteWithHeader> {
     const itemIndex = index < 10 ? index + ". " : "    "
     el.createEl("div", { text: itemIndex + prefix + item.notePath})// + item.header})
     if (item.header.length > 0) {
-      el.createEl("small", { text: "     " + item.header + " " + item.startLine})
+      el.createEl("small", { text: "     " + item.header})
+      //el.createEl("small", { text: "     " + item.header + " " + item.startLine})
     }
   }
 
