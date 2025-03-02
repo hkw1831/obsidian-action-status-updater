@@ -32,6 +32,7 @@ import { EchoModal } from 'echoModal';
 import { CurrentNoteAllLineView, VIEW_TYPE_CURRENT_NOTE_ALL_LINE } from 'currentNoteSearchFilterView';
 import { AddSpecialCharacterModal } from 'addSpecialCharacterModal';
 import { RecentFilesView, VIEW_TYPE_RECENT_FILE } from 'recentFilesView';
+import { RecentViewedNotesView, VIEW_TYPE_RECENT_VIEWED_NOTES } from 'recentViewedNotesView';
 
 // Remember to rename these classes and interfaces!
 
@@ -55,6 +56,7 @@ export default class MyPlugin extends Plugin {
 	public currentNoteOutstandingActionView: CurrentNoteOutstandingActionView;
 	public currentNoteAllLineView: CurrentNoteAllLineView;
 	public recentFilesView: RecentFilesView;
+	public recentViewedNotesView: RecentViewedNotesView;
 	public plugin: MyPlugin = this
 	private lastActiveLeaf: WorkspaceLeaf | null = null;
 
@@ -126,6 +128,21 @@ export default class MyPlugin extends Plugin {
         }
 	}
 
+	public async activateRecentViewedNotesView() {
+		let leaf: WorkspaceLeaf | null;
+        [leaf] = this.app.workspace.getLeavesOfType(
+			VIEW_TYPE_RECENT_VIEWED_NOTES,
+        );
+        if (!leaf) {
+          leaf = this.app.workspace.getLeftLeaf(false);
+          await leaf?.setViewState({ type: VIEW_TYPE_RECENT_VIEWED_NOTES });
+        }
+
+        if (leaf) {
+          this.app.workspace.revealLeaf(leaf);
+        }
+	}
+
 
 	async onload() {
 		await this.loadSettings();
@@ -165,6 +182,25 @@ export default class MyPlugin extends Plugin {
 		this.addRibbonIcon('lucide-pencil', 'Open Recent Files View', () => {
 			this.activateRecentFilesView();
 		});
+
+		this.registerView(
+			VIEW_TYPE_RECENT_VIEWED_NOTES,
+			(leaf) => this.recentViewedNotesView = new RecentViewedNotesView(leaf, this.notesTypeTag)
+		);
+	
+		this.addRibbonIcon('history', 'Open Recent Viewed Notes', () => {
+			this.activateRecentViewedNotesView();
+		});
+
+		this.addCommand({
+			id: "open-recent-viewed-notes-view",
+			name: "Open Recent Viewed Notes View",
+			icon: "history",
+			callback: () => {
+				this.activateRecentViewedNotesView();
+				this.recentViewedNotesView.redraw(true);
+			}
+		});
 		/*
 	this.registerEvent(
 		this.app.workspace.on('active-leaf-change', (leaf) => {
@@ -191,6 +227,9 @@ export default class MyPlugin extends Plugin {
 			}
 			if (this.currentNoteAllLineView) {
 				this.currentNoteAllLineView.redraw(true);
+				}
+			if (this.recentViewedNotesView) {
+				this.recentViewedNotesView.redraw(true);
 			}
 		})
 
@@ -207,6 +246,9 @@ export default class MyPlugin extends Plugin {
 				}
 				if (this.recentFilesView) {
 					this.recentFilesView.redraw(false);
+				}
+				if (this.recentViewedNotesView) {
+					this.recentViewedNotesView.redraw(false);
 				}
 			}
         });
@@ -414,7 +456,7 @@ export default class MyPlugin extends Plugin {
 				} else {
 					// find next broken link
 					const unresolvedLinks: Record<string, Record<string, number>> = this.app.metadataCache.unresolvedLinks;
-					const brokenLinkRecord: Record<string, number> = unresolvedLinks[view.file.path]
+					const brokenLinkRecord: Record<string, number> = this.app.metadataCache.unresolvedLinks[view.file.path]
 					if (brokenLinkRecord == null) {
 						new Notice("No broken link found in this file")	
 						return
@@ -3620,83 +3662,10 @@ this.addCommand({
 			if (!line.trim().startsWith("%%") || !line.trim().endsWith("%%")) {
 				let modifiedLine = editor.getLine(i + above)
 				if (!/\d+\/\d+ *【.*】/.test(modifiedLine)) {
-					modifiedLine = modifiedLine.replace(/^\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
-											.replace(/[^!]\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
-											.replace(/https[^\n]+\.jpeg/g, "")
-											.replace(/^\s+$/g, "")
-											.replace(/^- /, "• ")
-					if (!/^\d+\. /.test(modifiedLine) && !/^• /.test(modifiedLine)) {
-						modifiedLine = modifiedLine.replace(/？([^】」\n])/g, "？\n\n$1")
-											.replace(/。([^】」\n])/g, "。\n\n$1")
-											.replace(/！([^】」\n])/g, "！\n\n$1")
-											.replace(/～([^】」\n])/g, "～\n\n$1")
-					}
-				}
-				text = text + modifiedLine + "\n"
-			}
-		})
-		text = text.replace(/\n+$/, "")
-		return text
-	}
-
-	getThreadsSegment(editor: Editor) : string {
-		let cursor = editor.getCursor();
-		let line = cursor.line;
-		let above = line;
-		let below = line;
-		// first get above
-		
-		while (above >= 0) {
-			let l = editor.getLine(above);
-			if (l == '---') {
-				break;
-			}
-			above--;
-		}
-		if (editor.getLine(above) == '---') {
-			above++;
-		}
-		while(true) {
-			if (editor.getLine(above) == '') {
-				above++;
-			} else {
-				break;
-			}
-		}
-
-		// then get below
-		while (below < editor.lineCount()) {
-			let l = editor.getLine(below);
-			if (l == '---') {
-				break;
-			}
-			below++;
-		}
-		if (editor.getLine(below) == '---') {
-			below--;
-		}
-
-		while(true) {
-			if (editor.getLine(below) == '') {
-				below--;
-			} else {
-				break;
-			}
-		}
-
-		// then put them to line
-
-		let text = "";
-		Array.from(Array(below - above + 1).keys()).forEach(i => {
-			const line = editor.getLine(i + above)
-			if (!line.trim().startsWith("%%") || !line.trim().endsWith("%%")) {
-				let modifiedLine = editor.getLine(i + above)
-				if (!/\d+\/\d+ *【.*】/.test(modifiedLine)) {
 					modifiedLine = modifiedLine.replace(/🧵[ ]+(.*)/g, "【$1】")
 											.replace(/^\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
 											.replace(/[^!]\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
-											.replace(/!\[.*\]\(https[^\n]+\.jpeg\)/g, "")
-											.replace(/https[^\n]+\.jpeg/g, "")									
+											.replace(/https[^\n]+\.jpeg/g, "")
 											.replace(/^\s+$/g, "")
 											.replace(/^- /, "• ")
 											.replace(/^#+ /, "")
@@ -3861,12 +3830,10 @@ this.addCommand({
 			}/*,
 			hotkeys: [
 				{
-					modifiers: [`Ctrl`, `Meta`, `Shift`],
-					key: t == 'n' ? '1' : '2'
+					modifiers: t == 'n' ? '1' : '2'
 				},
 				{
-					modifiers: [`Ctrl`, `Alt`, `Shift`],
-					key: t == 'n' ? '1' : '2'
+					modifiers: t == 'n' ? '1' : '2'
 				}
 			]*/
 		});
@@ -4112,6 +4079,7 @@ this.addCommand({
 
 	async onunload() {
 		this.app.workspace.detachLeavesOfType(VIEW_TYPE_NOTE_LIST);
+		this.app.workspace.detachLeavesOfType(VIEW_TYPE_RECENT_VIEWED_NOTES);
 	  }
 
 	async loadSettings() {
