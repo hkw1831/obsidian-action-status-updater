@@ -456,7 +456,7 @@ export default class MyPlugin extends Plugin {
 				} else {
 					// find next broken link
 					const unresolvedLinks: Record<string, Record<string, number>> = this.app.metadataCache.unresolvedLinks;
-					const brokenLinkRecord: Record<string, number> = this.app.metadataCache.unresolvedLinks[view.file.path]
+					const brokenLinkRecord: Record<string, number> = unresolvedLinks[view.file.path]
 					if (brokenLinkRecord == null) {
 						new Notice("No broken link found in this file")	
 						return
@@ -3662,9 +3662,82 @@ this.addCommand({
 			if (!line.trim().startsWith("%%") || !line.trim().endsWith("%%")) {
 				let modifiedLine = editor.getLine(i + above)
 				if (!/\d+\/\d+ *【.*】/.test(modifiedLine)) {
+					modifiedLine = modifiedLine.replace(/^\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
+											.replace(/[^!]\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
+											.replace(/https[^\n]+\.jpeg/g, "")
+											.replace(/^\s+$/g, "")
+											.replace(/^- /, "• ")
+					if (!/^\d+\. /.test(modifiedLine) && !/^• /.test(modifiedLine)) {
+						modifiedLine = modifiedLine.replace(/？([^】」\n])/g, "？\n\n$1")
+											.replace(/。([^】」\n])/g, "。\n\n$1")
+											.replace(/！([^】」\n])/g, "！\n\n$1")
+											.replace(/～([^】」\n])/g, "～\n\n$1")
+					}
+				}
+				text = text + modifiedLine + "\n"
+			}
+		})
+		text = text.replace(/\n+$/, "")
+		return text
+	}
+
+	getThreadsSegment(editor: Editor) : string {
+		let cursor = editor.getCursor();
+		let line = cursor.line;
+		let above = line;
+		let below = line;
+		// first get above
+		
+		while (above >= 0) {
+			let l = editor.getLine(above);
+			if (l == '---') {
+				break;
+			}
+			above--;
+		}
+		if (editor.getLine(above) == '---') {
+			above++;
+		}
+		while(true) {
+			if (editor.getLine(above) == '') {
+				above++;
+			} else {
+				break;
+			}
+		}
+
+		// then get below
+		while (below < editor.lineCount()) {
+			let l = editor.getLine(below);
+			if (l == '---') {
+				break;
+			}
+			below++;
+		}
+		if (editor.getLine(below) == '---') {
+			below--;
+		}
+
+		while(true) {
+			if (editor.getLine(below) == '') {
+				below--;
+			} else {
+				break;
+			}
+		}
+
+		// then put them to line
+
+		let text = "";
+		Array.from(Array(below - above + 1).keys()).forEach(i => {
+			const line = editor.getLine(i + above)
+			if (!line.trim().startsWith("%%") || !line.trim().endsWith("%%")) {
+				let modifiedLine = editor.getLine(i + above)
+				if (!/\d+\/\d+ *【.*】/.test(modifiedLine)) {
 					modifiedLine = modifiedLine.replace(/🧵[ ]+(.*)/g, "【$1】")
 											.replace(/^\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
 											.replace(/[^!]\[([^\[\]\(\)]+)\]\([^\[\]\(\)]+\)/g, "$1")
+											.replace(/!\[.*\]\(https[^\n]+\.jpeg\)/g, "")
 											.replace(/https[^\n]+\.jpeg/g, "")
 											.replace(/^\s+$/g, "")
 											.replace(/^- /, "• ")
@@ -3830,10 +3903,12 @@ this.addCommand({
 			}/*,
 			hotkeys: [
 				{
-					modifiers: t == 'n' ? '1' : '2'
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: t == 'n' ? '1' : '2'
 				},
 				{
-					modifiers: t == 'n' ? '1' : '2'
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: t == 'n' ? '1' : '2'
 				}
 			]*/
 		});
@@ -4080,6 +4155,9 @@ this.addCommand({
 	async onunload() {
 		this.app.workspace.detachLeavesOfType(VIEW_TYPE_NOTE_LIST);
 		this.app.workspace.detachLeavesOfType(VIEW_TYPE_RECENT_VIEWED_NOTES);
+		this.app.workspace.detachLeavesOfType(VIEW_TYPE_RECENT_FILE);
+		this.app.workspace.detachLeavesOfType(VIEW_TYPE_CURRENT_NOTE_ALL_LINE);
+		this.app.workspace.detachLeavesOfType(VIEW_TYPE_CURRENT_OURSTANDING_TASK);
 	  }
 
 	async loadSettings() {
