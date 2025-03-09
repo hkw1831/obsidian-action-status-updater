@@ -542,7 +542,8 @@ export default class MyPlugin extends Plugin {
 				}
 			}
 			new Notice("No unfinished action found after cursor line in this file")	
-		},
+		}
+		/*,
 		hotkeys: [
 			{
 				modifiers: [`Ctrl`, `Meta`, `Shift`],
@@ -553,6 +554,7 @@ export default class MyPlugin extends Plugin {
 				key: `k`,
 			},
 		]
+			*/
 	});
 
 	this.addCommand({
@@ -573,7 +575,8 @@ export default class MyPlugin extends Plugin {
 				}
 			}
 			new Notice("No unfinished action found after cursor line in this file")	
-		},
+		}
+		/*,
 		hotkeys: [
 			{
 				modifiers: [`Ctrl`, `Meta`, `Shift`],
@@ -583,7 +586,7 @@ export default class MyPlugin extends Plugin {
 				modifiers: [`Ctrl`, `Alt`, `Shift`],
 				key: `j`,
 			},
-		]
+		]*/
 	});
 
 
@@ -1745,6 +1748,172 @@ this.addCommand({
 				new Notice(`There are ${matches.length} outstanding actions in this notes${tasks}`);
 			}
 		});
+
+
+		/* by copilot
+I want to add an action, trigger by Ctrl Meta Shift + j or Ctrl Alt Shift + j to insert "#d/<current date in yyyyMMdd> " in current cursor, if current date exist, then remove the tag in the line with correct cursor location
+
+for example: Assume cursor represented by |:
+
+- "|aaa bbb" -> - "#d/20250101 |aaa bbb"
+- "aaa bbb|" -> - "aaa bbb #d/20250101 |"
+- "aaa bb|b" -> - "aaa bb #d/20250101 |b"
+- "aaa |bbb" -> - "aaa #d/20250101 |bbb"
+- "aaa| bbb" -> - "aaa #d/20250101 |bbb"
+
+if remove date, need to make sure the cursor location is exactly same as the same words before removing:
+
+for example: Assume cursor represented by |:
+
+- "aaa #d/20250101 bbb|" -> - "aaa bbb|"
+- "aaa #d/20250101 b|bb" -> - "aaa b|bb"
+- "a|aa #d/20250101 bbb" -> - "a|aa bbb"
+- "aaa #d/202|50101 bbb" -> - "aaa |bbb"
+- "aaa bbb #d/20250101|" -> - "aaa bbb|"
+- "aaa bbb #d/20250101 |" -> - "aaa bbb |"
+- "aaa bbb #d/2025|0101" -> - "aaa bbb|"
+- "aaa b|bb #d/20250101" -> - "aaa b|bb"
+- "aaa b #d/20250101 b|b" -> - "aaa b b|b"
+- "aaa b #d/20250101 bb" -> - "aaa b bb"
+- "a|aa b #d/20250101 bb" -> - "a|aa b bb"
+- "aaa b #d/2025|0101 bb" -> - "aaa b |bb"
+- "#d/20250101 aaa bbb|" -> - "aaa bbb|"
+- "#d/202501|01 aaa bbb" -> - "|aaa bbb"
+- "|#d/20250101 aaa bbb" -> - "|aaa bbb"
+- "#d/20|250101 aaa bbb" -> - "|aaa bbb"
+*/
+        this.addCommand({
+            id: "toggle-date-tag",
+            name: "Toggle Date Tag",
+            icon: "calendar",
+            editorCallback: (editor: Editor, view: MarkdownView) => {
+                const cursor = editor.getCursor();
+                const line = editor.getLine(cursor.line);
+                const currentDate = moment().format('YYYYMMDD');
+                const dateTag = `#d/${currentDate}`;
+                
+                // Check if a date tag exists in the line
+                const tagRegex = /#d\/\d{8}/;
+                const tagMatch = line.match(tagRegex);
+                
+                if (tagMatch) {
+                    // Remove the tag
+                    const tagIndex = tagMatch.index!;
+                    const tagLength = tagMatch[0].length;
+                    const tagEndIndex = tagIndex + tagLength;
+                    
+                    // Calculate exact positions for removal including surrounding spaces
+                    let startRemove = tagIndex;
+                    let endRemove = tagEndIndex;
+                    
+                    // Check for space before the tag
+                    const hasSpaceBefore = startRemove > 0 && line.charAt(startRemove - 1) === ' ';
+                    if (hasSpaceBefore) {
+                        startRemove--;
+                    }
+                    
+                    // Check for space after the tag
+                    const hasSpaceAfter = endRemove < line.length && line.charAt(endRemove) === ' ';
+                    if (hasSpaceAfter) {
+                        endRemove++;
+                    }
+                    
+                    // Special handling for cases where we have "word1 #d/date word2"
+                    // We should preserve exactly one space between words
+                    const needToPreserveSpace = hasSpaceBefore && hasSpaceAfter && 
+                                               startRemove > 0 && endRemove < line.length;
+                    
+                    // Create new line without the tag
+                    let newLine;
+                    if (needToPreserveSpace) {
+                        newLine = line.substring(0, startRemove) + " " + line.substring(endRemove);
+                    } else {
+                        newLine = line.substring(0, startRemove) + line.substring(endRemove);
+                    }
+                    
+                    // Calculate cursor position after removal
+                    let newCursorCh = cursor.ch;
+                    
+                    if (cursor.ch > startRemove) {
+                        if (cursor.ch <= tagEndIndex) {
+                            // Cursor was inside the tag - move to start position
+                            newCursorCh = startRemove;
+                            if (needToPreserveSpace) {
+                                newCursorCh++; // Move after preserved space
+                            }
+                        } else {
+                            // Cursor was after the tag - adjust backward
+                            let reduction = endRemove - startRemove;
+                            if (needToPreserveSpace) {
+                                reduction--; // Account for preserved space
+                            }
+                            newCursorCh = cursor.ch - reduction;
+                        }
+                    }
+                    
+                    editor.setLine(cursor.line, newLine);
+                    cursor.ch = newCursorCh;
+                    editor.setCursor(cursor);
+			} else {
+				// Add the tag
+				const ch = cursor.ch;
+				
+				if (ch === 0) {
+					// At beginning of line
+					editor.setLine(cursor.line, `${dateTag} ${line}`);
+					cursor.ch = dateTag.length + 1;
+				} else if (ch >= line.length) {
+					// At end of line - add a space after the tag too
+					editor.setLine(cursor.line, `${line} ${dateTag} `);
+					cursor.ch = line.length + 1 + dateTag.length + 1;
+				} else {
+					// In middle of line
+					const beforeCursor = line.substring(0, ch);
+					const afterCursor = line.substring(ch);
+					
+					// Check surrounding characters
+					const charBeforeCursor = ch > 0 ? line.charAt(ch - 1) : '';
+					const charAtCursor = line.charAt(ch);
+					
+					let newLine;
+					let cursorAdjustment;
+					
+					if (charBeforeCursor === ' ' && charAtCursor === ' ') {
+						// Space on both sides - replace one space
+						newLine = beforeCursor + dateTag + ' ' + afterCursor.substring(1);
+						cursorAdjustment = dateTag.length;
+					} else if (charBeforeCursor === ' ') {
+						// Space before cursor only
+						newLine = beforeCursor + dateTag + ' ' + afterCursor;
+						cursorAdjustment = dateTag.length + 1;
+					} else if (charAtCursor === ' ') {
+						// Space after cursor only
+						newLine = beforeCursor + ' ' + dateTag + afterCursor;
+						cursorAdjustment = dateTag.length + 1;
+					} else {
+						// No spaces - add spaces on both sides
+						newLine = beforeCursor + ' ' + dateTag + ' ' + afterCursor;
+						cursorAdjustment = dateTag.length + 2;
+					}
+					
+					editor.setLine(cursor.line, newLine);
+					cursor.ch += cursorAdjustment;
+				}
+				
+				editor.setCursor(cursor);
+			}
+            },
+            hotkeys: [
+                {
+                    modifiers: [`Ctrl`, `Meta`, `Shift`],
+                    key: `j`,
+                },
+                {
+                    modifiers: [`Ctrl`, `Alt`, `Shift`],
+                    key: `j`,
+                }
+            ]
+        });
 
 		this.addObsidianIcon('toggle-n-w-task', '#=');
 		this.addCommand({
