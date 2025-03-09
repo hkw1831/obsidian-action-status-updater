@@ -201,31 +201,31 @@ export const ALL_FOOTNOTE_TYPES = [
     chinese: "## 參考："
   },
   {
-    type: "d/💫",
+    type: "e/💫",
     description: "Echo from",
     additionalInfo: "",
     chinese: ""
   },
   {
-    type: "d/⏫",
+    type: "e/⏫",
     description: "Idea/Task/Action Compass - Up - North - Where does this idea come from / Reason of this idea? OR What is the goal/prereq of this task/action?",
     additionalInfo: "",
     chinese: ""
   },
   {
-    type: "d/⏬",
+    type: "e/⏬",
     description: "Idea/Task/Action Compass - Down - Sorth - Where does the idea lead to / It can solve what problem? OR What is the result/next task/action of this task/action?",
     additionalInfo: "",
     chinese: ""
   },
   {
-    type: "d/⏩️",
+    type: "e/⏩️",
     description: "Idea/Task/Action Compass - Right - East - What are similar / supporting idea? OR Same Goal Different Task/Action?",
     additionalInfo: "",
     chinese: ""
   },
   {
-    type: "d/⏪",
+    type: "e/⏪",
     description: "Idea/Task/Action Compass - Left - West - What are oppose idea? OR Same Task/Action Different Goal?",
     additionalInfo: "",
     chinese: ""

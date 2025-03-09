@@ -126,7 +126,7 @@ export class EchoModal extends SuggestModal<EchoItem> {
     // Step 1: create a new file with echo file
     let text = ""
     text += "---\ntags: b/k/s\n---\n\n"
-    text += "#d/💫 ";
+    text += "#e/💫 ";
     text += "[[" + this.fileToEcho.basename + "]]\n\n"
     const { vault } = this.app;
     const path = this.fileToEcho.path
