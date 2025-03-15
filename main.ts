@@ -33,6 +33,7 @@ import { CurrentNoteAllLineView, VIEW_TYPE_CURRENT_NOTE_ALL_LINE } from 'current
 import { AddSpecialCharacterModal } from 'addSpecialCharacterModal';
 import { RecentFilesView, VIEW_TYPE_RECENT_FILE } from 'recentFilesView';
 import { RecentViewedNotesView, VIEW_TYPE_RECENT_VIEWED_NOTES } from 'recentViewedNotesView';
+import { CalendarView, VIEW_TYPE_CALENDAR } from 'calendarView';
 
 // Remember to rename these classes and interfaces!
 
@@ -57,6 +58,7 @@ export default class MyPlugin extends Plugin {
 	public currentNoteAllLineView: CurrentNoteAllLineView;
 	public recentFilesView: RecentFilesView;
 	public recentViewedNotesView: RecentViewedNotesView;
+	public calendarView: CalendarView; // Add the calendar view
 	public plugin: MyPlugin = this
 	private lastActiveLeaf: WorkspaceLeaf | null = null;
 
@@ -143,6 +145,20 @@ export default class MyPlugin extends Plugin {
         }
 	}
 
+	public async activateCalendarView() {
+		let leaf: WorkspaceLeaf | null;
+		[leaf] = this.app.workspace.getLeavesOfType(
+			VIEW_TYPE_CALENDAR,
+		);
+		if (!leaf) {
+			leaf = this.app.workspace.getLeftLeaf(false);
+			await leaf?.setViewState({ type: VIEW_TYPE_CALENDAR });
+		}
+
+		if (leaf) {
+			this.app.workspace.revealLeaf(leaf);
+		}
+	}
 
 	async onload() {
 		await this.loadSettings();
@@ -190,6 +206,24 @@ export default class MyPlugin extends Plugin {
 	
 		this.addRibbonIcon('history', 'Open Recent Viewed Notes', () => {
 			this.activateRecentViewedNotesView();
+		});
+
+		this.registerView(
+			VIEW_TYPE_CALENDAR,
+			(leaf) => this.calendarView = new CalendarView(leaf)
+		);
+
+		this.addRibbonIcon('calendar', 'Open Calendar View', () => {
+			this.activateCalendarView();
+		});
+
+		this.addCommand({
+			id: "open-calendar-view",
+			name: "Open Calendar View",
+			icon: "calendar",
+			callback: () => {
+				this.activateCalendarView();
+			}
 		});
 
 		this.addCommand({

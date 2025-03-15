@@ -1,8 +1,87 @@
 /*
-
 This CSS file will be included with your plugin, and
 available in the app when your plugin is enabled.
-
 If your plugin does not need CSS, delete this file.
-
 */
+
+/* Calendar View Styles */
+.obsidian-calendar-container .calendar-header {
+  padding: 10px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.obsidian-calendar-container .calendar-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.obsidian-calendar-container .calendar-month-year {
+  font-weight: bold;
+  font-size: 1.2em;
+  padding: 0 15px;
+}
+
+.obsidian-calendar-container .calendar-nav-btn, 
+.obsidian-calendar-container .calendar-today-btn {
+  background: var(--interactive-normal);
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  color: var(--text-normal);
+}
+
+.obsidian-calendar-container .calendar-nav-btn:hover, 
+.obsidian-calendar-container .calendar-today-btn:hover {
+  background: var(--interactive-hover);
+}
+
+.obsidian-calendar-container .calendar-today-btn {
+  margin-left: 10px;
+}
+
+.obsidian-calendar-container .calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  padding: 10px;
+}
+
+.obsidian-calendar-container .calendar-day-header {
+  text-align: center;
+  font-weight: bold;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.obsidian-calendar-container .calendar-day {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.obsidian-calendar-container .calendar-day:hover {
+  background-color: var(--interactive-hover);
+}
+
+.obsidian-calendar-container .calendar-day.current-month {
+  color: var(--text-normal);
+}
+
+.obsidian-calendar-container .calendar-day.other-month {
+  color: var(--text-muted);
+}
+
+.obsidian-calendar-container .calendar-day.today {
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.obsidian-calendar-container .calendar-day.today:hover {
+  background-color: var(--interactive-accent-hover);
+}
