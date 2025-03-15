@@ -1,4 +1,41 @@
 /*
+
+This CSS file will be included with your plugin, and
+available in the app when your plugin is enabled.
+
+If your plugin does not need CSS, delete this file.
+
+*/
+.my-highlight {
+    background-color: yellow;
+  }
+  .recent-files-title-content2 {
+    flex-grow: 1;
+  }
+  .scrollable {
+    overflow: auto; /* Enables scrolling */
+  }
+  .self-padding-left-10 {
+    padding-left: 10px;
+    display: block;
+  }
+  .self-padding-left-55 {
+    padding-left: 55px;
+    display: block;
+  }
+  .self-wrap-content {
+    word-wrap: break-word;
+    //word-break: break-all;
+    white-space: normal;
+  }
+  .width25 {
+    width: 25%;
+  }
+  .width50 {
+    width: 50%;
+  }  
+
+/*
 This CSS file will be included with your plugin, and
 available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
