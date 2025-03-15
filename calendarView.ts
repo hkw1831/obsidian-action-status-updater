@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf, moment, Platform, Notice, TFile, Keymap, PaneType, MarkdownView, CachedMetadata, Menu } from 'obsidian';
+import { ItemView, WorkspaceLeaf, moment, Platform, Notice, TFile, Keymap, PaneType, MarkdownView, CachedMetadata, Menu, EventRef } from 'obsidian';
 import { filesWhereTagIsUsed } from 'selfutil/findNotesFromTag';
 import { getNoteType } from 'selfutil/getTaskTag';
 
@@ -22,6 +22,8 @@ class CalendarView extends ItemView {
   private notesListEl: HTMLElement;
   private selectedDateTag: string | null = null;
   private datesWithNotes: Set<string> = new Set(); // Store dates that have notes
+  private vaultChangeRef: EventRef;
+  private metadataChangeRef: EventRef;
   
   constructor(leaf: WorkspaceLeaf) {
     super(leaf);
@@ -40,6 +42,9 @@ class CalendarView extends ItemView {
     // Add a specific class to the container for better CSS targeting
     this.containerEl.addClass('obsidian-calendar-container');
     
+    // Set up event listeners for vault changes
+    this.registerVaultEvents();
+    
     // Pre-cache dates with notes for current month
     await this.updateDatesWithNotes();
     
@@ -48,6 +53,33 @@ class CalendarView extends ItemView {
     // Select current date by default when opening
     const today = window.moment().format('YYYYMMDD');
     this.displayDateNotes(today);
+  }
+
+  /**
+   * Register event listeners for vault and metadata changes
+   */
+  private registerVaultEvents(): void {
+    // Listen for file modifications
+    this.vaultChangeRef = this.app.vault.on('modify', async (file) => {
+      if (file instanceof TFile && file.extension === 'md') {
+        // A markdown file was modified, refresh our dates cache
+        await this.updateDatesWithNotes();
+        this.render(); // Re-render the calendar to update the date stylings
+      }
+    });
+    
+    // Listen for metadata changes (which happen when tags are added/modified)
+    this.metadataChangeRef = this.app.metadataCache.on('changed', async (file) => {
+      if (file && file.path) {
+        // File metadata changed, refresh our dates cache
+        await this.updateDatesWithNotes();
+        this.render(); // Re-render the calendar to update the date stylings
+      }
+    });
+    
+    // Make sure to register these references for cleanup
+    this.registerEvent(this.vaultChangeRef);
+    this.registerEvent(this.metadataChangeRef);
   }
 
   public getIcon(): string {
@@ -93,6 +125,12 @@ class CalendarView extends ItemView {
   }
   
   private async render(): Promise<void> {
+    // Preserve the scroll position of the notes list
+    let notesListScrollTop = 0;
+    if (this.notesListEl) {
+      notesListScrollTop = this.notesListEl.scrollTop;
+    }
+    
     const container = this.containerEl.children[1];
     container.empty();
     
@@ -248,6 +286,13 @@ class CalendarView extends ItemView {
     
     // Create notes list container
     this.notesListEl = container.createEl('div', { cls: 'calendar-notes-list' });
+    
+    // Restore scroll position
+    if (notesListScrollTop > 0) {
+      setTimeout(() => {
+        this.notesListEl.scrollTop = notesListScrollTop;
+      }, 0);
+    }
     
     // If we had a selected date, redisplay its notes
     if (this.selectedDateTag) {
