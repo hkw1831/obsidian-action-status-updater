@@ -39,6 +39,10 @@ class CalendarView extends ItemView {
     // Add a specific class to the container for better CSS targeting
     this.containerEl.addClass('obsidian-calendar-container');
     await this.render();
+    
+    // Select current date by default when opening
+    const today = window.moment().format('YYYYMMDD');
+    this.displayDateNotes(today);
   }
 
   public getIcon(): string {
@@ -59,7 +63,11 @@ class CalendarView extends ItemView {
     prevYearBtn.innerHTML = '&lt;&lt;';
     prevYearBtn.addEventListener('click', () => {
       this.currentDate.subtract(1, 'year');
-      this.render();
+      this.render().then(() => {
+        // After rendering, display notes for the 1st day of the month
+        const newDate = this.currentDate.format('YYYYMMDD');
+        this.displayDateNotes(newDate);
+      });
     });
     
     // Previous month button
@@ -67,7 +75,11 @@ class CalendarView extends ItemView {
     prevMonthBtn.innerHTML = '&lt;';
     prevMonthBtn.addEventListener('click', () => {
       this.currentDate.subtract(1, 'month');
-      this.render();
+      this.render().then(() => {
+        // After rendering, display notes for the 1st day of the month
+        const newDate = this.currentDate.format('YYYYMMDD');
+        this.displayDateNotes(newDate);
+      });
     });
     
     // Month and year display
@@ -81,7 +93,11 @@ class CalendarView extends ItemView {
     nextMonthBtn.innerHTML = '&gt;';
     nextMonthBtn.addEventListener('click', () => {
       this.currentDate.add(1, 'month');
-      this.render();
+      this.render().then(() => {
+        // After rendering, display notes for the 1st day of the month
+        const newDate = this.currentDate.format('YYYYMMDD');
+        this.displayDateNotes(newDate);
+      });
     });
     
     // Next year button
@@ -89,7 +105,11 @@ class CalendarView extends ItemView {
     nextYearBtn.innerHTML = '&gt;&gt;';
     nextYearBtn.addEventListener('click', () => {
       this.currentDate.add(1, 'year');
-      this.render();
+      this.render().then(() => {
+        // After rendering, display notes for the 1st day of the month
+        const newDate = this.currentDate.format('YYYYMMDD');
+        this.displayDateNotes(newDate);
+      });
     });
     
     // Today button
@@ -99,7 +119,11 @@ class CalendarView extends ItemView {
     });
     todayBtn.addEventListener('click', () => {
       this.currentDate = window.moment();
-      this.render();
+      this.render().then(() => {
+        // After rendering, display notes for today
+        const today = window.moment().format('YYYYMMDD');
+        this.displayDateNotes(today);
+      });
     });
     
     // Create calendar grid
