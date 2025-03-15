@@ -21,6 +21,7 @@ class CalendarView extends ItemView {
   private headerEl: HTMLElement;
   private notesListEl: HTMLElement;
   private selectedDateTag: string | null = null;
+  private datesWithNotes: Set<string> = new Set(); // Store dates that have notes
   
   constructor(leaf: WorkspaceLeaf) {
     super(leaf);
@@ -38,6 +39,10 @@ class CalendarView extends ItemView {
   async onOpen(): Promise<void> {
     // Add a specific class to the container for better CSS targeting
     this.containerEl.addClass('obsidian-calendar-container');
+    
+    // Pre-cache dates with notes for current month
+    await this.updateDatesWithNotes();
+    
     await this.render();
     
     // Select current date by default when opening
@@ -47,6 +52,44 @@ class CalendarView extends ItemView {
 
   public getIcon(): string {
     return 'calendar';
+  }
+  
+  // Collect all dates that have notes in the current month view
+  private async updateDatesWithNotes(): Promise<void> {
+    // Clear the existing cache
+    this.datesWithNotes.clear();
+    
+    // Calculate the range of dates to check (including days from adjacent months that appear in the view)
+    const firstDayOfMonth = this.currentDate.clone().startOf('month');
+    let startDate = firstDayOfMonth.clone();
+    if (firstDayOfMonth.day() === 0) { // If Sunday
+      startDate.subtract(6, 'days');
+    } else {
+      startDate.subtract(firstDayOfMonth.day() - 1, 'days');
+    }
+    
+    const lastDayOfMonth = this.currentDate.clone().endOf('month');
+    const endDate = lastDayOfMonth.clone();
+    // Extend to the end of the week
+    if (endDate.day() !== 0) { // If not Sunday
+      endDate.add(7 - endDate.day(), 'days');
+    }
+    
+    // Loop through each date in the range
+    const currentDate = startDate.clone();
+    while (currentDate.isSameOrBefore(endDate, 'day')) {
+      const dateTag = `#d/${currentDate.format('YYYYMMDD')}`;
+      
+      // Check if any files contain this date tag
+      const filesWithTag = filesWhereTagIsUsed(dateTag);
+      
+      if (filesWithTag.length > 0) {
+        // This date has notes, add it to our cache
+        this.datesWithNotes.add(currentDate.format('YYYYMMDD'));
+      }
+      
+      currentDate.add(1, 'day');
+    }
   }
   
   private async render(): Promise<void> {
@@ -61,8 +104,9 @@ class CalendarView extends ItemView {
     // Previous year button
     const prevYearBtn = navigationEl.createEl('button', { cls: 'calendar-nav-btn' });
     prevYearBtn.innerHTML = '&lt;&lt;';
-    prevYearBtn.addEventListener('click', () => {
+    prevYearBtn.addEventListener('click', async () => {
       this.currentDate.subtract(1, 'year');
+      await this.updateDatesWithNotes();
       this.render().then(() => {
         // After rendering, display notes for the 1st day of the month
         const newDate = this.currentDate.format('YYYYMMDD');
@@ -73,8 +117,9 @@ class CalendarView extends ItemView {
     // Previous month button
     const prevMonthBtn = navigationEl.createEl('button', { cls: 'calendar-nav-btn' });
     prevMonthBtn.innerHTML = '&lt;';
-    prevMonthBtn.addEventListener('click', () => {
+    prevMonthBtn.addEventListener('click', async () => {
       this.currentDate.subtract(1, 'month');
+      await this.updateDatesWithNotes();
       this.render().then(() => {
         // After rendering, display notes for the 1st day of the month
         const newDate = this.currentDate.format('YYYYMMDD');
@@ -91,8 +136,9 @@ class CalendarView extends ItemView {
     // Next month button
     const nextMonthBtn = navigationEl.createEl('button', { cls: 'calendar-nav-btn' });
     nextMonthBtn.innerHTML = '&gt;';
-    nextMonthBtn.addEventListener('click', () => {
+    nextMonthBtn.addEventListener('click', async () => {
       this.currentDate.add(1, 'month');
+      await this.updateDatesWithNotes();
       this.render().then(() => {
         // After rendering, display notes for the 1st day of the month
         const newDate = this.currentDate.format('YYYYMMDD');
@@ -103,8 +149,9 @@ class CalendarView extends ItemView {
     // Next year button
     const nextYearBtn = navigationEl.createEl('button', { cls: 'calendar-nav-btn' });
     nextYearBtn.innerHTML = '&gt;&gt;';
-    nextYearBtn.addEventListener('click', () => {
+    nextYearBtn.addEventListener('click', async () => {
       this.currentDate.add(1, 'year');
+      await this.updateDatesWithNotes();
       this.render().then(() => {
         // After rendering, display notes for the 1st day of the month
         const newDate = this.currentDate.format('YYYYMMDD');
@@ -117,8 +164,9 @@ class CalendarView extends ItemView {
       cls: 'calendar-today-btn',
       text: 'Today'
     });
-    todayBtn.addEventListener('click', () => {
+    todayBtn.addEventListener('click', async () => {
       this.currentDate = window.moment();
+      await this.updateDatesWithNotes();
       this.render().then(() => {
         // After rendering, display notes for today
         const today = window.moment().format('YYYYMMDD');
@@ -158,10 +206,24 @@ class CalendarView extends ItemView {
       const isToday = date.isSame(today, 'day');
       const dateTag = date.format('YYYYMMDD');
       const isSelected = this.selectedDateTag === dateTag;
+      const hasNotes = this.datesWithNotes.has(dateTag);
       
-      const dayEl = this.calendarEl.createEl('div', {
-        cls: `calendar-day ${isCurrentMonth ? 'current-month' : 'other-month'} ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''}`
-      });
+      // Build the classes for this calendar day
+      let classNames = 'calendar-day';
+      
+      // Check if it's current month or other month
+      classNames += isCurrentMonth ? ' current-month' : ' other-month';
+      
+      // Check if it's today
+      if (isToday) classNames += ' today';
+      
+      // Check if it's selected
+      if (isSelected) classNames += ' selected';
+      
+      // Check if it has notes
+      classNames += hasNotes ? ' has-notes' : ' no-notes';
+      
+      const dayEl = this.calendarEl.createEl('div', { cls: classNames });
       
       dayEl.createEl('span', {
         text: date.format('D')

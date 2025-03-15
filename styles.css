@@ -159,3 +159,19 @@ If your plugin does not need CSS, delete this file.
   overflow-wrap: break-word;
   word-break: break-word;
 }
+
+/* Styling for dates with/without notes */
+.obsidian-calendar-container .calendar-day.has-notes {
+  color: var(--text-normal); /* Black color for days with notes */
+  font-weight: bold; /* Make days with notes bold */
+}
+
+.obsidian-calendar-container .calendar-day.no-notes {
+  color: var(--text-muted); /* Grey color for days without notes */
+}
+
+/* Today's date should always be visible regardless of having notes */
+.obsidian-calendar-container .calendar-day.today.has-notes,
+.obsidian-calendar-container .calendar-day.today.no-notes {
+  color: var(--text-on-accent); /* Keep the text color for today consistent */
+}
