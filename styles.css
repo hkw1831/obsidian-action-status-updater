@@ -85,3 +85,40 @@ If your plugin does not need CSS, delete this file.
 .obsidian-calendar-container .calendar-day.today:hover {
   background-color: var(--interactive-accent-hover);
 }
+
+/* Selected day styling */
+.obsidian-calendar-container .calendar-day.selected {
+  border: 2px solid var(--interactive-accent);
+  font-weight: bold;
+}
+
+/* Notes list styling */
+.obsidian-calendar-container .calendar-notes-list {
+  margin-top: 20px;
+  border-top: 1px solid var(--background-modifier-border);
+  padding-top: 10px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.obsidian-calendar-container .nav-header {
+  padding: 8px;
+  font-weight: bold;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.obsidian-calendar-container .nav-empty {
+  padding: 10px;
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+}
+
+.obsidian-calendar-container .self-padding-left-10 {
+  padding-left: 10px;
+}
+
+.obsidian-calendar-container .tree-item-inner {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
