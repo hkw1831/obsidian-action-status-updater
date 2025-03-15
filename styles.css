@@ -43,7 +43,7 @@ If your plugin does not need CSS, delete this file.
 
 /* Calendar View Styles */
 .obsidian-calendar-container .calendar-header {
-  padding: 10px;
+  padding: 6px;
   border-bottom: 1px solid var(--background-modifier-border);
 }
 
@@ -51,13 +51,13 @@ If your plugin does not need CSS, delete this file.
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 .obsidian-calendar-container .calendar-month-year {
   font-weight: bold;
-  font-size: 1.2em;
-  padding: 0 15px;
+  font-size: 1em;
+  padding: 0 10px;
 }
 
 .obsidian-calendar-container .calendar-nav-btn, 
@@ -83,7 +83,7 @@ If your plugin does not need CSS, delete this file.
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 2px;
-  padding: 10px;
+  padding: 0px;
 }
 
 .obsidian-calendar-container .calendar-day-header {
@@ -94,7 +94,7 @@ If your plugin does not need CSS, delete this file.
 }
 
 .obsidian-calendar-container .calendar-day {
-  height: 40px;
+  height: 25px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -131,7 +131,7 @@ If your plugin does not need CSS, delete this file.
 
 /* Notes list styling */
 .obsidian-calendar-container .calendar-notes-list {
-  margin-top: 20px;
+  margin-top: 0px;
   border-top: 1px solid var(--background-modifier-border);
   padding-top: 10px;
   max-height: 400px;
