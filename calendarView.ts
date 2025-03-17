@@ -310,7 +310,7 @@ class CalendarView extends ItemView {
     this.notesListEl.empty();
     
     const dateTag = `#d/${dateString}`;
-    this.notesListEl.createDiv({ cls: 'nav-header', text: `Notes tagged with ${dateTag}` });
+    this.notesListEl.createDiv({ cls: 'note-header', text: `Notes tagged with ${dateTag}` });
     
     const rootEl = this.notesListEl.createDiv({ cls: 'nav-folder mod-root scrollable' });
     const childrenEl = rootEl.createDiv({ cls: 'nav-folder-children' });

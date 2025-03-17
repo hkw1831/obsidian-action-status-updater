@@ -42,6 +42,24 @@ If your plugin does not need CSS, delete this file.
 */
 
 /* Calendar View Styles */
+.obsidian-calendar-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden; /* Prevent scrolling of the entire container */
+  position: relative; /* For proper containment */
+  padding: 0; /* Remove any padding */
+  margin: 0; /* Remove any margin */
+}
+
+.obsidian-calendar-container .calendar-header,
+.obsidian-calendar-container .calendar-grid,
+.obsidian-calendar-container .calendar-day-header {
+  flex-shrink: 0; /* Prevent these elements from shrinking */
+  overflow: visible; /* Ensure no scrolling */
+  user-select: none; /* Prevent text selection which can cause unwanted scrolling */
+}
+
 .obsidian-calendar-container .calendar-header {
   padding: 6px;
   border-bottom: 1px solid var(--background-modifier-border);
@@ -84,6 +102,7 @@ If your plugin does not need CSS, delete this file.
   grid-template-columns: repeat(7, 1fr);
   gap: 2px;
   padding: 0px;
+  margin: 0; /* Ensure no margin */
 }
 
 .obsidian-calendar-container .calendar-day-header {
@@ -133,15 +152,31 @@ If your plugin does not need CSS, delete this file.
 .obsidian-calendar-container .calendar-notes-list {
   margin-top: 0px;
   border-top: 1px solid var(--background-modifier-border);
-  padding-top: 10px;
-  max-height: 400px;
-  overflow-y: auto;
+  padding-top: 0; /* Remove padding from container */
+  flex: 1 1 0; /* grow, shrink, and base size of 0 */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Hide overflow at the container level */
+  min-height: 50px; /* Smaller minimum height */
+  max-height: calc(100% - 260px); /* Maximum height calculation */
+  position: relative; /* For proper containment */
 }
 
-.obsidian-calendar-container .nav-header {
+.obsidian-calendar-container .note-header {
   padding: 8px;
   font-weight: bold;
   border-bottom: 1px solid var(--background-modifier-border);
+  flex-shrink: 0; /* Prevent the header from shrinking */
+  /* Remove the background-color property to maintain original color */
+  z-index: 1; /* Ensure it stays on top */
+}
+
+.obsidian-calendar-container .nav-folder.mod-root {
+  flex: 1;
+  overflow-y: auto; /* Make only this part scrollable */
+  overflow-x: hidden;
+  padding-top: 10px; /* Move padding here from the container */
+  overscroll-behavior: contain; /* Prevent scroll chaining */
 }
 
 .obsidian-calendar-container .nav-empty {
