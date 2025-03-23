@@ -310,6 +310,59 @@ class CalendarView extends ItemView {
     this.notesListEl.empty();
     
     const dateTag = `#d/${dateString}`;
+    
+    // Add journal file link
+    const journalPath = `J/${dateString}.md`;
+    const journalExists = this.fileExists(journalPath);
+    
+    // Create properly styled journal link
+    const journalContainer = this.notesListEl.createDiv({
+      cls: 'journal-link-container metadata-container',
+    });
+    
+    const formattedDate = window.moment(dateString, "YYYYMMDD").format("MMMM D, YYYY");
+    
+    // The key is to use the correct classes:
+    // - 'internal-link' is for all internal links
+    // - 'is-unresolved' should be added only when file doesn't exist
+    const linkEl = journalContainer.createEl('a', {
+      cls: `internal-link${!journalExists ? ' is-unresolved' : ''}`, 
+      text: `J/${dateString}.md`,
+      attr: {
+        'data-href': journalPath
+      }
+    });
+    
+    // Add click handler to open journal file
+    linkEl.addEventListener('click', (event) => {
+      event.preventDefault();
+      const targetPath = journalPath;
+      
+      if (journalExists) {
+        // If file exists, open it
+        const targetFile = this.app.vault.getAbstractFileByPath(targetPath);
+        if (targetFile instanceof TFile) {
+          const newLeaf = Keymap.isModEvent(event);
+          const leaf = this.app.workspace.getLeaf(newLeaf);
+          leaf.openFile(targetFile);
+        }
+      } else {
+        // If file doesn't exist, create it
+        const folderPath = targetPath.substring(0, targetPath.lastIndexOf('/'));
+        
+        // Check if folder exists, create it if not
+        this.app.vault.adapter.exists(folderPath).then(exists => {
+          if (!exists) {
+            this.app.vault.createFolder(folderPath).then(() => {
+              this.createAndOpenJournalFile(targetPath, dateString);
+            });
+          } else {
+            this.createAndOpenJournalFile(targetPath, dateString);
+          }
+        });
+      }
+    });
+    
     this.notesListEl.createDiv({ cls: 'note-header', text: `Notes tagged with ${dateTag}` });
     
     const rootEl = this.notesListEl.createDiv({ cls: 'nav-folder mod-root scrollable' });
@@ -480,6 +533,26 @@ class CalendarView extends ItemView {
         });
       }
     });
+  }
+  
+  // Helper method to check if a file exists in the vault
+  private fileExists(path: string): boolean {
+    const file = this.app.vault.getAbstractFileByPath(path);
+    return file instanceof TFile;
+  }
+  
+  // Helper method to create and open a journal file
+  private async createAndOpenJournalFile(path: string, dateString: string): Promise<void> {
+    const formattedDate = window.moment(dateString, "YYYYMMDD").format("MMMM D, YYYY");
+    const content = `---\ntags: b/n/j\n---\n\n`;
+    
+    try {
+      const file = await this.app.vault.create(path, content);
+      const leaf = this.app.workspace.getLeaf(false);
+      await leaf.openFile(file);
+    } catch (error) {
+      new Notice(`Failed to create journal file: ${error}`);
+    }
   }
   
   // Helper method to determine if running on Windows

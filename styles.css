@@ -162,8 +162,14 @@ If your plugin does not need CSS, delete this file.
   position: relative; /* For proper containment */
 }
 
+.journal-link-container {
+  padding-top: 8px;
+  padding-left: 8px;
+}
+
 .obsidian-calendar-container .note-header {
-  padding: 8px;
+  padding-left: 8px;
+  padding-bottom: 8px;
   font-weight: bold;
   border-bottom: 1px solid var(--background-modifier-border);
   flex-shrink: 0; /* Prevent the header from shrinking */
