@@ -39,6 +39,13 @@ class CurrentNoteOutstandingActionView extends ItemView {
   }
 
   public readonly redraw = async (forceRedraw: boolean): Promise<void> => {
+    // Preserve the scroll position
+    let scrollPosition = 0;
+    const contentContainer = this.containerEl.querySelector('.nav-folder.mod-root.scrollable');
+    if (contentContainer) {
+      scrollPosition = contentContainer.scrollTop;
+    }
+    
     const activeFile = app.workspace.getActiveFile();
     if (!activeFile) {
       //console.log("redraw() with no active file")
@@ -208,6 +215,16 @@ class CurrentNoteOutstandingActionView extends ItemView {
           this.focusFileAtLine(f, newLeaf, lineInfoInner.line);
         });
       }
+    }
+    
+    // Restore the scroll position after a short delay to ensure the DOM has updated
+    if (scrollPosition > 0) {
+      setTimeout(() => {
+        const newContentContainer = this.containerEl.querySelector('.nav-folder.mod-root.scrollable');
+        if (newContentContainer) {
+          newContentContainer.scrollTop = scrollPosition;
+        }
+      }, 0);
     }
     //console.log("finish redraw")
   }

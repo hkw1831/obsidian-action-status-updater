@@ -39,6 +39,13 @@ class NotesTypeView extends ItemView {
   }
 
   public readonly redraw = async (): Promise<void> => {
+    // Preserve the scroll position
+    let scrollPosition = 0;
+    const contentContainer = this.containerEl.querySelector('.nav-folder.mod-root.scrollable');
+    if (contentContainer) {
+      scrollPosition = contentContainer.scrollTop;
+    }
+    
     //console.log("redraw()")
     //const tag = "#c/t/p"
     
@@ -247,6 +254,15 @@ class NotesTypeView extends ItemView {
 
     });
     
+    // Restore the scroll position after a short delay to ensure the DOM has updated
+    if (scrollPosition > 0) {
+      setTimeout(() => {
+        const newContentContainer = this.containerEl.querySelector('.nav-folder.mod-root.scrollable');
+        if (newContentContainer) {
+          newContentContainer.scrollTop = scrollPosition;
+        }
+      }, 0);
+    }
   }
 
   isWindows() {
