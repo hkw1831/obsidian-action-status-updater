@@ -32,6 +32,23 @@ export function removeContentFromCursorToEndOfNote(editor: Editor) {
     editor.setCursor(cursor)
 }
 
+export function copyContentFromStartOfNoteToCursor(editor: Editor) {
+    const cursor = editor.getCursor()
+    const line = cursor.line
+    const ch = cursor.ch
+    let newContent = ""
+    for (let i = 0; i < line; i++) {
+        newContent += editor.getLine(i) + "\n"
+    }
+    const lineContent = editor.getLine(line)
+    newContent += lineContent.substring(0, ch)
+    navigator.clipboard.writeText(newContent).then(function () {
+        new Notice(`Copied content from cursor to end of note to clipboard!`);
+    }, function (error) {
+        new Notice(`error when copy to clipboard!`);
+    });
+}
+
 export function copyContentFromCursorToEndOfNote(editor: Editor) {
     const cursor = editor.getCursor()
     const line = cursor.line
