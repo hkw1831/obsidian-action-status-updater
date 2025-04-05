@@ -216,3 +216,56 @@ If your plugin does not need CSS, delete this file.
 .obsidian-calendar-container .calendar-day.today.no-notes {
   color: var(--text-on-accent); /* Keep the text color for today consistent */
 }
+
+/* Add these styles to your existing CSS file */
+
+/* Updated filter styles */
+.recent-viewed-notes-filter-container {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.recent-viewed-notes-search-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.recent-viewed-notes-filter-input {
+  flex-grow: 1;
+  height: 32px;
+  padding: 6px 10px;
+  border-radius: 4px 0 0 4px;
+  border: 1px solid var(--background-modifier-border);
+  border-right: none;
+  background-color: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 14px;
+}
+
+.recent-viewed-notes-filter-input:focus {
+  box-shadow: 0 0 0 2px var(--interactive-accent);
+  outline: none;
+}
+
+.recent-viewed-notes-search-button {
+  height: 32px;
+  width: 36px;
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recent-viewed-notes-search-button:hover {
+  background-color: var(--interactive-accent-hover);
+}
+
+.recent-viewed-notes-search-button svg {
+  width: 16px;
+  height: 16px;
+}

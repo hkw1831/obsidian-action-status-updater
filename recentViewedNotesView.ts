@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf, TFile, Keymap, PaneType, Notice, Menu, MarkdownView } from 'obsidian';
+import { ItemView, WorkspaceLeaf, TFile, Keymap, PaneType, Notice, Menu, MarkdownView, setIcon } from 'obsidian';
 import { getRecentNotes, getRecentNotesWithInfo, RecentNoteInfo } from 'selfutil/getRecentNotes';
 import { getNoteType, NoteType } from 'selfutil/getTaskTag';
 
@@ -6,6 +6,8 @@ export const VIEW_TYPE_RECENT_VIEWED_NOTES = 'recent-viewed-notes-view';
 
 class RecentViewedNotesView extends ItemView {
   public currentNotesPath: string;
+  public filterText: string = '';
+  private pendingFilterText: string = '';
 
   constructor(leaf: WorkspaceLeaf, notesTypeTag: string) {
     super(leaf);
@@ -38,15 +40,70 @@ class RecentViewedNotesView extends ItemView {
     
     this.containerEl.empty();
     
+    // Add filter input at the top with a search button
+    const filterContainerEl = this.containerEl.createDiv({ cls: 'recent-viewed-notes-filter-container' });
+    
+    // Create a wrapper for the search input and button to sit side by side
+    const searchInputWrapperEl = filterContainerEl.createDiv({ cls: 'recent-viewed-notes-search-wrapper' });
+    
+    const filterInputEl = searchInputWrapperEl.createEl('input', {
+      type: 'text',
+      placeholder: 'Filter notes...',
+      cls: 'recent-viewed-notes-filter-input'
+    });
+    
+    // Set current pending filter value if any
+    filterInputEl.value = this.pendingFilterText || this.filterText;
+    
+    // Create search button
+    const searchButtonEl = searchInputWrapperEl.createEl('button', {
+      cls: 'recent-viewed-notes-search-button'
+    });
+    setIcon(searchButtonEl, 'search');
+    
+    // Function to apply filter
+    const applyFilter = () => {
+      this.filterText = this.pendingFilterText;
+      this.redraw(false);
+    };
+    
+    // Handle input changes - store but don't apply
+    filterInputEl.addEventListener('input', (e: InputEvent) => {
+      const target = e.target as HTMLInputElement;
+      this.pendingFilterText = target.value;
+    });
+    
+    // Apply filter when Enter is pressed in the input field
+    filterInputEl.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        applyFilter();
+      }
+    });
+    
+    // Apply filter when search button is clicked
+    searchButtonEl.addEventListener('click', () => {
+      applyFilter();
+    });
+    
     // Get the combined and sorted list of recently viewed and modified notes
     const recentlyViewedNotes = getRecentNotesWithInfo(this.app, 100);
     
     const rootEl = this.containerEl.createDiv({ cls: 'nav-folder mod-root scrollable' });
     const childrenEl = rootEl.createDiv({ cls: 'nav-folder-children' });
     
+    let visibleCount = 0;
+    
     for (let noteInfo of recentlyViewedNotes) {
       const file = this.app.vault.getAbstractFileByPath(noteInfo.path);
       if (!file || !(file instanceof TFile)) continue;
+      
+      // Apply filter if filter text exists
+      if (this.filterText && !file.path.toLowerCase().includes(this.filterText.toLowerCase())) {
+        continue; // Skip this file as it doesn't match the filter
+      }
+      
+      visibleCount++;
       
       const navFile = childrenEl.createDiv({
         cls: 'tree-item nav-file recent-viewed-notes-file',
@@ -104,12 +161,17 @@ class RecentViewedNotesView extends ItemView {
       });
     }
     
-    // Add a message if no recently viewed notes are found
-    if (recentlyViewedNotes.length === 0) {
+    // Add a message if no recently viewed notes are found or nothing matches filter
+    if (visibleCount === 0) {
       const emptyState = childrenEl.createDiv({
         cls: 'nav-folder-empty-state',
       });
-      emptyState.setText('No recently viewed notes found');
+      
+      if (this.filterText) {
+        emptyState.setText(`No notes matching "${this.filterText}"`);
+      } else {
+        emptyState.setText('No recently viewed notes found');
+      }
     }
     
     // Restore the scroll position after a short delay to ensure the DOM has updated
@@ -120,6 +182,11 @@ class RecentViewedNotesView extends ItemView {
           newContentContainer.scrollTop = scrollPosition;
         }
       }, 0);
+    }
+    
+    // Focus on filter input if it was focused before redraw
+    if (document.activeElement === filterInputEl) {
+      filterInputEl.focus();
     }
   }
   
