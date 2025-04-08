@@ -9,6 +9,18 @@ interface FootnoteType {
 
 export const ALL_FOOTNOTE_TYPES = [
   {
+    type: "## Goal / Outcome : ",
+    description: "",
+    additionalInfo: "",
+    chinese: "## 目的 / 成果："
+  },
+  {
+    type: "## Actions : ",
+    description: "",
+    additionalInfo: "",
+    chinese: "## 行動："
+  },
+  {
     type: "## Event Thought / Exp / Notes : ",
     description: "",
     additionalInfo: "",
