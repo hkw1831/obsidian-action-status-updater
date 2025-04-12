@@ -27,6 +27,12 @@ export const ALL_FOOTNOTE_TYPES = [
     chinese: ""
   },
   {
+    type: "## References : ",
+    description: "",
+    additionalInfo: "",
+    chinese: "## 參考："
+  },
+  {
     type: "## Tips : ",
     description: "",
     additionalInfo: "",
@@ -205,12 +211,6 @@ export const ALL_FOOTNOTE_TYPES = [
     description: "",
     additionalInfo: "```\n\n```",
     chinese: ""
-  },
-  {
-    type: "## References : ",
-    description: "",
-    additionalInfo: "",
-    chinese: "## 參考："
   },
   {
     type: "e/💫",
