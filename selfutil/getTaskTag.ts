@@ -39,16 +39,26 @@ export const ALL_TYPES = [
     },
     {
       type: "a/a/p",
-      description: "Area of Responsibility - Primary",
-      prefix: "🟥",
+      description: "Area of Responsibility - Primary important poeople",
+      prefix: "❤️",
     },
     {
       type: "a/a/s",
-      description: "Area of Responsibility - Secondary",
+      description: "Area of Responsibility - Secondary important poeople",
+      prefix: "💚",
+    },
+    {
+      type: "a/a/f",
+      description: "Area of Responsibility - Area to focus",
+      prefix: "🟥",
+    },
+    {
+      type: "a/a/h",
+      description: "Area of Responsibility - Hobby",
       prefix: "🟩",
     },
     {
-      type: "a/a/a",
+      type: "a/a/h",
       description: "Area of Responsibility - Abandoned",
       prefix: "🟪",
     },
