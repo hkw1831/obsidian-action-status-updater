@@ -1,4 +1,4 @@
-import { App, Editor, FuzzySuggestModal, FuzzyMatch, TFile } from "obsidian";
+import { App, Editor, FuzzySuggestModal, FuzzyMatch, TFile, Notice } from "obsidian";
 import { copyContentFromCursorToEndOfNote, copyContentFromStartOfNoteToCursor, removeContentFromCursorToEndOfNote, removeContentFromStartOfNoteToCursor, removeContentLeftSameLine, removeContentRightSameLine } from "selfutil/removeContentFromCursor";
 
 export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
@@ -11,8 +11,21 @@ export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
   removeContentRightSameLine : string = "Remove content right same line"
   removeContentFromStartOfNoteToCursor: string = "Remove content from start of note to cursor"
   removeContentFromCursorToEndOfNote: string = "Remove content from cursor to end of note"
+  copyCurrentHeadingSectionWithHeading: string = "Copy current heading section with heading"
+  copyCurrentHeadingSectionWithoutHeading: string = "Copy current heading section without heading"
 
-  options: string[] = [this.copyContentFromCursorToEndOfNote, this.cutContentFromCursorToEndOfNote, this.copyContentFromStartOfNoteToCursor, this.cutContentFromStartOfNoteToCursor, this.removeContentLeftSameLine, this.removeContentRightSameLine, this.removeContentFromStartOfNoteToCursor, this.removeContentFromCursorToEndOfNote]
+  options: string[] = [
+    this.copyContentFromCursorToEndOfNote, 
+    this.cutContentFromCursorToEndOfNote, 
+    this.copyContentFromStartOfNoteToCursor, 
+    this.cutContentFromStartOfNoteToCursor, 
+    this.removeContentLeftSameLine, 
+    this.removeContentRightSameLine, 
+    this.removeContentFromStartOfNoteToCursor, 
+    this.removeContentFromCursorToEndOfNote,
+    this.copyCurrentHeadingSectionWithHeading,
+    this.copyCurrentHeadingSectionWithoutHeading
+  ]
   editor: Editor;
   keydownHandler: (event: KeyboardEvent) => void;
 
@@ -90,6 +103,92 @@ export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
     } else if (choosenOption === this.cutContentFromStartOfNoteToCursor) {
       copyContentFromCursorToEndOfNote(this.editor)
       removeContentFromStartOfNoteToCursor(this.editor)
+    } else if (choosenOption === this.copyCurrentHeadingSectionWithHeading) {
+      this.copyCurrentHeadingSection(true);
+    } else if (choosenOption === this.copyCurrentHeadingSectionWithoutHeading) {
+      this.copyCurrentHeadingSection(false);
     }
+  }
+
+  // Copy the current markdown heading section
+  private copyCurrentHeadingSection(includeHeading: boolean) {
+    const cursor = this.editor.getCursor();
+    const text = this.editor.getValue();
+    const lines = text.split('\n');
+    
+    // Find the current heading line
+    let currentLine = cursor.line;
+    let headingLineNumber = -1;
+    let headingLevel = 0;
+    
+    // Search upward for the nearest heading
+    for (let i = currentLine; i >= 0; i--) {
+      const line = lines[i];
+      const headingMatch = line.match(/^(#+)\s+/);
+      if (headingMatch) {
+        headingLineNumber = i;
+        headingLevel = headingMatch[1].length;
+        break;
+      }
+    }
+
+    // Find the end of the section (next heading of same or higher level, or EOF)
+    let endLineNumber = lines.length - 1;
+    for (let i = currentLine + 1; i < lines.length; i++) {
+      const line = lines[i];
+      const nextHeadingMatch = line.match(/^(#+)\s+/);
+      if (nextHeadingMatch) {
+        if (headingLineNumber === -1) {
+          // No heading found, copy from start of note to cursor line
+          endLineNumber = i - 1;
+          break;
+        } else {
+          if (nextHeadingMatch[1].length <= headingLevel)
+          {
+            endLineNumber = i - 1;
+            break;
+          }
+        }
+      }
+      
+    }
+    
+    if (headingLineNumber === -1) {
+      // No heading found, copy from start of note to cursor line
+      let startLine = 0;
+      
+      // Skip YAML frontmatter if it exists
+      if (lines[0]?.trim() === "---") {
+        for (let i = 1; i < lines.length; i++) {
+          if (lines[i]?.trim() === "---") {
+            startLine = i + 1;
+            break;
+          }
+        }
+      }
+      
+      // Extract content from start of note (after frontmatter) to cursor
+      const sectionContent = lines.slice(startLine, endLineNumber + 1).join('\n');
+      
+      // Copy to clipboard
+      navigator.clipboard.writeText(sectionContent).then(function () {
+        new Notice(`Copied\n\`\`\`\n${sectionContent}\n\`\`\`\nfrom beginning of note to cursor`);
+      }, function (error) {
+        new Notice(`Error when copying to clipboard!`);
+      });
+      
+      return;
+    }
+    
+    // Extract the section content
+    const startLine = includeHeading ? headingLineNumber : headingLineNumber + 1;
+    const sectionContent = lines.slice(startLine, endLineNumber + 1).join('\n');
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(sectionContent).then(function () {
+      new Notice(`Copied\n\`\`\`\n${sectionContent}\n\`\`\`\nto clipboard!`);
+    }, function (error) {
+      new Notice(`error when copy to clipboard!`);
+    });
   }
 }
