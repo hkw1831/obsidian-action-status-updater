@@ -1719,6 +1719,25 @@ this.addCommand({
 			}
 		});
 
+
+		this.addObsidianIcon('journal-line-processing', 'PJ');
+		this.addCommand({
+			id: "journal-line-processing",
+			name: "PJ Journal line processing",
+			icon: `journal-line-processing`,
+			editorCallback: async (editor: Editor, view: MarkdownView) => {
+				const cursor = editor.getCursor();
+    			const text = editor.getLine(cursor.line);
+
+				navigator.clipboard.writeText(text).then(function () {
+					new Notice(`Copied\n\`\`\`\n${text}\n\`\`\`\nto clipboard for generating prompt!`);
+					window.open(`shortcuts://run-shortcut?name=Daily%20Journal%20line%20to%20knowledge%20or%20action&x-cancel=obsidian://&x-error=obsidian://`);
+				}, function (error) {
+					new Notice(`error when copy to clipboard!`);   
+				});  
+			}
+		});
+
 		this.addObsidianIcon('add-special-character-icon', '.*');
 		this.addCommand({
 			id: "add-special-character",
