@@ -1,6 +1,7 @@
 import { App, Notice, TFile, MarkdownView, SuggestModal } from "obsidian"
 import { filesWhereTagIsUsed } from "selfutil/findNotesFromTag"
 import { getNoteType } from "selfutil/getTaskTag"
+import { LinkType } from "selfutil/linkType"
 
 interface EchoItem {
   notePath: string;
@@ -58,9 +59,34 @@ export class EchoModal extends SuggestModal<EchoItem> {
     // Stop listening for keydown events when the modal is closed
     document.removeEventListener('keydown', this.keydownHandler);
   }
+  
+  getChildlinkItems(app: App, file : TFile): LinkType[] {
+    const backlinks = app.metadataCache.getBacklinksForFile(file)
+    const backlinksData = backlinks?.data
+    if (!backlinksData) {
+      return []
+    }
+    let childLinkResult = []
+    for (let [i, v] of backlinksData.entries()) {
+      for (let j = 0; j < v.length; j++) {
+        const index = v.length > 1 ? "[" + j + "]" : ""
+        if (i != file.path) {
+          const position = v[j]['position']
+          if (position)
+          {
+            const positionLine = position['start']['line']
+            childLinkResult.push({path: i, type: "v ", index: index, heading: "", line: positionLine, ch: 0}) 
+          }
+        }
+      }
+    }
+    return childLinkResult
+  }
 
   async getSuggestions(query: string): Promise<EchoItem[]> {
-    const filePaths: string[] = filesWhereTagIsUsed("#b/n/z");
+    const lts : LinkType[] = this.getChildlinkItems(app, this.fileToEcho)
+
+    //const filePaths: string[] = filesWhereTagIsUsed("#b/n/z");
     const items: EchoItem[] = [];
 
     items.push({
@@ -70,33 +96,18 @@ export class EchoModal extends SuggestModal<EchoItem> {
     })
 
     // find zk content in each file
-    const readPromises = filePaths.map(async (filePath) => {
-      const file = this.app.vault.getAbstractFileByPath(filePath) as TFile;
+    const readPromises = lts.map(async (lt) => {
+      const file = this.app.vault.getAbstractFileByPath(lt.path) as TFile;
       const content = await this.app.vault.read(file);
       const fileLines = content.split('\n');
-      for (let i = 0; i < fileLines.length; i++) {
-        const lineContent = fileLines[i].trim();
-        if (lineContent.includes(this.fileNameLinkToEcho)) {
-          items.push({
-            notePath: filePath,
-            lineNumber: i,
-            lineContent: lineContent
-          })
-        }
-      }
-    })
-    await Promise.all(readPromises);
-
-    // Then add all zk files (add to end of file)
-    const readPromises2 = filePaths.map(async (filePath) => {
+      const lineContent = fileLines[lt.line];
       items.push({
-        notePath: filePath,
-        lineNumber: 0,
-        lineContent: ""
+        notePath: lt.path,
+        lineNumber: lt.line,
+        lineContent: lineContent
       })
     })
-    await Promise.all(readPromises2);
-
+    await Promise.all(readPromises);
    return items
 }
 
