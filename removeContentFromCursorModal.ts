@@ -13,6 +13,8 @@ export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
   removeContentFromCursorToEndOfNote: string = "Remove content from cursor to end of note"
   copyCurrentHeadingSectionWithHeading: string = "Copy current heading section with heading"
   copyCurrentHeadingSectionWithoutHeading: string = "Copy current heading section without heading"
+  replaceCurrentLineToClipboardLine: string = "Replace current line to clipboard line"
+  replaceCurrentLineToClipboardAsListLine: string = "Replace current line to clipboard as list line"
 
   options: string[] = [
     this.copyContentFromCursorToEndOfNote, 
@@ -23,6 +25,8 @@ export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
     this.removeContentRightSameLine, 
     this.removeContentFromStartOfNoteToCursor, 
     this.removeContentFromCursorToEndOfNote,
+    this.replaceCurrentLineToClipboardLine,
+    this.replaceCurrentLineToClipboardAsListLine,
     this.copyCurrentHeadingSectionWithHeading,
     this.copyCurrentHeadingSectionWithoutHeading
   ]
@@ -103,6 +107,19 @@ export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
     } else if (choosenOption === this.cutContentFromStartOfNoteToCursor) {
       copyContentFromCursorToEndOfNote(this.editor)
       removeContentFromStartOfNoteToCursor(this.editor)
+    }
+    else if (choosenOption === this.replaceCurrentLineToClipboardLine) {
+      const cursor = this.editor.getCursor();
+      const clipboardContent = await this.getClipboardContent();
+      if (clipboardContent !== "") {
+        this.editor.replaceRange(clipboardContent, { line: cursor.line, ch: 0 }, { line: cursor.line, ch: this.editor.getLine(cursor.line).length });
+      }
+    } else if (choosenOption === this.replaceCurrentLineToClipboardAsListLine) {
+      const cursor = this.editor.getCursor();
+      const clipboardContent = await this.getClipboardContent();
+      if (clipboardContent !== "") {
+        this.editor.replaceRange("- " + clipboardContent, { line: cursor.line, ch: 0 }, { line: cursor.line, ch: this.editor.getLine(cursor.line).length });
+      }
     } else if (choosenOption === this.copyCurrentHeadingSectionWithHeading) {
       this.copyCurrentHeadingSection(true);
     } else if (choosenOption === this.copyCurrentHeadingSectionWithoutHeading) {
@@ -190,5 +207,16 @@ export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
     }, function (error) {
       new Notice(`error when copy to clipboard!`);
     });
+  }
+
+  // Read from clipboard
+  async getClipboardContent() : Promise<string> {
+    try {
+      const text = await navigator.clipboard.readText();
+      return text;
+    } catch (error) {
+      new Notice("Failed to read clipboard: " + error);
+      return "";
+    }
   }
 }
