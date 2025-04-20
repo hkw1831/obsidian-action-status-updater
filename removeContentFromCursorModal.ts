@@ -120,7 +120,8 @@ export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
       if (clipboardContent !== "") {
         const lineContent = this.editor.getLine(cursor.line)
         const prefix = lineContent.replace(/(\t*- ).*/, "$1")
-        this.editor.replaceRange(prefix + clipboardContent, { line: cursor.line, ch: 0 }, { line: cursor.line, ch: this.editor.getLine(cursor.line).length });
+        const clipboardContent2 = clipboardContent.replace(/(\t*- )?(.*)/, "$2")
+        this.editor.replaceRange(prefix + clipboardContent2, { line: cursor.line, ch: 0 }, { line: cursor.line, ch: this.editor.getLine(cursor.line).length });
       }
     } else if (choosenOption === this.copyCurrentHeadingSectionWithHeading) {
       this.copyCurrentHeadingSection(true);
