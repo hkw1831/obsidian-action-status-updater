@@ -137,14 +137,14 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
               const backlinkLineFiles2 = backlinkLineFiles.split("\n")
               const backlinkLine = backlinkLineFiles2[line].trim()
               const backlinkLine2 = backlinkLine.replace(/^- /, "").replace(/^\d+\. /, "")
-              const backlinkLine3 = backlinkLine2 === v[j]['original'] ? "" : backlinkLine2
+              //const backlinkLine3 = backlinkLine2 === v[j]['original'] ? "" : backlinkLine2
 
               // for ZK
               let zkContent = ""
               const backlinkNoteType = getNoteType(i)
               // console.log(backlinkNoteType)
-              if (backlinkNoteType && backlinkNoteType.type === "b/n/z")
-              {
+              //if (backlinkNoteType && backlinkNoteType.type === "b/n/z")
+              //{
                 if (line - 3 >= 0) {
                   zkContent += backlinkLineFiles2[line - 3] + "\n"
                 }
@@ -166,8 +166,10 @@ export class NavigateToForwardAndBacklinkTagModal extends SuggestModal<LinkType>
                 }
                 // remove end newline character
                 zkContent = zkContent.replace(/\n$/, "")
-              }
-              const aaa = this.getBacklinkHeading(heading, backlinkLine3, zkContent);
+              
+              // TODO see if need to change back getBacklinkHeading to only 2 args
+              //const aaa = this.getBacklinkHeading(heading, backlinkLine3, zkContent);
+              const aaa = this.getBacklinkHeading(heading, "", zkContent);
               backLinkItems.push({path: i, type: "< ", index: index, heading: aaa, line: v[j]['position']['start']['line'], ch: v[j]['position']['start']['col']})
             }
           }
