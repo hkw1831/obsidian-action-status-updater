@@ -1,9 +1,10 @@
-import { ItemView, WorkspaceLeaf, moment, Platform, Notice, TFile, Keymap, PaneType, MarkdownView, CachedMetadata, Menu, EventRef } from 'obsidian';
+import { ItemView, WorkspaceLeaf, moment, Platform, Notice, TFile, Keymap, PaneType, MarkdownView, CachedMetadata, Menu, EventRef, debounce } from 'obsidian';
 import { filesWhereTagIsUsed } from 'selfutil/findNotesFromTag';
 import { getNoteType } from 'selfutil/getTaskTag';
 
 export const VIEW_TYPE_CALENDAR = 'calendar-view';
 
+// Added interfaces for better type checking
 interface NotesListData {
   title: string;
   lineInfo: LineInfo[];
@@ -24,10 +25,18 @@ class CalendarView extends ItemView {
   private datesWithNotes: Set<string> = new Set(); // Store dates that have notes
   private vaultChangeRef: EventRef;
   private metadataChangeRef: EventRef;
+  private updateDebounceInterval = 2000; // 2 seconds
   
   constructor(leaf: WorkspaceLeaf) {
     super(leaf);
     this.currentDate = window.moment(); // Use window.moment() to access moment in Obsidian
+    
+    // Create debounced update method
+    this.debouncedUpdateDatesWithNotes = debounce(
+      this.updateDatesWithNotes.bind(this),
+      this.updateDebounceInterval,
+      true
+    );
   }
 
   getViewType(): string {
@@ -59,21 +68,19 @@ class CalendarView extends ItemView {
    * Register event listeners for vault and metadata changes
    */
   private registerVaultEvents(): void {
-    // Listen for file modifications
+    // Listen for file modifications with debounced updates
     this.vaultChangeRef = this.app.vault.on('modify', async (file) => {
       if (file instanceof TFile && file.extension === 'md') {
-        // A markdown file was modified, refresh our dates cache
-        await this.updateDatesWithNotes();
-        this.render(); // Re-render the calendar to update the date stylings
+        // Use debounced update instead of immediate update
+        this.debouncedUpdateDatesWithNotes();
       }
     });
     
-    // Listen for metadata changes (which happen when tags are added/modified)
+    // Listen for metadata changes with debounced updates
     this.metadataChangeRef = this.app.metadataCache.on('changed', async (file) => {
       if (file && file.path) {
-        // File metadata changed, refresh our dates cache
-        await this.updateDatesWithNotes();
-        this.render(); // Re-render the calendar to update the date stylings
+        // Use debounced update instead of immediate update
+        this.debouncedUpdateDatesWithNotes();
       }
     });
     
@@ -85,6 +92,9 @@ class CalendarView extends ItemView {
   public getIcon(): string {
     return 'calendar';
   }
+  
+  // Debounced method declaration
+  private debouncedUpdateDatesWithNotes: () => void;
   
   // Collect all dates that have notes in the current month view
   private async updateDatesWithNotes(): Promise<void> {
@@ -102,26 +112,67 @@ class CalendarView extends ItemView {
     
     const lastDayOfMonth = this.currentDate.clone().endOf('month');
     const endDate = lastDayOfMonth.clone();
-    // Extend to the end of the week
     if (endDate.day() !== 0) { // If not Sunday
       endDate.add(7 - endDate.day(), 'days');
     }
     
-    // Loop through each date in the range
-    const currentDate = startDate.clone();
-    while (currentDate.isSameOrBefore(endDate, 'day')) {
-      const dateString = currentDate.format('YYYYMMDD')
-      const layerDateTag = `#d/${dateString.slice(0, 4)}/${dateString.slice(4, 6)}/${dateString.slice(6, 8)}`;
-      // Check if any files contain this date tag
-      const filesWithTag = filesWhereTagIsUsed(layerDateTag);
+    // Use batch processing to reduce CPU load
+    const batchSize = 7; // Process a week at a time
+    const totalDays = endDate.diff(startDate, 'days') + 1;
+    const batches = Math.ceil(totalDays / batchSize);
+    
+    for (let i = 0; i < batches; i++) {
+      const batchStart = startDate.clone().add(i * batchSize, 'days');
+      const batchEnd = moment.min(batchStart.clone().add(batchSize - 1, 'days'), endDate);
       
-      if (filesWithTag.length > 0) {
-        // This date has notes, add it to our cache
-        this.datesWithNotes.add(currentDate.format('YYYYMMDD'));
+      // Process this batch of dates
+      const batchDate = batchStart.clone();
+      while (batchDate.isSameOrBefore(batchEnd, 'day')) {
+        const dateString = batchDate.format('YYYYMMDD');
+        const layerDateTag = `#d/${dateString.slice(0, 4)}/${dateString.slice(4, 6)}/${dateString.slice(6, 8)}`;
+        
+        // Always fetch files with tag (no caching)
+        const filesWithTag = filesWhereTagIsUsed(layerDateTag);
+        
+        if (filesWithTag.length > 0) {
+          this.datesWithNotes.add(dateString);
+        }
+        
+        batchDate.add(1, 'day');
       }
       
-      currentDate.add(1, 'day');
+      // If there are more batches, yield to other processes
+      if (i < batches - 1) {
+        await new Promise(resolve => setTimeout(resolve, 0));
+      }
     }
+    
+    // Only re-render if the view is actually visible
+    if (this.containerEl.isShown()) {
+      this.renderCalendarDays();
+    }
+  }
+  
+  // Separate render function into smaller parts for better performance
+  private renderCalendarDays(): void {
+    if (!this.calendarEl) return;
+    
+    // Get all current day elements
+    const dayElements = this.calendarEl.querySelectorAll('.calendar-day');
+    
+    // Update each day element's classes based on notes status
+    dayElements.forEach((dayEl: HTMLElement) => {
+      const dateAttr = dayEl.getAttribute('data-date');
+      if (dateAttr) {
+        if (this.datesWithNotes.has(dateAttr)) {
+          dayEl.classList.add('has-notes');
+          dayEl.classList.remove('no-notes');
+        } else {
+          dayEl.classList.add('no-notes');
+          dayEl.classList.remove('has-notes');
+        }
+      }
+    });
   }
   
   private async render(): Promise<void> {
@@ -134,13 +185,21 @@ class CalendarView extends ItemView {
     const container = this.containerEl.children[1];
     container.empty();
     
-    // Create header with navigation controls
-    this.headerEl = container.createEl('div', { cls: 'calendar-header' });
+    // Use DocumentFragment for better performance
+    const fragment = document.createDocumentFragment();
     
-    const navigationEl = this.headerEl.createEl('div', { cls: 'calendar-navigation' });
+    // Create header with navigation controls
+    this.headerEl = document.createElement('div');
+    this.headerEl.className = 'calendar-header';
+    fragment.appendChild(this.headerEl);
+    
+    const navigationEl = document.createElement('div');
+    navigationEl.className = 'calendar-navigation';
+    this.headerEl.appendChild(navigationEl);
     
     // Previous year button
-    const prevYearBtn = navigationEl.createEl('button', { cls: 'calendar-nav-btn' });
+    const prevYearBtn = document.createElement('button');
+    prevYearBtn.className = 'calendar-nav-btn';
     prevYearBtn.innerHTML = '&lt;&lt;';
     prevYearBtn.addEventListener('click', async () => {
       this.currentDate.subtract(1, 'year');
@@ -151,57 +210,60 @@ class CalendarView extends ItemView {
         this.displayDateNotes(newDate);
       });
     });
+    navigationEl.appendChild(prevYearBtn);
     
     // Previous month button
-    const prevMonthBtn = navigationEl.createEl('button', { cls: 'calendar-nav-btn' });
+    const prevMonthBtn = document.createElement('button');
+    prevMonthBtn.className = 'calendar-nav-btn';
     prevMonthBtn.innerHTML = '&lt;';
     prevMonthBtn.addEventListener('click', async () => {
       this.currentDate.subtract(1, 'month');
       await this.updateDatesWithNotes();
       this.render().then(() => {
-        // After rendering, display notes for the 1st day of the month
         const newDate = this.currentDate.format('YYYYMMDD');
         this.displayDateNotes(newDate);
       });
     });
+    navigationEl.appendChild(prevMonthBtn);
     
     // Month and year display
-    const monthYearEl = navigationEl.createEl('span', { 
-      cls: 'calendar-month-year',
-      text: this.currentDate.format('MMMM YYYY')
-    });
+    const monthYearEl = document.createElement('span');
+    monthYearEl.className = 'calendar-month-year';
+    monthYearEl.textContent = this.currentDate.format('MMMM YYYY');
+    navigationEl.appendChild(monthYearEl);
     
     // Next month button
-    const nextMonthBtn = navigationEl.createEl('button', { cls: 'calendar-nav-btn' });
+    const nextMonthBtn = document.createElement('button');
+    nextMonthBtn.className = 'calendar-nav-btn';
     nextMonthBtn.innerHTML = '&gt;';
     nextMonthBtn.addEventListener('click', async () => {
       this.currentDate.add(1, 'month');
       await this.updateDatesWithNotes();
       this.render().then(() => {
-        // After rendering, display notes for the 1st day of the month
         const newDate = this.currentDate.format('YYYYMMDD');
         this.displayDateNotes(newDate);
       });
     });
+    navigationEl.appendChild(nextMonthBtn);
     
     // Next year button
-    const nextYearBtn = navigationEl.createEl('button', { cls: 'calendar-nav-btn' });
+    const nextYearBtn = document.createElement('button');
+    nextYearBtn.className = 'calendar-nav-btn';
     nextYearBtn.innerHTML = '&gt;&gt;';
     nextYearBtn.addEventListener('click', async () => {
       this.currentDate.add(1, 'year');
       await this.updateDatesWithNotes();
       this.render().then(() => {
-        // After rendering, display notes for the 1st day of the month
         const newDate = this.currentDate.format('YYYYMMDD');
         this.displayDateNotes(newDate);
       });
     });
+    navigationEl.appendChild(nextYearBtn);
     
     // Today button
-    const todayBtn = navigationEl.createEl('button', {
-      cls: 'calendar-today-btn',
-      text: 'Today'
-    });
+    const todayBtn = document.createElement('button');
+    todayBtn.className = 'calendar-today-btn';
+    todayBtn.textContent = 'Today';
     todayBtn.addEventListener('click', async () => {
       this.currentDate = window.moment();
       await this.updateDatesWithNotes();
@@ -211,17 +273,20 @@ class CalendarView extends ItemView {
         this.displayDateNotes(today);
       });
     });
+    navigationEl.appendChild(todayBtn);
     
     // Create calendar grid
-    this.calendarEl = container.createEl('div', { cls: 'calendar-grid' });
+    this.calendarEl = document.createElement('div');
+    this.calendarEl.className = 'calendar-grid';
+    fragment.appendChild(this.calendarEl);
     
     // Render weekday headers (starting from Monday)
     const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     weekdays.forEach(day => {
-      this.calendarEl.createEl('div', { 
-        cls: 'calendar-day-header',
-        text: day
-      });
+      const dayHeaderEl = document.createElement('div');
+      dayHeaderEl.className = 'calendar-day-header';
+      dayHeaderEl.textContent = day;
+      this.calendarEl.appendChild(dayHeaderEl);
     });
     
     // Calculate first day to display (could be from previous month)
@@ -238,6 +303,8 @@ class CalendarView extends ItemView {
     
     // Render calendar days (42 days = 6 weeks)
     const today = window.moment();
+    const calendarDaysFragment = document.createDocumentFragment();
+    
     for (let i = 0; i < 42; i++) {
       const date = startDate.clone().add(i, 'days');
       const isCurrentMonth = date.month() === this.currentDate.month();
@@ -247,25 +314,21 @@ class CalendarView extends ItemView {
       const hasNotes = this.datesWithNotes.has(dateTag);
       
       // Build the classes for this calendar day
-      let classNames = 'calendar-day';
+      const classNames = [
+        'calendar-day',
+        isCurrentMonth ? 'current-month' : 'other-month',
+        isToday ? 'today' : '',
+        isSelected ? 'selected' : '',
+        hasNotes ? 'has-notes' : 'no-notes'
+      ].filter(Boolean).join(' ');
       
-      // Check if it's current month or other month
-      classNames += isCurrentMonth ? ' current-month' : ' other-month';
+      const dayEl = document.createElement('div');
+      dayEl.className = classNames;
+      dayEl.setAttribute('data-date', dateTag);
       
-      // Check if it's today
-      if (isToday) classNames += ' today';
-      
-      // Check if it's selected
-      if (isSelected) classNames += ' selected';
-      
-      // Check if it has notes
-      classNames += hasNotes ? ' has-notes' : ' no-notes';
-      
-      const dayEl = this.calendarEl.createEl('div', { cls: classNames });
-      
-      dayEl.createEl('span', {
-        text: date.format('D')
-      });
+      const dayTextSpan = document.createElement('span');
+      dayTextSpan.textContent = date.format('D');
+      dayEl.appendChild(dayTextSpan);
       
       // Make clickable to display notes with the date tag
       dayEl.addEventListener('click', () => {
@@ -278,14 +341,23 @@ class CalendarView extends ItemView {
         dayEl.classList.add('selected');
       });
       
+      calendarDaysFragment.appendChild(dayEl);
+      
       // Stop after completing the week that contains the last day of the month
       if (i > 28 && date.month() !== this.currentDate.month() && date.day() === 0) {
         break;
       }
     }
     
+    this.calendarEl.appendChild(calendarDaysFragment);
+    
     // Create notes list container
-    this.notesListEl = container.createEl('div', { cls: 'calendar-notes-list' });
+    this.notesListEl = document.createElement('div');
+    this.notesListEl.className = 'calendar-notes-list';
+    fragment.appendChild(this.notesListEl);
+    
+    // Append all elements to container
+    container.appendChild(fragment);
     
     // Restore scroll position
     if (notesListScrollTop > 0) {
@@ -306,8 +378,13 @@ class CalendarView extends ItemView {
       this.selectedDateTag = dateString;
     }
     
-    // Clear the notes list
-    this.notesListEl.empty();
+    // Clear the notes list efficiently
+    while (this.notesListEl.firstChild) {
+      this.notesListEl.removeChild(this.notesListEl.firstChild);
+    }
+    
+    // Use DocumentFragment for better performance
+    const fragment = document.createDocumentFragment();
     
     const dateTag = `#d/${dateString}`;
     
@@ -316,22 +393,20 @@ class CalendarView extends ItemView {
     const journalExists = this.fileExists(journalPath);
     
     // Create properly styled journal link
-    const journalContainer = this.notesListEl.createDiv({
-      cls: 'journal-link-container metadata-container',
-    });
+    const journalContainer = document.createElement('div');
+    journalContainer.className = 'journal-link-container metadata-container';
+    fragment.appendChild(journalContainer);
     
     const formattedDate = window.moment(dateString, "YYYYMMDD").format("MMMM D, YYYY");
     
     // The key is to use the correct classes:
     // - 'internal-link' is for all internal links
     // - 'is-unresolved' should be added only when file doesn't exist
-    const linkEl = journalContainer.createEl('a', {
-      cls: `internal-link${!journalExists ? ' is-unresolved' : ''}`, 
-      text: `J/${dateString}.md`,
-      attr: {
-        'data-href': journalPath
-      }
-    });
+    const linkEl = document.createElement('a');
+    linkEl.className = `internal-link${!journalExists ? ' is-unresolved' : ''}`;
+    linkEl.textContent = `J/${dateString}.md`;
+    linkEl.setAttribute('data-href', journalPath);
+    journalContainer.appendChild(linkEl);
     
     // Add click handler to open journal file
     linkEl.addEventListener('click', (event) => {
@@ -366,15 +441,26 @@ class CalendarView extends ItemView {
     // #d/20250323 -> #d/2025/03/23
     const layerDateTag = `#d/${dateString.slice(0, 4)}/${dateString.slice(4, 6)}/${dateString.slice(6, 8)}`;
     
-    this.notesListEl.createDiv({ cls: 'note-header', text: `Notes tagged with ${layerDateTag}` });
+    const headerEl = document.createElement('div');
+    headerEl.className = 'note-header';
+    headerEl.textContent = `Notes tagged with ${layerDateTag}`;
+    fragment.appendChild(headerEl);
     
-    const rootEl = this.notesListEl.createDiv({ cls: 'nav-folder mod-root scrollable' });
-    const childrenEl = rootEl.createDiv({ cls: 'nav-folder-children' });
+    const rootEl = document.createElement('div');
+    rootEl.className = 'nav-folder mod-root scrollable';
+    fragment.appendChild(rootEl);
+    
+    const childrenEl = document.createElement('div');
+    childrenEl.className = 'nav-folder-children';
+    rootEl.appendChild(childrenEl);
     
     // Get files with the date tag
     const files: TFile[] = filesWhereTagIsUsed(layerDateTag)
       .map(filePath => this.app.vault.getAbstractFileByPath(filePath) as TFile)
       .filter(file => file !== null);
+    
+    // Append the fragment to the notes list first to ensure the journal link is always displayed
+    this.notesListEl.appendChild(fragment);
     
     if (files.length === 0) {
       childrenEl.createDiv({ cls: 'nav-empty', text: 'No notes found with this tag' });

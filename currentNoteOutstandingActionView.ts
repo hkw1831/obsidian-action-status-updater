@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf, TFile, Keymap, PaneType, Notice, Menu, MarkdownView, CachedMetadata, Platform } from 'obsidian';
+import { ItemView, WorkspaceLeaf, TFile, Keymap, PaneType, Notice, Menu, MarkdownView, CachedMetadata, Platform, debounce } from 'obsidian';
 import { getNoteType } from 'selfutil/getTaskTag';
 
 const VIEW_TYPE_CURRENT_OURSTANDING_TASK = 'current-note-outstanding-action-view';
@@ -13,9 +13,18 @@ class CurrentNoteOutstandingActionView extends ItemView {
   public currentNotesPath: string
   filterStr: string = ''
   tagsToMatch = ["#wn", "#nn", "#wl", "#nl", "#ww", "#nw", "tm"];
+  private debouncedRedraw: () => void;
+  
   constructor(leaf: WorkspaceLeaf, notesTypeTag: string) {
     super(leaf);
-    this.currentNotesPath = notesTypeTag
+    this.currentNotesPath = notesTypeTag;
+    
+    // Set up debounced redraw to prevent excessive updates
+    this.debouncedRedraw = debounce(
+      () => this.redraw(false),
+      300, // 300ms debounce time
+      true
+    );
   }
 
   getViewType() {
@@ -28,6 +37,31 @@ class CurrentNoteOutstandingActionView extends ItemView {
 
   async onOpen() {
     this.redraw(true);
+    
+    // Register event listener for active leaf changes
+    this.registerEvent(
+      this.app.workspace.on('active-leaf-change', () => {
+        this.debouncedRedraw();
+      })
+    );
+    
+    // Register event for file modifications
+    this.registerEvent(
+      this.app.vault.on('modify', (file) => {
+        if (file instanceof TFile && file.path === this.currentNotesPath) {
+          this.debouncedRedraw();
+        }
+      })
+    );
+    
+    // Register event for metadata changes
+    this.registerEvent(
+      this.app.metadataCache.on('changed', (file) => {
+        if (file && file.path === this.currentNotesPath) {
+          this.debouncedRedraw();
+        }
+      })
+    );
   }
 
   public getIcon(): string {
@@ -48,13 +82,10 @@ class CurrentNoteOutstandingActionView extends ItemView {
     
     const activeFile = app.workspace.getActiveFile();
     if (!activeFile) {
-      //console.log("redraw() with no active file")
       return;
     }
 
-    //console.log("redraw() with active file: " + activeFile.path)
     if (!forceRedraw && activeFile.path === this.currentNotesPath) {
-      //console.log("redraw() with same path")
       return;
     }
     if (activeFile.path !== this.currentNotesPath) {
@@ -68,156 +99,98 @@ class CurrentNoteOutstandingActionView extends ItemView {
     if (!f) {
       return
     }
-    //console.log("redraw()")
-    //const tag = "#c/t/p"
     
+    // Create document fragment for better performance
+    const fragment = new DocumentFragment();
+    
+    // Always process the file directly (no caching)
+    const lineInfosByTag = await this.processFile(f);
+    
+    // Filter the line infos based on the current filter string
+    const filteredLineInfosByTag = this.filterLineInfos(lineInfosByTag);
+    
+    // Count total actions
+    let allActionCount = 0;
+    for (const [_, lineInfos] of filteredLineInfosByTag) {
+      allActionCount += lineInfos.length;
+    }
+    
+    // Clear the container
     this.containerEl.empty();
 
-    const fileCache = this.app.metadataCache.getFileCache(f);
-    let lineInfos = []
-    
-    if (fileCache && fileCache.tags) {
-      const content = await this.app.vault.read(f);
-      const fileLines = content.split('\n');
-      
-      for (const tagToMatch of this.tagsToMatch) {
-        let lineInfosInner : LineInfo[] = []
-        for (const tagMetadata of fileCache.tags) {
-          if (tagToMatch === tagMetadata.tag) {
-            const heading = this.getHeadingForLine(fileCache, tagMetadata.position.start.line);
-            const lineContent = fileLines[tagMetadata.position.start.line].trim();
-            const newLineIfNeeded = heading.length != 0 ? (this.isWindows() ? "\r\n" : "\n") : "" 
-            const contentToDisplay = heading + newLineIfNeeded + lineContent
-            
-            const contentToDisplayLower = contentToDisplay.toLowerCase()
-            const filterStrLower = this.filterStr.toLowerCase()
-            if (this.filterStr === "" || contentToDisplayLower.includes(filterStrLower) || contentToDisplayLower.match(new RegExp(filterStrLower)))
-            {
-              lineInfosInner.push({
-                content: contentToDisplay, 
-                line: tagMetadata.position.start.line,
-                tag: tagMetadata.tag
-              });
-            }
-          }
-        }
-        if (lineInfosInner.length > 0) {
-          lineInfos.push(lineInfosInner)
-        }
-      }
-    }
+    // Create UI components
+    const label = document.createElement('div');
+    label.className = 'nav-folder-children';
+    label.textContent = "Outstanding Actions";
+    fragment.appendChild(label);
 
-    let allActionCount = 0
-    for (let lineInfo of lineInfos){
-      allActionCount += lineInfo.length
-    }
+    // Create search container
+    const searchContainer = document.createElement('div');
+    searchContainer.className = 'search-container';
+    fragment.appendChild(searchContainer);
 
-    const label = this.containerEl.createDiv({ cls: 'nav-folder-children' });
-    label.setText("Outstanding Actions");
+    // Create search field
+    const searchField = document.createElement('input');
+    searchField.type = 'text';
+    searchField.placeholder = this.filterStr === '' ? 'Filter...' : this.filterStr;
+    searchField.className = 'width50';
+    searchContainer.appendChild(searchField);
 
-    // Create a container for the search field and button
-    const searchContainer = this.containerEl.createDiv({ cls: 'search-container' });
-
-    // Create the search field
-    const searchField = searchContainer.createEl('input', {
-      type: 'text',
-      placeholder: this.filterStr === '' ? 'Filter...' : this.filterStr,
-      cls: 'width50'
-    });
-
-    // Add event listener to the search field
+    // Add event listeners to search field
     searchField.addEventListener('input', (event: Event) => {
       this.filterStr = (event.target as HTMLInputElement).value.toLowerCase();
     });
 
-    // Add event listener for Enter key on the search field
     searchField.addEventListener('keydown', (event: KeyboardEvent) => {
       if (event.key === 'Enter') {
-        searchButton.click();
+        this.redraw(true);
       }
     });
 
-    // Create the search button
-    const searchButton = searchContainer.createEl('button', {
-      text: 'Filter',
-      cls: 'width25'
-    });
-
-    // Add event listener to the search button
+    // Create search button
+    const searchButton = document.createElement('button');
+    searchButton.textContent = 'Filter';
+    searchButton.className = 'width25';
     searchButton.addEventListener('click', () => {
       this.redraw(true);
     });
+    searchContainer.appendChild(searchButton);
 
-    // Create the clear button
-    const clearButton = searchContainer.createEl('button', {
-      text: 'Clear',
-      cls: 'width25'
-    });
-
-    // Add event listener to the search button
+    // Create clear button
+    const clearButton = document.createElement('button');
+    clearButton.textContent = 'Clear';
+    clearButton.className = 'width25';
     clearButton.addEventListener('click', () => {
-      this.clearFilter()
+      this.clearFilter();
       this.redraw(true);
     });
+    searchContainer.appendChild(clearButton);
 
-    //console.log(lineInfos)
-    let noteType = getNoteType(path)
-    let prefix = noteType ? (noteType.prefix ? noteType.prefix + " " : "") : ""
-    this.containerEl.createDiv({ cls: 'nav-header', text: "Path: " + prefix + path + " ( " + allActionCount + " )" });
-
-    const rootEl = this.containerEl.createDiv({ cls: 'nav-folder mod-root scrollable' });
-    const childrenEl = rootEl.createDiv({ cls: 'nav-folder-children' });
-
-    for (let lineInfo of lineInfos){
-      const navFile = childrenEl.createDiv({
-        cls: 'tree-item nav-file recent-files-file',
-      });
-      navFile.setText(lineInfo[0].tag + " ( " + lineInfo.length + " )" )
-      for (let lineInfoInner of lineInfo) {
-        const navFile = childrenEl.createDiv({
-          cls: 'tree-item nav-file recent-files-file',
-        });
-        const navFileTitle = navFile.createDiv({
-          cls: 'tree-item-self is-clickable nav-file-title recent-files-title',
-        });
-        const navFileTitleContent = navFileTitle.createDiv({
-          cls: 'tree-item-inner nav-file-title-content recent-files-title-content internal-link self-wrap-content',
-        });
-
-        navFileTitleContent.setText(lineInfoInner.content);
-        navFileTitle.addEventListener('contextmenu', (event: MouseEvent) => {
-
-          const menu = new Menu();
-          menu.addItem((item) =>
-            item
-              .setSection('action')
-              .setTitle('Open in new tab')
-              .setIcon('file-plus')
-              .onClick(() => {
-                if (f === null) {
-                  return;
-                }
-                this.focusFileAtLine(f, 'tab', 0);
-              })
-          );
-          const file = this.app.vault.getAbstractFileByPath(f?.path);
-          this.app.workspace.trigger(
-            'file-menu',
-            menu,
-            file,
-            'link-context-menu',
-          );
-          menu.showAtPosition({ x: event.clientX, y: event.clientY });
-        });
-  
-        navFileTitle.addEventListener('click', (event: MouseEvent) => {  
-          const newLeaf = Keymap.isModEvent(event)
-          this.focusFileAtLine(f, newLeaf, lineInfoInner.line);
-        });
-      }
-    }
+    // Create header with path and count
+    let noteType = getNoteType(path);
+    let prefix = noteType ? (noteType.prefix ? noteType.prefix + " " : "") : "";
     
-    // Restore the scroll position after a short delay to ensure the DOM has updated
+    const header = document.createElement('div');
+    header.className = 'nav-header';
+    header.textContent = "Path: " + prefix + path + " ( " + allActionCount + " )";
+    fragment.appendChild(header);
+
+    // Create root container for tasks
+    const rootEl = document.createElement('div');
+    rootEl.className = 'nav-folder mod-root scrollable';
+    fragment.appendChild(rootEl);
+    
+    const childrenEl = document.createElement('div');
+    childrenEl.className = 'nav-folder-children';
+    rootEl.appendChild(childrenEl);
+
+    // Batch render the task items
+    this.renderTaskItems(childrenEl, filteredLineInfosByTag, f);
+    
+    // Append the fragment to the container (single DOM operation)
+    this.containerEl.appendChild(fragment);
+    
+    // Restore scroll position
     if (scrollPosition > 0) {
       setTimeout(() => {
         const newContentContainer = this.containerEl.querySelector('.nav-folder.mod-root.scrollable');
@@ -226,15 +199,150 @@ class CurrentNoteOutstandingActionView extends ItemView {
         }
       }, 0);
     }
-    //console.log("finish redraw")
+  }
+
+  // Process file content and extract LineInfos grouped by tag
+  private async processFile(file: TFile): Promise<Map<string, LineInfo[]>> {
+    const fileCache = this.app.metadataCache.getFileCache(file);
+    const lineInfosByTag = new Map<string, LineInfo[]>();
+    
+    if (fileCache && fileCache.tags) {
+      const content = await this.app.vault.read(file);
+      const fileLines = content.split('\n');
+      
+      // Pre-initialize the map with empty arrays for all tags
+      this.tagsToMatch.forEach(tag => {
+        lineInfosByTag.set(tag, []);
+      });
+      
+      // Process all tags at once to avoid multiple iterations
+      for (const tagMetadata of fileCache.tags) {
+        const tag = tagMetadata.tag;
+        if (this.tagsToMatch.includes(tag)) {
+          const line = tagMetadata.position.start.line;
+          const heading = this.getHeadingForLine(fileCache, line);
+          const lineContent = fileLines[line].trim();
+          const newLineIfNeeded = heading.length != 0 ? (this.isWindows() ? "\r\n" : "\n") : "";
+          const contentToDisplay = heading + newLineIfNeeded + lineContent;
+          
+          const lineInfoArray = lineInfosByTag.get(tag) || [];
+          lineInfoArray.push({
+            content: contentToDisplay,
+            line: line,
+            tag: tag
+          });
+          
+          lineInfosByTag.set(tag, lineInfoArray);
+        }
+      }
+    }
+    
+    return lineInfosByTag;
+  }
+
+  // Filter LineInfos based on the current filter string
+  private filterLineInfos(lineInfosByTag: Map<string, LineInfo[]>): Map<string, LineInfo[]> {
+    if (this.filterStr === '') {
+      return lineInfosByTag;
+    }
+    
+    const filteredMap = new Map<string, LineInfo[]>();
+    const filterStrLower = this.filterStr.toLowerCase();
+    
+    for (const [tag, lineInfos] of lineInfosByTag) {
+      const filteredLineInfos = lineInfos.filter(info => {
+        const contentToDisplayLower = info.content.toLowerCase();
+        return contentToDisplayLower.includes(filterStrLower) || 
+               contentToDisplayLower.match(new RegExp(filterStrLower));
+      });
+      
+      if (filteredLineInfos.length > 0) {
+        filteredMap.set(tag, filteredLineInfos);
+      }
+    }
+    
+    return filteredMap;
+  }
+
+  // Render task items efficiently
+  private renderTaskItems(container: HTMLElement, lineInfosByTag: Map<string, LineInfo[]>, file: TFile): void {
+    // Use document fragment for batch updates
+    const fragment = new DocumentFragment();
+    
+    // Iterate through each tag group
+    for (const [tag, lineInfos] of lineInfosByTag) {
+      if (lineInfos.length === 0) continue;
+      
+      // Create tag header
+      const tagHeader = document.createElement('div');
+      tagHeader.className = 'tree-item nav-file recent-files-file';
+      tagHeader.textContent = tag + " ( " + lineInfos.length + " )";
+      fragment.appendChild(tagHeader);
+      
+      // Create task items for this tag
+      for (const lineInfo of lineInfos) {
+        const navFile = document.createElement('div');
+        navFile.className = 'tree-item nav-file recent-files-file';
+        
+        const navFileTitle = document.createElement('div');
+        navFileTitle.className = 'tree-item-self is-clickable nav-file-title recent-files-title';
+        
+        const navFileTitleContent = document.createElement('div');
+        navFileTitleContent.className = 'tree-item-inner nav-file-title-content recent-files-title-content internal-link self-wrap-content';
+        navFileTitleContent.textContent = lineInfo.content;
+        
+        navFileTitle.appendChild(navFileTitleContent);
+        navFile.appendChild(navFileTitle);
+        
+        // Add event listeners
+        this.addTaskEventListeners(navFileTitle, file, lineInfo.line);
+        
+        fragment.appendChild(navFile);
+      }
+    }
+    
+    // Append all elements in one operation
+    container.appendChild(fragment);
+  }
+  
+  // Add event listeners to task items
+  private addTaskEventListeners(element: HTMLElement, file: TFile, line: number): void {
+    element.addEventListener('contextmenu', (event: MouseEvent) => {
+      const menu = new Menu();
+      menu.addItem((item) =>
+        item
+          .setSection('action')
+          .setTitle('Open in new tab')
+          .setIcon('file-plus')
+          .onClick(() => {
+            if (file === null) {
+              return;
+            }
+            this.focusFileAtLine(file, 'tab', line);
+          })
+      );
+      const abstractFile = this.app.vault.getAbstractFileByPath(file?.path);
+      this.app.workspace.trigger(
+        'file-menu',
+        menu,
+        abstractFile,
+        'link-context-menu',
+      );
+      menu.showAtPosition({ x: event.clientX, y: event.clientY });
+    });
+
+    element.addEventListener('click', (event: MouseEvent) => {  
+      const newLeaf = Keymap.isModEvent(event);
+      this.focusFileAtLine(file, newLeaf, line);
+    });
   }
 
   isWindows() {
-    return !Platform.isAndroidApp && !Platform.isIosApp && !Platform.isMacOS && !Platform.isSafari
+    return !Platform.isAndroidApp && !Platform.isIosApp && !Platform.isMacOS && !Platform.isSafari;
   }
 
   async onClose() {
-    // Cleanup if necessary
+    // Nothing to clean up anymore
   }
 
   private readonly focusFileAtLine = (file: TFile, newLeaf: boolean | PaneType, line: number): void => {
@@ -271,25 +379,24 @@ class CurrentNoteOutstandingActionView extends ItemView {
     }
   };
 
-
-getHeadingForLine(fileCache: CachedMetadata, lineNumber: number): string {
-  if (!fileCache || !fileCache.headings) {
-    return "";
-  }
-
-  const headings = fileCache.headings;
-  let currentHeading = "";
-
-  for (const heading of headings) {
-    if (heading.position.start.line <= lineNumber) {
-      currentHeading = "# " + heading.heading;
-    } else {
-      break;
+  getHeadingForLine(fileCache: CachedMetadata, lineNumber: number): string {
+    if (!fileCache || !fileCache.headings) {
+      return "";
     }
-  }
 
-  return currentHeading;
-}
+    const headings = fileCache.headings;
+    let currentHeading = "";
+
+    for (const heading of headings) {
+      if (heading.position.start.line <= lineNumber) {
+        currentHeading = "# " + heading.heading;
+      } else {
+        break;
+      }
+    }
+
+    return currentHeading;
+  }
 }
 
 export { CurrentNoteOutstandingActionView as CurrentNoteOutstandingActionView, VIEW_TYPE_CURRENT_OURSTANDING_TASK as VIEW_TYPE_CURRENT_OURSTANDING_TASK };
