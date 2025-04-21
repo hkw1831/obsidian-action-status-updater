@@ -248,12 +248,22 @@ class CurrentNoteOutstandingActionView extends ItemView {
         const view = this.app.workspace.getActiveViewOfType(MarkdownView);
         if (view) {
           view.editor.setCursor({ line: line, ch: 0 });
+          if (line > 0)
+          {
+            try {
+              view.setEphemeralState({ line });
+              } catch (error) {
+                console.error(error);
+              }
+          }
+          /*
           view.editor.scrollIntoView({from: {line: line, ch: 0}, to: {line: line, ch: 0}}, true)
           if (line != 0) {
             const ch = view.editor.getLine(line).length;
             view.editor.setSelection({line: line, ch: 0}, {line: line, ch: ch});
             view.editor.scrollIntoView({from: {line: line, ch: 0}, to: {line: line, ch: 0}}, true)
           }
+            */
         }
       });
     } else {

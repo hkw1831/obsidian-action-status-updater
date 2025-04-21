@@ -414,12 +414,22 @@ async prepareItems(): Promise<LinkType[]> {
               return Promise.reject(errorReason)
           }
           editor.setCursor({line: line, ch: ch})
+          if (line > 0)
+            {
+              try {
+                markdownView.setEphemeralState({ line });
+              } catch (error) {
+                console.error(error);
+              }
+            }
+          /*
           const ch2 = editor.getLine(line).length
           if (ch != 0)
           {
             editor.setSelection({line: line, ch: 0}, {line: line, ch: ch2})
           }
           editor.scrollIntoView({from: {line: line, ch: ch}, to: {line: line, ch: ch}}, true)
+          */
           //editor.markText({line: line, ch: ch}, {line: line + 1, ch: ch + 3}, {className: "my-highlight"})
 
           // POC testing highlight the line if selected, but failed

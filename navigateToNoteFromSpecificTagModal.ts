@@ -217,7 +217,17 @@ fuzzyMatch(str: string, pattern: string): boolean {
         }
         editor.setCursor({line: path.startLine, ch: 0})
             // scroll the view to the cursor
-        editor.scrollIntoView({from: {line: path.startLine, ch: 0}, to: {line: path.startLine, ch: 0}}, true)
+        if (path.startLine > 0)
+        {
+          const line : number = path.startLine
+          try {
+            markdownView.setEphemeralState({ line });
+          } catch (error) {
+            console.error(error);
+          }
+
+        }    
+        //editor.scrollIntoView({from: {line: path.startLine, ch: 0}, to: {line: path.startLine, ch: 0}}, true)
       })
     }
   }

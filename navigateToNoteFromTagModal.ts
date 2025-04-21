@@ -182,8 +182,16 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
           const line = editor.getLine(i)
           if (line == choosenValue.search) {
             editor.setCursor({line: i, ch: 0})
-            // scroll the view to the cursor
-            editor.scrollIntoView({from: {line: i, ch: 0}, to: {line: i, ch: 0}}, true)
+            if (i > 0)
+            {
+              // scroll the view to the cursor
+              editor.scrollIntoView({from: {line: i, ch: 0}, to: {line: i, ch: 0}}, true)
+              try {
+                markdownView.setEphemeralState({ i });
+              } catch (error) {
+                console.error(error);
+              }
+            }
             return
           }
         }
