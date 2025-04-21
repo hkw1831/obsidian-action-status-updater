@@ -415,13 +415,13 @@ async prepareItems(): Promise<LinkType[]> {
           }
           editor.setCursor({line: line, ch: ch})
           if (line > 0)
-            {
-              try {
-                markdownView.setEphemeralState({ line });
-              } catch (error) {
-                console.error(error);
-              }
+          {
+            try {
+              markdownView.setEphemeralState({ line });
+            } catch (error) {
+              console.error(error);
             }
+          }
           /*
           const ch2 = editor.getLine(line).length
           if (ch != 0)

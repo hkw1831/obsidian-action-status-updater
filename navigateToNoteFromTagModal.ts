@@ -8,7 +8,8 @@ import { Heading } from "selfutil/heading";
 interface Note {
   search: string,
   secondary: string
-  type: string
+  type: string,
+  line: number
 }
 
 const note = "note"
@@ -92,16 +93,16 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
     })
 		return [
       ...getRecentNotes(this.app, 50).map(n => {
-        return {search: n, secondary: "", type: history}
+        return {search: n, secondary: "", type: history, line: -1}
       }),
       ...getAllTagsWithFilter(this.app).map(n => {
-        return {search: n.replace(/^#/, "@"), secondary: "", type: tag}
+        return {search: n.replace(/^#/, "@"), secondary: "", type: tag, line: -1}
       }),
       ...allNotes.map(n => {
-        return {search: n, secondary: "", type: note}
+        return {search: n, secondary: "", type: note, line: -1}
       }),
       ...headings.map(h => {
-        return {search: '#'.repeat(h.level) + " " + h.heading, secondary: h.note, type: heading}
+        return {search: '#'.repeat(h.level) + " " + h.heading, secondary: h.note, type: heading, line: h.startLine}
       })
     ];
   }
@@ -122,7 +123,7 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
     const index = this.resultContainerEl.querySelectorAll('.suggestion-item').length;
     const itemIndex = index < 10 ? index + ". " : "    "
     el.createEl("div", { text: itemIndex + prefix + item.search });
-    el.createEl("small", { text: "     " + item.type + " " + item.secondary + taskType});
+    el.createEl("small", { text: "     " + item.type + " " + item.secondary + taskType + " -> " + item.line });
   }
 
   onOpen() {
@@ -166,6 +167,7 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
     } else if (choosenValue.type == heading) {
       const { vault, workspace } = this.app;
       const leaf = workspace.getLeaf(false);
+
       Promise.resolve()
       .then(() => {
           return leaf.openFile(vault.getAbstractFileByPath(choosenValue.secondary) as TFile, { active : true });
@@ -177,6 +179,18 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
             const errorReason = `editor or value ${choosenValue.secondary} not exist. Aborting...`
             return Promise.reject(errorReason)
         }
+
+        editor.setCursor({line: choosenValue.line, ch: 0})
+        if (choosenValue.line > 0) {
+          const line = choosenValue.line
+          try {
+            markdownView.setEphemeralState({ line });
+            //markdownView.setEphemeralState({ l });
+          } catch (error) {
+            console.error(error);
+          }
+        }
+        /*
         const totalLineNum = editor.lineCount()
         for (let i = 0; i < totalLineNum; i++) {
           const line = editor.getLine(i)
@@ -195,6 +209,7 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
             return
           }
         }
+          */
       })
     }
   }
