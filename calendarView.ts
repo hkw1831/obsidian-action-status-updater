@@ -111,9 +111,10 @@ class CalendarView extends ItemView {
     const currentDate = startDate.clone();
     while (currentDate.isSameOrBefore(endDate, 'day')) {
       const dateTag = `#d/${currentDate.format('YYYYMMDD')}`;
+      const layerDateTag = `#d/${dateTag.slice(0, 4)}/${dateTag.slice(4, 6)}/${dateTag.slice(6, 8)}`;
       
       // Check if any files contain this date tag
-      const filesWithTag = filesWhereTagIsUsed(dateTag);
+      const filesWithTag = filesWhereTagIsUsed(layerDateTag);
       
       if (filesWithTag.length > 0) {
         // This date has notes, add it to our cache
@@ -363,13 +364,16 @@ class CalendarView extends ItemView {
       }
     });
     
-    this.notesListEl.createDiv({ cls: 'note-header', text: `Notes tagged with ${dateTag}` });
+    // #d/20250323 -> #d/2025/03/23
+    const layerDateTag = `#d/${dateString.slice(0, 4)}/${dateString.slice(4, 6)}/${dateString.slice(6, 8)}`;
+    
+    this.notesListEl.createDiv({ cls: 'note-header', text: `Notes tagged with ${layerDateTag}` });
     
     const rootEl = this.notesListEl.createDiv({ cls: 'nav-folder mod-root scrollable' });
     const childrenEl = rootEl.createDiv({ cls: 'nav-folder-children' });
     
     // Get files with the date tag
-    const files: TFile[] = filesWhereTagIsUsed(dateTag)
+    const files: TFile[] = filesWhereTagIsUsed(layerDateTag)
       .map(filePath => this.app.vault.getAbstractFileByPath(filePath) as TFile)
       .filter(file => file !== null);
     
@@ -390,7 +394,7 @@ class CalendarView extends ItemView {
         const content = await this.app.vault.read(f);
         const fileLines = content.split('\n');
         for (const tag of fileCache.tags) {
-          if (tag.tag === dateTag) {
+          if (tag.tag === layerDateTag) {
             const heading = this.getHeadingForLine(fileCache, tag.position.start.line);
             const lineContent = fileLines[tag.position.start.line].trim();
             const newLineIfNeeded = heading.length != 0 ? (this.isWindows() ? "\r\n" : "\n") : "";

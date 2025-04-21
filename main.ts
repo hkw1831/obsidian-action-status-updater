@@ -1811,10 +1811,11 @@ this.addCommand({
                 const cursor = editor.getCursor();
                 const line = editor.getLine(cursor.line);
                 const currentDate = moment().format('YYYYMMDD');
-                const dateTag = `#d/${currentDate}`;
+				const layerDateTag = `#d/${currentDate.slice(0, 4)}/${currentDate.slice(4, 6)}/${currentDate.slice(6, 8)}`;
+                //const dateTag = `#d/${currentDate}`;
 
-				editor.setLine(cursor.line, `${line} ${dateTag}`);
-				cursor.ch = line.length + 1 + dateTag.length;
+				editor.setLine(cursor.line, `${line} ${layerDateTag}`);
+				cursor.ch = line.length + 1 + layerDateTag.length;
 				editor.setCursor(cursor);
             },
             hotkeys: [
