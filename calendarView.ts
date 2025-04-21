@@ -110,9 +110,8 @@ class CalendarView extends ItemView {
     // Loop through each date in the range
     const currentDate = startDate.clone();
     while (currentDate.isSameOrBefore(endDate, 'day')) {
-      const dateTag = `#d/${currentDate.format('YYYYMMDD')}`;
-      const layerDateTag = `#d/${dateTag.slice(0, 4)}/${dateTag.slice(4, 6)}/${dateTag.slice(6, 8)}`;
-      
+      const dateString = currentDate.format('YYYYMMDD')
+      const layerDateTag = `#d/${dateString.slice(0, 4)}/${dateString.slice(4, 6)}/${dateString.slice(6, 8)}`;
       // Check if any files contain this date tag
       const filesWithTag = filesWhereTagIsUsed(layerDateTag);
       
