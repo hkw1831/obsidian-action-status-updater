@@ -1814,8 +1814,13 @@ this.addCommand({
 				const layerDateTag = `#d/${currentDate.slice(0, 4)}/${currentDate.slice(4, 6)}/${currentDate.slice(6, 8)}`;
                 //const dateTag = `#d/${currentDate}`;
 
-				editor.setLine(cursor.line, `${line} ${layerDateTag}`);
-				cursor.ch = line.length + 1 + layerDateTag.length;
+				if (line.length > 0) {
+				  editor.setLine(cursor.line, `${line} ${layerDateTag}`);
+				  cursor.ch = line.length + 1 + layerDateTag.length;
+				} else {
+				  editor.setLine(cursor.line, layerDateTag);
+				  cursor.ch = layerDateTag.length;
+				}
 				editor.setCursor(cursor);
             },
             hotkeys: [
