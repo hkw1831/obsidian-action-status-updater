@@ -11,6 +11,7 @@ export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
   removeContentRightSameLine : string = "Remove content right same line"
   removeContentFromStartOfNoteToCursor: string = "Remove content from start of note to cursor"
   removeContentFromCursorToEndOfNote: string = "Remove content from cursor to end of note"
+  renameFilenameWithCurrentLineValue: string = "Rename Filename with Current Line value"
   copyCurrentHeadingSectionWithHeading: string = "Copy current heading section with heading"
   copyCurrentHeadingSectionWithoutHeading: string = "Copy current heading section without heading"
   replaceCurrentLineToClipboardLine: string = "Replace current line to clipboard line"
@@ -25,6 +26,7 @@ export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
     this.removeContentRightSameLine, 
     this.removeContentFromStartOfNoteToCursor, 
     this.removeContentFromCursorToEndOfNote,
+    this.renameFilenameWithCurrentLineValue,
     this.replaceCurrentLineToClipboardLine,
     this.replaceCurrentLineToClipboardAsListLine,
     this.copyCurrentHeadingSectionWithHeading,
@@ -107,8 +109,28 @@ export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
     } else if (choosenOption === this.cutContentFromStartOfNoteToCursor) {
       copyContentFromCursorToEndOfNote(this.editor)
       removeContentFromStartOfNoteToCursor(this.editor)
-    }
-    else if (choosenOption === this.replaceCurrentLineToClipboardLine) {
+    } else if (choosenOption === this.renameFilenameWithCurrentLineValue) {
+      const cursor = this.editor.getCursor();
+      const lineContent = this.editor.getLine(cursor.line)
+      if (lineContent.contains("\\") || lineContent.contains("/") || lineContent.contains("'") || lineContent.contains('"') || lineContent.contains("<") || lineContent.contains(">") || lineContent.contains(":") || lineContent.contains("?") || lineContent.contains("*") || lineContent.contains("|")) {
+        new Notice("Line contains special character (\\ / : * ? \" < > |)so cannot rename file")
+        return;
+      }
+      const file = this.app.workspace.getActiveFile();
+      if (file && lineContent !== "") {
+        const newPath = file.path.replace(/[^\/]+$/, lineContent + ".md");
+        this.app.fileManager.renameFile(file, newPath)
+        .then(() => {
+          new Notice(`Renamed file to ${this.app.workspace.getActiveFile()?.path}`);
+          // then remove the line
+          this.editor.replaceRange("", { line: cursor.line, ch: 0 }, { line: cursor.line, ch: this.editor.getLine(cursor.line).length + 1 });
+        }).catch((error) => {
+          new Notice(`Error renaming file: ${error}`);
+        });
+        return;
+      }
+      new Notice(`Error renaming file: file path not found or lineContent is empty`);
+    } else if (choosenOption === this.replaceCurrentLineToClipboardLine) {
       const cursor = this.editor.getCursor();
       const clipboardContent = await this.getClipboardContent();
       if (clipboardContent !== "") {
