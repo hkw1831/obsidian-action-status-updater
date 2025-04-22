@@ -1166,6 +1166,7 @@ export default class MyPlugin extends Plugin {
 				await leaf.openFile(vault.getAbstractFileByPath(inboxMd) as TFile, { active : true });
 				*/
 			}
+			/*
 			,
 			hotkeys: [
 				{
@@ -1177,6 +1178,7 @@ export default class MyPlugin extends Plugin {
 					key: `b`,
 				}
 			]
+				*/
 			
 		})
 
@@ -1191,7 +1193,7 @@ export default class MyPlugin extends Plugin {
 				const leaf = workspace.getLeaf(false);
 				await leaf.openFile(vault.getAbstractFileByPath(inboxMd) as TFile, { active : true });
 			}
-			/*,
+			,
 			hotkeys: [
 				{
 					modifiers: [`Ctrl`, `Meta`, `Shift`],
@@ -1202,7 +1204,7 @@ export default class MyPlugin extends Plugin {
 					key: `b`,
 				}
 			]
-			*/
+			
 		})
 
 		this.addCommand({
