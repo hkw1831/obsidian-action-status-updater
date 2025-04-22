@@ -123,7 +123,8 @@ export class NavigateToNoteFromTagModal extends FuzzySuggestModal<Note> {
     const index = this.resultContainerEl.querySelectorAll('.suggestion-item').length;
     const itemIndex = index < 10 ? index + ". " : "    "
     el.createEl("div", { text: itemIndex + prefix + item.search });
-    el.createEl("small", { text: "     " + item.type + " " + item.secondary + taskType + " -> " + item.line });
+    const lineInfo = item.line > 0 ? " (line " + item.line + ")" : ""
+    el.createEl("small", { text: "     " + item.type + " " + item.secondary + taskType + lineInfo });
   }
 
   onOpen() {
