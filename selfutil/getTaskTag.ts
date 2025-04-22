@@ -289,17 +289,17 @@ export const ALL_TYPES = [
     },
     {
       type: "b/k/s",
-      description: "Expermential Knowledge Group - Subjective",
+      description: "Expermential Knowledge Group - Simple Card (Single perspective)",
       prefix: "2️⃣",
     },
     {
       type: "b/k/p",
-      description: "Expermential Knowledge Group - Complete system to solve a Problem",
+      description: "Expermential Knowledge Group - Perspective Card (Multiple perspective)",
       prefix: "3️⃣",
     },
     {
       type: "b/k/c",
-      description: "Expermential Knowledge Group - Collections of Subjective / Problem",
+      description: "Expermential Knowledge Group - Collections of Perspective Card for a topic",
       prefix: "4️⃣",
     },
 ];
