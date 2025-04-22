@@ -937,6 +937,52 @@ export default class MyPlugin extends Plugin {
 			},
 		})
 
+		this.addObsidianIcon('mark-action-complate', 'MC');
+		this.addCommand({
+			id: "mark-action-complate",
+			name: "MC Mark action complete",
+			icon: "mark-action-complate",
+			editorCallback: async (editor: Editor, view: MarkdownView) => {
+				const { vault, workspace } = this.app;
+				const clipboardValue = await navigator.clipboard.readText();
+
+				const a = clipboardValue.split(" -> ")
+				let dateTag = ""
+				let lineToSearch = ""
+				if (a.length == 1)
+				{
+					new Notice("no -> " + clipboardValue)
+					return;
+				} else if (a.length == 2) {
+					lineToSearch = a[0]
+					dateTag = a[1]
+				} else {
+					new Notice("a.length > 2 " + clipboardValue)
+					return;
+				}
+				for (let i = 0; i < editor.lineCount(); i++) {
+					const lineContent = editor.getLine(i)
+					if (lineContent.contains(lineToSearch)) {
+						const replacedLine = lineContent + " " + dateTag
+						const replacedLine2 = replacedLine.replace("#nn ", "#nd ")
+							.replace("#nl ", "#nd ")
+							.replace("#nw ", "#nd ")
+							.replace("#na ", "#nd ")
+							.replace("#wn ", "#wd ")
+							.replace("#wl ", "#wd ")
+							.replace("#ww ", "#wd ")
+							.replace("#wa ", "#wd ")
+						editor.setLine(i, replacedLine2)
+						editor.setCursor({line: i, ch: 0})
+						view.setEphemeralState({line: i})
+						new Notice("Marked action to finish")
+						return
+					}
+				}
+				new Notice("Cannot find action in task notes :" + lineToSearch)
+			}
+	    })
+
 		this.addObsidianIcon('move-weekly-action', 'WA');
 		this.addCommand({
 			id: "move-weekly-action",
