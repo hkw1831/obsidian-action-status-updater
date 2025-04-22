@@ -937,17 +937,190 @@ export default class MyPlugin extends Plugin {
 			},
 		})
 
-		this.addObsidianIcon('open-bored-icon', 'IB');
+		this.addObsidianIcon('move-weekly-action', 'WA');
 		this.addCommand({
-			id: "open-board",
-			name: "IB Open When I am Bored",
-			icon: "open-bored-icon",
-			callback: async () => {
+			id: "move-weekly-action",
+			name: "WA Move weekly action",
+			icon: "move-weekly-action",
+			editorCallback: async (editor: Editor, view: MarkdownView) => {
 				const { vault, workspace } = this.app;
-				const inboxMd = "I/When I am Bored.md"
+
+				// Look the heading name of current cursor stays in
+				// e.g. 
+				// I am in line "- [[FLUME Synthetic order app]] -> ✅ Test send multi leg order to lab with synthetic order app /NPush" -> return "2025-01-28"
+				// ## 2025-01-28 Tue
+				//
+				//- [[FLUME Synthetic order app]] -> ✅ Test send multi leg order to lab with synthetic order app /NPush
+				const origFilePath = view.file.path
+				
+				const cursor = editor.getCursor()
+				let origLinec = cursor.line
+				let linec = cursor.line
+				let header = ""
+				while (linec > 0) {
+					const lineContentc = editor.getLine(linec)
+					if (lineContentc.match(/^#+ /)) {
+						header = lineContentc.replace(/^#+ /, "")
+						header = header.replace(/^(\d{4})-(\d{2})-(\d{2}) .*/, " #d/$1/$2/$3")
+						break;
+					}
+					linec--;
+				}
+				if (header === "") {
+					new Notice("No header found")
+					return
+				}
+				console.log("header: " + header)
+
+				let origLineContent = editor.getLine(editor.getCursor().line)
+				let lineContent = editor.getLine(editor.getCursor().line)
+
+				console.log(lineContent)
+
+				// [[FLUME Synthetic order app]] -> ✅ Test send multi leg order to lab with synthetic order app /NPush
+				lineContent = lineContent.replace(" /NPush", "")
+				lineContent = lineContent.replace(" /WPush", "")
+				lineContent = lineContent.replace(" /NWait", "")
+				lineContent = lineContent.replace(" /WWait", "")
+				lineContent = lineContent.replace(" /NPush", "")
+				lineContent = lineContent.replace(" /Done", "")
+				lineContent = lineContent.replace(" /Event", "")
+				lineContent = lineContent.replace(" /One step at a time", "")
+				lineContent = lineContent.replace(" /Daily", "")
+				lineContent = lineContent.replace(" /NDone", "")
+				lineContent = lineContent.replace(" /WDone", "")
+				lineContent = lineContent.replace(" /NPush", "")
+				lineContent = lineContent.replace(" /矇矇飯飯", "")
+				lineContent = lineContent.replace(" /親朋好友", "")
+				lineContent = lineContent.replace(" /Body Status", "")
+				lineContent = lineContent.replace("✅ ", "")
+				lineContent = lineContent.replace("❎ ", "")
+				lineContent = lineContent.replace(/^\t*- /, "")
+				const a = lineContent.split(" -> ")
+				let noteFile = ""
+				let lineToSearch = ""
+				if (a.length == 1)
+				{
+					lineToSearch = a[0]
+					new Notice("no link " + lineContent)
+					return;
+				} else if (a.length == 2) {
+					noteFile = a[0]
+					if (!noteFile.contains('[[')) {
+						new Notice("no link " + lineContent)
+						return;
+					}
+					noteFile = noteFile.replace('[[', "").replace(']]', "")
+					console.log(noteFile)
+					lineToSearch = a[1].replace("[WF] ", "")
+				} else {
+					new Notice("a.length > 2 " + lineContent)
+					return;
+				}
+				const file : TFile | null = app.metadataCache.getFirstLinkpathDest(noteFile, noteFile)
+				if (!file)
+				{
+					new Notice("File " + noteFile + " not found")
+					return;
+				}
+				console.log("`" + file.path + "`")
+				console.log("`" + lineToSearch + "`")
+				const deLink = origLineContent.replace("[[" + noteFile + "]]", noteFile)
+				console.log("delink=" + deLink);
+				editor.setLine(origLinec, deLink)
+
+				const leaf = workspace.getLeaf(false);
+				navigator.clipboard.writeText(lineToSearch).then(() => {
+				    new Notice("Copied to clipboard: " + lineToSearch)
+			    })
+				.then(() => {
+					return leaf.openFile(vault.getAbstractFileByPath(file.path) as TFile, { active : true });
+				})
+				.then(() => {
+					const view2 = this.app.workspace.getActiveViewOfType(MarkdownView);
+					if (!view2) {
+						new Notice("No view found")
+						return
+					}
+					const editor = view2.editor;
+					if (!editor) {
+						new Notice("No editor found")
+						return
+					}
+					const lineCount = editor.lineCount()
+					let found = false
+					for (let i = 0; i < lineCount; i++) {
+						const lineContent = editor.getLine(i)
+						if (lineContent.contains(lineToSearch)) {
+							editor.setCursor({line: i, ch: 0})
+							if (editor.getLine(i).contains(" #d/")) {
+							} else {
+								editor.setLine(i, lineContent + " " + header)
+							}
+							try {
+								view.setEphemeralState({ line : i });
+							} catch (error) {
+							    console.error(error);
+							}
+							return true
+						}
+					}
+					return false
+				})
+				.then(found => {
+					if (found) {
+						new Notice("Found line: " + lineToSearch)
+						return Promise.reject()
+					} else {
+						new Notice("Not found line: " + lineToSearch)
+						new Notice("Trying to open back : " + origFilePath)
+						return leaf.openFile(vault.getAbstractFileByPath(origFilePath) as TFile, { active : true });
+					}
+				})
+				.then(() => {
+					/*
+					console.log(aaa)
+					if (aaa === "1") {
+						console.log("!aaa")
+						return aaa
+					} else {
+					 */
+						console.log("aaa")
+						const view3 = this.app.workspace.getActiveViewOfType(MarkdownView);
+						if (!view3) {
+							new Notice("No view3 found")
+							return
+						}
+						const editor = view3.editor;
+						if (!editor) {
+							new Notice("No editor found")
+							return
+						}
+						editor.setLine(origLinec, origLineContent)
+						editor.setCursor({line: origLinec, ch: 0})
+						try {
+							view.setEphemeralState({ line : origLinec });
+						} catch (error) {
+							console.error(error);
+						}
+						new Notice("Not found line: " + lineToSearch)
+						return
+					//}
+				})
+				.catch(error => {
+					if (error) {
+						console.error(error);
+					}
+				});
+				
+				
+
+				/*
 				const leaf = workspace.getLeaf(false);
 				await leaf.openFile(vault.getAbstractFileByPath(inboxMd) as TFile, { active : true });
-			},
+				*/
+			}
+			,
 			hotkeys: [
 				{
 					modifiers: [`Ctrl`, `Meta`, `Shift`],
@@ -958,6 +1131,32 @@ export default class MyPlugin extends Plugin {
 					key: `b`,
 				}
 			]
+			
+		})
+
+		this.addObsidianIcon('open-bored-icon', 'IB');
+		this.addCommand({
+			id: "open-board",
+			name: "IB Open When I am Bored",
+			icon: "open-bored-icon",
+			callback: async () => {
+				const { vault, workspace } = this.app;
+				const inboxMd = "I/When I am Bored.md"
+				const leaf = workspace.getLeaf(false);
+				await leaf.openFile(vault.getAbstractFileByPath(inboxMd) as TFile, { active : true });
+			}
+			/*,
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `b`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `b`,
+				}
+			]
+			*/
 		})
 
 		this.addCommand({
