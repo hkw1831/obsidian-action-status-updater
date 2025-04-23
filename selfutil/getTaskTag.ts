@@ -279,7 +279,7 @@ export const ALL_TYPES = [
     },
     {
       type: "b/k/q",
-      description: "Expermential Knowledge Group - Dummy Question",
+      description: "Expermential Knowledge Group - Unresolved Thought Question",
       prefix: "0️⃣",
     },
     {
