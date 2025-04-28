@@ -2345,7 +2345,7 @@ this.addCommand({
 			name: "TF Task to Fantastical Event",
 			icon: `task-to-fantastical-event-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				// if cursor line is a markdown heading, text = heading name, else use file basename
+				// if cursor line is a markdown heading, text = file basename + "#" + heading name, else use file basename
 				const cursor = editor.getCursor()
 				const line = cursor.line
 				const lineContent = editor.getLine(line)
@@ -2386,7 +2386,18 @@ this.addCommand({
 				//console.log(shortcutUrl)
 
 				window.open(shortcutUrl);
-			  }
+			}
+			,
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `k`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `k`,
+				},
+			]
 		});
 
 
