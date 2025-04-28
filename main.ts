@@ -2345,7 +2345,17 @@ this.addCommand({
 			name: "TF Task to Fantastical Event",
 			icon: `task-to-fantastical-event-icon`,
 			editorCallback: (editor: Editor, view: MarkdownView) => {
+				// if cursor line is a markdown heading, text = heading name, else use file basename
+				const cursor = editor.getCursor()
+				const line = cursor.line
+				const lineContent = editor.getLine(line)
+				
 				let text = view.file.basename;
+				if (lineContent.match(/^#+ /)) {
+					text += "#"
+					text += lineContent.replace(/^#+ /, "")
+				}
+				
 				/*
 				const vault: Vault = this.app.vault;
 				const listSelections: EditorSelection[] = editor.listSelections();
