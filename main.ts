@@ -460,9 +460,29 @@ export default class MyPlugin extends Plugin {
 			
 
 			// then add spaces between english and chinese if no space
+			// note that do not ad spaces between "[[" and "]]"
+
+			//modifiedValue = modifiedValue
+			//.replace(/([a-zA-Z0-9])([\u4E00-\u9FFF])/g, "$1 $2")
+			//.replace(/([\u4E00-\u9FFF])([a-zA-Z0-9])/g, "$1 $2")
+
+			/*
+			This modification uses regex capture groups and a replacement function to:
+
+			First check if the match is inside a wikilink [[...]] (captured as wikilink)
+			If it's a wikilink, return it unchanged
+			Otherwise, add a space between the Latin/numeric character and Chinese character
+			*/
 			modifiedValue = modifiedValue
-			.replace(/([a-zA-Z0-9])([\u4E00-\u9FFF])/g, "$1 $2")
-			.replace(/([\u4E00-\u9FFF])([a-zA-Z0-9])/g, "$1 $2")
+			.replace(/(\[\[[^\]]*\]\])|([a-zA-Z0-9])([\u4E00-\u9FFF])/g, function(match, wikilink, latin, chinese) {
+				return wikilink || latin + " " + chinese;  // Preserve wikilinks, add space between Latin/numbers and Chinese
+			})
+			.replace(/(\[\[[^\]]*\]\])|([\u4E00-\u9FFF])([a-zA-Z0-9])/g, function(match, wikilink, chinese, latin) {
+				return wikilink || chinese + " " + latin;  // Preserve wikilinks, add space between Chinese and Latin/numbers
+			})
+
+
+			
 			editor.setValue(modifiedValue)
 		}
 	});
