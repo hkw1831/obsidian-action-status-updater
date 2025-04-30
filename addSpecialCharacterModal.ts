@@ -9,6 +9,12 @@ interface SpecialCharacterType {
 
 export const ALL_SPECIAL_CHARACTER_TYPE : SpecialCharacterType[] = [
   {
+    character: " -> ",
+    description: " arrow 1",
+    additionalInfo: "",
+    chinese: ""
+  },
+  {
     character: "【】",
     description: "New Title",
     additionalInfo: "",
