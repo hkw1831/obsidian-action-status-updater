@@ -431,6 +431,7 @@ export default class MyPlugin extends Plugin {
 		name: "Auto Correct AC",
 		icon: "auto-correct",
 		editorCallback: (editor: Editor, view: MarkdownView) => {
+			const cursor = editor.getCursor()
 			const value = editor.getValue()
 			let modifiedValue = value.split("\n").map(line => {
 				var l2 = line.replace(/10分/g, "十分")
@@ -480,10 +481,8 @@ export default class MyPlugin extends Plugin {
 			.replace(/(\[\[[^\]]*\]\])|([\u4E00-\u9FFF])([a-zA-Z0-9])/g, function(match, wikilink, chinese, latin) {
 				return wikilink || chinese + " " + latin;  // Preserve wikilinks, add space between Chinese and Latin/numbers
 			})
-
-
-			
 			editor.setValue(modifiedValue)
+			editor.setCursor(cursor)
 		}
 	});
 
