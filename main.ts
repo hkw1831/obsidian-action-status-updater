@@ -781,6 +781,63 @@ export default class MyPlugin extends Plugin {
 			]
 		});
 
+		this.addObsidianIcon('bake-aggregate-to-clipboard', 'BC');
+		this.addCommand({
+			id: "bake-aggregate-to-clipboard",
+			name: "Bake aggregate to clipboard",
+			icon: `bake-aggregate-to-clipboard`,
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+
+				let firstValue = editor.getValue()
+				const frontmatter = firstValue.match(/^\s*---\n([\s\S]*?)\n---/);
+				if (frontmatter != null) {
+					firstValue = firstValue.replace(frontmatter[0], "")
+				}
+
+
+				let text = "# " + view.file.basename + "\n\n" + firstValue
+				const forwardlinks = app.metadataCache.getFileCache(view.file)?.links
+				let p = Promise.resolve()
+
+				if (forwardlinks != null) {
+					// read the link content and add to the text
+					forwardlinks.forEach(link => {
+						const file = app.metadataCache.getFirstLinkpathDest(link.link, view.file.path)
+						if (file != null) {
+							p = p.then(() => {
+								return app.vault.read(file)
+							}).then( content => {
+								// remove metadata which is in start of file by regexp
+								const frontmatter = content.match(/^\s*---\n([\s\S]*?)\n---/);
+								if (frontmatter != null) {
+									content = content.replace(frontmatter[0], "")
+								}
+
+								text += "\n\n---\n\n# " + link.link + "\n\n" + content
+							})
+						}
+					})
+				}
+				// put to clipboard then show notification
+				p.then(() => {	
+					navigator.clipboard.writeText(text)
+				}).then(() => {
+					new Notice("copied to clipboard!")
+				})
+			}
+			/*,
+			hotkeys: [
+				{
+					modifiers: [`Ctrl`, `Meta`, `Shift`],
+					key: `c`,
+				},
+				{
+					modifiers: [`Ctrl`, `Alt`, `Shift`],
+					key: `c`,
+				},
+			]*/
+		});
+
 
 		// combined version
 		//this.updateSchedulingIcon()
