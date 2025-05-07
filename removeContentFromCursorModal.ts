@@ -16,6 +16,8 @@ export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
   copyCurrentHeadingSectionWithoutHeading: string = "Copy current heading section without heading"
   replaceCurrentLineToClipboardLine: string = "Replace current line to clipboard line"
   replaceCurrentLineToClipboardAsListLine: string = "Replace current line to clipboard as list line"
+  tabToFourSpaces: string = "Tab to four spaces"
+  fourSpacesToTab: string = "Four spaces to tab"
 
   options: string[] = [
     this.copyContentFromCursorToEndOfNote, 
@@ -30,7 +32,9 @@ export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
     this.replaceCurrentLineToClipboardLine,
     this.replaceCurrentLineToClipboardAsListLine,
     this.copyCurrentHeadingSectionWithHeading,
-    this.copyCurrentHeadingSectionWithoutHeading
+    this.copyCurrentHeadingSectionWithoutHeading,
+    this.tabToFourSpaces,
+    this.fourSpacesToTab
   ]
   editor: Editor;
   keydownHandler: (event: KeyboardEvent) => void;
@@ -149,6 +153,30 @@ export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
       this.copyCurrentHeadingSection(true);
     } else if (choosenOption === this.copyCurrentHeadingSectionWithoutHeading) {
       this.copyCurrentHeadingSection(false);
+    } else if (choosenOption === this.tabToFourSpaces) {
+      // replace tab with four spaces for whole file
+      const cursor = this.editor.getCursor();
+      const text = this.editor.getValue();
+      const lines = text.split('\n');
+      const newLines = lines.map(line => line.replace(/\t/g, '    '));
+      const newText = newLines.join('\n');
+      this.editor.setValue(newText);
+      this.editor.setCursor(cursor.line, 0);
+      this.editor.scrollIntoView({from: {line: cursor.line, ch: 0}, to: {line: cursor.line, ch: 0}}, true)
+
+      new Notice(`Replaced tab with four spaces for whole file`);
+    } else if (choosenOption === this.fourSpacesToTab) {
+      // replace four spaces with tab for whole file
+      const cursor = this.editor.getCursor();
+      const text = this.editor.getValue();
+      const lines = text.split('\n');
+      const newLines = lines.map(line => line.replace(/ {4}/g, '\t'));
+      const newText = newLines.join('\n');
+      this.editor.setValue(newText);
+      this.editor.setCursor(cursor.line, 0);
+      this.editor.scrollIntoView({from: {line: cursor.line, ch: 0}, to: {line: cursor.line, ch: 0}}, true)
+
+      new Notice(`Replaced four spaces with tab for whole file`);
     }
   }
 
