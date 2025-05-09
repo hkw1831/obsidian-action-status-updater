@@ -1027,8 +1027,19 @@ export default class MyPlugin extends Plugin {
 				let lineToSearch = ""
 				if (a.length == 1)
 				{
-					new Notice("no -> " + clipboardValue)
-					return;
+					new Notice("no -> " + clipboardValue + ", will only search line")
+					lineToSearch = a[0]
+					for (let i = 0; i < editor.lineCount(); i++) {
+						const lineContent = editor.getLine(i)
+						if (lineContent.contains(lineToSearch)) {
+							editor.setCursor({line: i, ch: 0})
+							view.setEphemeralState({line: i})
+							new Notice("Found line in task notes : '" + lineToSearch + "'")
+							return
+						}
+					}
+					new Notice("Cannot find action in task notes : '" + lineToSearch + "'")
+					return
 				} else if (a.length == 2) {
 					lineToSearch = a[0]
 					dateTag = a[1]
