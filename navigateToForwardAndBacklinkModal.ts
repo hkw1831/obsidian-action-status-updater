@@ -473,6 +473,7 @@ async prepareItems(): Promise<LinkType[]> {
     const ch = l.ch
     this.editor.setCursor({line: line, ch: ch})
     this.editor.scrollIntoView({from: {line: line, ch: ch}, to: {line: line, ch: ch}}, true)
+    this.view.setEphemeralState({ line });
     //this.editor.markText({line: line, ch: ch}, {line: line + 1, ch: ch}, {className: "my-highlight"})
     return
   }
