@@ -28,7 +28,7 @@ import { NavigateRewritableThreadsModal } from 'navigateRewritableThreadsModal';
 import { RewriteThreadsModal } from 'rewriteThreads';
 import { NotesTypeView, VIEW_TYPE_NOTE_LIST } from 'notesTypeView';
 import { CheckNotesLinkingView, VIEW_TYPE_CHECK_NOTES_LINKING } from 'checkNotesLinkingView';
-import { CheckNotesLinkingModal } from 'checkNotesLinkingModal';
+import { CheckNotesLinkingModal, CheckNotesLinkingType } from 'checkNotesLinkingModal';
 import { CurrentNoteOutstandingActionView, VIEW_TYPE_CURRENT_OURSTANDING_TASK } from 'currentNoteOutstandingActionView';
 import { EchoModal } from 'echoModal';
 import { CurrentNoteAllLineView, VIEW_TYPE_CURRENT_NOTE_ALL_LINE } from 'currentNoteSearchFilterView';
@@ -41,10 +41,43 @@ import { CalendarView, VIEW_TYPE_CALENDAR } from 'calendarView';
 
 interface MyPluginSettings {
 	mySetting: string;
+	checkNotesLinkingTypes: CheckNotesLinkingType[];
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
+	mySetting: 'default',
+	checkNotesLinkingTypes: [
+		{
+			notesWithTagsToTest: ["#b/k/s", "#b/n/c"],
+			nonExistenceTagsToBeTested: ["#b/k/c", "#b/n/z"],
+			checkExistOrNotExist: false
+		},
+		{
+			notesWithTagsToTest: ["#b/k/s", "#b/n/c"],
+			nonExistenceTagsToBeTested: ["#b/k/c", "#b/n/z"],
+			checkExistOrNotExist: true
+		},
+		{
+			notesWithTagsToTest: ["#b/k/s", "#b/n/c"],
+			nonExistenceTagsToBeTested: [],
+			checkExistOrNotExist: false
+		},
+		{
+			notesWithTagsToTest: ["#b/k/s", "#b/n/c"],
+			nonExistenceTagsToBeTested: [],
+			checkExistOrNotExist: true
+		},
+		{
+			notesWithTagsToTest: ["#c/b/p"],
+			nonExistenceTagsToBeTested: ["#b/k/c"],
+			checkExistOrNotExist: false
+		},
+		{
+			notesWithTagsToTest: ["#c/b/p"],
+			nonExistenceTagsToBeTested: ["#b/k/c"],
+			checkExistOrNotExist: true
+		}
+	]
 }
 
 const clipboardHistory: string[] = []
@@ -4682,6 +4715,77 @@ class SampleSettingTab extends PluginSettingTab {
 					this.plugin.settings.mySetting = value;
 					await this.plugin.saveSettings();
 				}));
+				
+		containerEl.createEl('h3', {text: 'Check Notes Linking Configurations'});
+		
+		// Add button to add a new configuration
+		new Setting(containerEl)
+			.setName('Note Link Configurations')
+			.setDesc('Add configurations for checking note links')
+			.addButton(button => button
+				.setButtonText('Add Configuration')
+				.onClick(async () => {
+					this.plugin.settings.checkNotesLinkingTypes.push({
+						notesWithTagsToTest: ["#new/tag"],
+						nonExistenceTagsToBeTested: [],
+						checkExistOrNotExist: false
+					});
+					await this.plugin.saveSettings();
+					this.display();
+				}));
+		
+		// Display each configuration with options to edit/delete
+		this.plugin.settings.checkNotesLinkingTypes.forEach((config, index) => {
+			const configContainer = containerEl.createDiv();
+			configContainer.addClass('note-link-config');
+			configContainer.createEl('h4', {text: `Configuration ${index + 1}`});
+			
+			new Setting(configContainer)
+				.setName('Tags to search in')
+				.setDesc('Notes with these tags will be searched')
+				.addText(text => text
+					.setPlaceholder('#tag1, #tag2')
+					.setValue(config.notesWithTagsToTest.join(', '))
+					.onChange(async (value) => {
+						config.notesWithTagsToTest = value.split(',').map(tag => tag.trim());
+						await this.plugin.saveSettings();
+					}));
+			
+			new Setting(configContainer)
+				.setName('Tags to check links for')
+				.setDesc('Check if notes link to notes with these tags')
+				.addText(text => text
+					.setPlaceholder('#tag1, #tag2')
+					.setValue(config.nonExistenceTagsToBeTested.join(', '))
+					.onChange(async (value) => {
+						config.nonExistenceTagsToBeTested = value.split(',').map(tag => tag.trim());
+						await this.plugin.saveSettings();
+					}));
+			
+			new Setting(configContainer)
+				.setName('Check type')
+				.setDesc('Whether to find notes that have links or don\'t have links')
+				.addDropdown(dropdown => dropdown
+					.addOption('false', 'Find notes WITHOUT links')
+					.addOption('true', 'Find notes WITH links')
+					.setValue(config.checkExistOrNotExist.toString())
+					.onChange(async (value) => {
+						config.checkExistOrNotExist = value === 'true';
+						await this.plugin.saveSettings();
+					}));
+			
+			new Setting(configContainer)
+				.addButton(button => button
+					.setButtonText('Remove')
+					.setClass('mod-warning')
+					.onClick(async () => {
+						this.plugin.settings.checkNotesLinkingTypes.splice(index, 1);
+						await this.plugin.saveSettings();
+						this.display();
+					}));
+			
+			containerEl.appendChild(configContainer);
+		});
 	}
 }
 

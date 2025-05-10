@@ -10,41 +10,6 @@ export class CheckNotesLinkingType {
 }
 
 export class CheckNotesLinkingModal extends FuzzySuggestModal<CheckNotesLinkingType> {
-    types : CheckNotesLinkingType[] = [
-        {
-            notesWithTagsToTest: ["#b/k/s", "#b/n/c"],
-            nonExistenceTagsToBeTested: ["#b/k/c", "#b/n/z"],
-            checkExistOrNotExist: false
-        },
-        {
-            notesWithTagsToTest: ["#b/k/s", "#b/n/c"],
-            nonExistenceTagsToBeTested: ["#b/k/c", "#b/n/z"],
-            checkExistOrNotExist: true
-        },
-        {
-            notesWithTagsToTest: ["#b/k/s", "#b/n/c"],
-            nonExistenceTagsToBeTested: [],
-            checkExistOrNotExist: false
-        },
-        {
-            notesWithTagsToTest: ["#b/k/s", "#b/n/c"],
-            nonExistenceTagsToBeTested: [],
-            checkExistOrNotExist: true
-        },
-        {
-            notesWithTagsToTest: ["#c/b/p"],
-            nonExistenceTagsToBeTested: ["#b/k/c"],
-            checkExistOrNotExist: false
-        },
-        {
-            notesWithTagsToTest: ["#c/b/p"],
-            nonExistenceTagsToBeTested: ["#b/k/c"],
-            checkExistOrNotExist: true
-        }
-    ]
-
-    allBKSWithoutLinkedToBKC : string = "All #b/k/s not linked to #b/k/c"
-
     private plugin: MyPlugin;
     
     constructor(app: App, plugin: MyPlugin) {
@@ -54,7 +19,8 @@ export class CheckNotesLinkingModal extends FuzzySuggestModal<CheckNotesLinkingT
     }
 
     getItems(): CheckNotesLinkingType[] {
-        return this.types;
+        // Use configurations from settings
+        return this.plugin.settings.checkNotesLinkingTypes;
     }
 
     getItemText(item: CheckNotesLinkingType): string {
