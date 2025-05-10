@@ -27,6 +27,8 @@ import { getAllNotesWithoutMetadata } from 'selfutil/getRecentNotes';
 import { NavigateRewritableThreadsModal } from 'navigateRewritableThreadsModal';
 import { RewriteThreadsModal } from 'rewriteThreads';
 import { NotesTypeView, VIEW_TYPE_NOTE_LIST } from 'notesTypeView';
+import { CheckNotesLinkingView, VIEW_TYPE_CHECK_NOTES_LINKING } from 'checkNotesLinkingView';
+import { CheckNotesLinkingModal } from 'checkNotesLinkingModal';
 import { CurrentNoteOutstandingActionView, VIEW_TYPE_CURRENT_OURSTANDING_TASK } from 'currentNoteOutstandingActionView';
 import { EchoModal } from 'echoModal';
 import { CurrentNoteAllLineView, VIEW_TYPE_CURRENT_NOTE_ALL_LINE } from 'currentNoteSearchFilterView';
@@ -59,6 +61,7 @@ export default class MyPlugin extends Plugin {
 	public recentFilesView: RecentFilesView;
 	public recentViewedNotesView: RecentViewedNotesView;
 	public calendarView: CalendarView; // Add the calendar view
+	public checkNotesLinkingView: CheckNotesLinkingView;
 	public plugin: MyPlugin = this
 	private lastActiveLeaf: WorkspaceLeaf | null = null;
 
@@ -160,6 +163,27 @@ export default class MyPlugin extends Plugin {
 		}
 	}
 
+	public async activateCheckNotesLinkingView(notePaths: string[], title: string) {
+		let leaf: WorkspaceLeaf | null;
+		[leaf] = this.app.workspace.getLeavesOfType(
+			VIEW_TYPE_CHECK_NOTES_LINKING,
+		);
+		if (!leaf) {
+			leaf = this.app.workspace.getLeftLeaf(false);
+			await leaf?.setViewState({ type: VIEW_TYPE_CHECK_NOTES_LINKING });
+		}
+
+		// Update the note paths in the view
+		if (leaf) {
+			const view = leaf.view as CheckNotesLinkingView;
+			view.setNotesPath(notePaths);
+			view.setTitle(title)
+			//view.notesPath = notePaths;
+			view.redraw();
+			this.app.workspace.revealLeaf(leaf);
+		}
+	}
+
 	async onload() {
 		await this.loadSettings();
 
@@ -217,6 +241,16 @@ export default class MyPlugin extends Plugin {
 			this.activateCalendarView();
 		});
 
+		this.registerView(
+			VIEW_TYPE_CHECK_NOTES_LINKING,
+			(leaf) => this.checkNotesLinkingView = new CheckNotesLinkingView(leaf)
+		);
+
+		this.addRibbonIcon('shield-check', 'Open Check Notes Linking View', () => {
+			this.activateCheckNotesLinkingView([], '');
+		});
+
+
 		this.addCommand({
 			id: "open-calendar-view",
 			name: "Open Calendar View",
@@ -233,6 +267,15 @@ export default class MyPlugin extends Plugin {
 			callback: () => {
 				this.activateRecentViewedNotesView();
 				this.recentViewedNotesView.redraw(true);
+			}
+		});
+
+		this.addCommand({
+			id: "open-check-notes-linking-modal",
+			name: "CN Open Check Notes Linking Modal",
+			icon: "link",
+			callback: () => {
+				new CheckNotesLinkingModal(this.app, this).open();
 			}
 		});
 		/*
