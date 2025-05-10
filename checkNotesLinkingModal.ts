@@ -1,4 +1,4 @@
-import { App, FuzzySuggestModal, TFile } from 'obsidian';
+import { App, FuzzySuggestModal, Notice, TFile } from 'obsidian';
 import MyPlugin from './main';
 import { filesWhereTagIsUsed } from 'selfutil/findNotesFromTag';
 import { getNoteType } from 'selfutil/getTaskTag';
@@ -54,7 +54,7 @@ export class CheckNotesLinkingModal extends FuzzySuggestModal<CheckNotesLinkingT
         })
         
         const linkedFiles = files.filter(file => {
-            console.log("=== file === " + file.path);
+            //console.log("=== file === " + file.path);
             const backLinkItems = this.getBacklinks(file);
             if (tagsNotExistanceCheck.length === 0) {
                 // test different thing: if no backlinks, then return true
@@ -67,9 +67,15 @@ export class CheckNotesLinkingModal extends FuzzySuggestModal<CheckNotesLinkingT
                 for (let i = 0; i < backLinkItems.length; i++) {
                     const filePath = backLinkItems[i];
                     let noteType = getNoteType(filePath);
-                    console.log("=== filePath === " + filePath + " : noteType = " + noteType?.type);
+                    //console.log("=== filePath === " + filePath + " : noteType = " + noteType?.type);
                     for (let j = 0; j < tagsNotExistanceCheck.length; j++) {
-                        if ("#" + noteType?.type === tagsNotExistanceCheck[j]) {
+                        if (noteType == null) {
+                            // ignore as it is child note
+                        } else if (noteType?.type == null) {
+                            // ignore as it is child note
+                        } else if (noteType?.type == undefined) {
+                            // ignore as it is child note
+                        } else if (("#" + noteType.type).startsWith(tagsNotExistanceCheck[j])) {
                             return !checkExistOrNotExist ? false : true;
                         }
                     }
