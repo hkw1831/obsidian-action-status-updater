@@ -1076,6 +1076,35 @@ export default class MyPlugin extends Plugin {
 			]
 		})
 
+		this.addObsidianIcon('open-today-journal-icon', 'OJ');
+		this.addCommand({
+			id: "open-today-journal",
+			name: "OJ Open Today Journal",
+			icon: "open-today-journal-icon",
+			callback: async () => {
+				const { vault, workspace } = this.app;
+				const currentDate = moment().format('YYYYMMDD');
+				const inboxMd = `J/${currentDate}.md`
+
+				if (vault.getAbstractFileByPath(inboxMd) == null) {
+					await vault.create(inboxMd, `---\ntags: b/n/j\n---\n\n`);
+				}
+
+				const leaf = workspace.getLeaf(false);
+				await leaf.openFile(vault.getAbstractFileByPath(inboxMd) as TFile, { active : true });
+
+				const markdownView = app.workspace.getActiveViewOfType(MarkdownView);
+				const editor = markdownView?.editor
+				// put cursor to last line last character
+				if (editor) {
+					const line = editor.lastLine();
+					const ch = editor.getLine(line).length;
+					editor.setCursor({ line: line, ch: ch }); // Move cursor to line 10, column 0
+					editor.scrollIntoView({ from: { line: line, ch: 0 }, to: { line: line, ch: 0 } }, true); // Scroll to the line
+				}
+			},
+		})
+
 		this.addObsidianIcon('open-braindump-icon', 'OB');
 		this.addCommand({
 			id: "open-braindump",
