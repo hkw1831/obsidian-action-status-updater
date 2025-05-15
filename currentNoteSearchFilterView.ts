@@ -205,24 +205,17 @@ class CurrentNoteAllLineView extends ItemView {
       value: this.filterStr
     });
 
-    // Use input event with debounce for better performance
-    let debounceTimeout: NodeJS.Timeout;
+    // Just store the value without triggering redraw
     searchField.addEventListener('input', (event: Event) => {
       const value = (event.target as HTMLInputElement).value;
-      clearTimeout(debounceTimeout);
-      debounceTimeout = setTimeout(() => {
-        this.filterStr = value.toLowerCase();
-        // Only trigger redraw if the filter is empty or longer than 2 chars
-        if (this.filterStr === '' || this.filterStr.length > 2) {
-          this.redraw(true);
-        }
-      }, 300); // 300ms debounce
+      this.filterStr = value.toLowerCase();
+      // No redraw here - we'll wait for button click
     });
 
-    // Add event listener for Enter key
+    // Add event listener for Enter key to act like Filter button
     searchField.addEventListener('keydown', (event: KeyboardEvent) => {
       if (event.key === 'Enter') {
-        clearTimeout(debounceTimeout);
+        // Only trigger filter on Enter key
         this.redraw(true);
       }
     });
