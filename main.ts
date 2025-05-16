@@ -1155,7 +1155,8 @@ export default class MyPlugin extends Plugin {
 				for (let i = 0; i < editor.lineCount(); i++) {
 					const lineContent = editor.getLine(i)
 					if (lineContent.contains(lineToSearch)) {
-						const replacedLine = lineContent + " " + dateTag
+						const suffix = lineContent.contains(dateTag) ? "" : " " + dateTag
+						const replacedLine = lineContent + suffix
 						const replacedLine2 = replacedLine.replace("#nn ", "#nd ")
 							.replace("#nl ", "#nd ")
 							.replace("#nw ", "#nd ")
