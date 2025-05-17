@@ -18,6 +18,7 @@ export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
   replaceCurrentLineToClipboardAsListLine: string = "Replace current line to clipboard as list line"
   tabToFourSpaces: string = "Tab to four spaces"
   fourSpacesToTab: string = "Four spaces to tab"
+  addNewLineToContinuousNewLine: string = "Add new line to continuous new line"
 
   options: string[] = [
     this.copyContentFromCursorToEndOfNote, 
@@ -34,7 +35,8 @@ export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
     this.copyCurrentHeadingSectionWithHeading,
     this.copyCurrentHeadingSectionWithoutHeading,
     this.tabToFourSpaces,
-    this.fourSpacesToTab
+    this.fourSpacesToTab,
+    this.addNewLineToContinuousNewLine,
   ]
   editor: Editor;
   keydownHandler: (event: KeyboardEvent) => void;
@@ -177,6 +179,25 @@ export class RemoveContentFromCursorModal extends FuzzySuggestModal<string> {
       this.editor.scrollIntoView({from: {line: cursor.line, ch: 0}, to: {line: cursor.line, ch: 0}}, true)
 
       new Notice(`Replaced four spaces with tab for whole file`);
+    } else if (choosenOption === this.addNewLineToContinuousNewLine) {
+      const text = this.editor.getValue();
+
+      // extract the metadata section and the rest of the text
+      const metadataMatch = text.match(/---\n([\s\S]*?)\n---/);
+      const metadataSection = metadataMatch ? metadataMatch[0] : "";
+      const restOfText = metadataMatch ? text.replace(metadataSection, "") : text;
+      const restOfTextWithoutMetadata = restOfText.replace(/---\n([\s\S]*?)\n---/, "");
+
+      // replace single \n to \n\n, but do not replace any \n{2,3,4...} by single regexp, except metadata section
+      const newText = restOfTextWithoutMetadata.replace(/(?<!\n)\n(?!\n)/g, '\n\n');
+      
+      // add the metadata section back to the text
+      const newTextWithMetadata = metadataSection + newText;
+
+      this.editor.setValue(newTextWithMetadata);
+      const cursor = this.editor.getCursor();
+      this.editor.setCursor(cursor.line, 0);
+      this.editor.scrollIntoView({from: {line: cursor.line, ch: 0}, to: {line: cursor.line, ch: 0}}, true)
     }
   }
 
