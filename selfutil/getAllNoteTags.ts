@@ -43,13 +43,9 @@ export function getAllTaskMixedWithActionTagsWithFilter(app: App) {
         const tts : Set<string> = new Set<string>();
         const ats : Set<string> = new Set<string>();
         allTags.forEach((tag) => {
-            if (/^#[a-z]\/[a-z]\/[a-z]$/.test(tag)) {
-                const layerOfTag: string[] = getLayersOfTag(tag)
-                for (const layer of layerOfTag) {
-                    tts.add(layer);
-                }
-            } else {
-                ats.add(tag);
+            const layerOfTag: string[] = getLayersOfTag(tag)
+            for (const layer of layerOfTag) {
+                tts.add(layer);
             }
         });
         for (const tt of tts) {
