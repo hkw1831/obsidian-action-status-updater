@@ -99,13 +99,10 @@ class NotesTypeView extends ItemView {
             if (relevantTags.length > 0) {
               fileLines = (await this.app.vault.read(f)).split('\n');
               
-              // Build a heading map only once if we need headings
-              headingsMap = this.buildHeadingsMap(fileCache);
-              
               const newLineChar = this.isWindows() ? "\r\n" : "\n";
               
               for (const tag of relevantTags) {
-                const heading = headingsMap.get(tag.position.start.line) || "";
+                const heading = this.getHeadingForLine(fileCache, tag.position.start.line);
                 const lineContent = fileLines[tag.position.start.line]?.trim() || "";
                 const newLineIfNeeded = heading.length !== 0 ? newLineChar : "";
                 
