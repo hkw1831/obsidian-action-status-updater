@@ -39,7 +39,7 @@ function locationsWhereTagIsUsed(findTag: string): Array<string> {
         const cache: CachedMetadata | null = oApp.metadataCache.getFileCache(file);
         if (cache != null && cache.tags) {
             for (const tag of cache.tags) {
-                if (findTag === tag.tag) {
+                if (findTag === tag.tag || tag.tag.startsWith(findTag + "/")) {
                     results.push(file.path)
                 }
             }
@@ -55,5 +55,14 @@ function locationsWhereTagIsUsed(findTag: string): Array<string> {
             }
         }
     }
+    // Remove duplicates
+    const uniqueResults: Set<string> = new Set(results);
+    results.length = 0; // Clear the original array
+    uniqueResults.forEach((value: string) => {
+        results.push(value);
+    });
+    // Sort results
+    results.sort((a: string, b: string) => a.localeCompare(b));
+    // Return results
     return results
 }

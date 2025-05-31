@@ -36,6 +36,7 @@ import { AddSpecialCharacterModal } from 'addSpecialCharacterModal';
 import { RecentFilesView, VIEW_TYPE_RECENT_FILE } from 'recentFilesView';
 import { RecentViewedNotesView, VIEW_TYPE_RECENT_VIEWED_NOTES } from 'recentViewedNotesView';
 import { CalendarView, VIEW_TYPE_CALENDAR } from 'calendarView';
+import { GetTaggedInfoToClipboardModal } from 'modal/getTaggedInfoToClipboardModal';
 
 // Remember to rename these classes and interfaces!
 
@@ -283,6 +284,14 @@ export default class MyPlugin extends Plugin {
 			this.activateCheckNotesLinkingView([], '');
 		});
 
+
+		this.addCommand({
+			id: "get-tagged-info-to-clipboard",
+			name: "Get tagged info to clipboard",
+			callback: () => {
+				new GetTaggedInfoToClipboardModal(this.app).open();
+			}
+		});
 
 		this.addCommand({
 			id: "open-calendar-view",
