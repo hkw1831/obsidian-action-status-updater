@@ -319,6 +319,7 @@ class NotesTypeView extends ItemView {
             const ch = view.editor.getLine(line).length;
             view.editor.setSelection({line: line, ch: 0}, {line: line, ch: ch});
             view.editor.scrollIntoView({from: {line: line, ch: 0}, to: {line: line, ch: 0}}, true)
+            view.setEphemeralState({ line });
           }
         }
       });
