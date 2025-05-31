@@ -94,7 +94,7 @@ class NotesTypeView extends ItemView {
             let headingsMap: Map<number, string> | null = null;
             
             // Find relevant tags first
-            const relevantTags = fileCache.tags.filter(tag => tag.tag === actionTag);
+            const relevantTags = fileCache.tags.filter(tag => tag.tag === actionTag || tag.tag.startsWith(actionTag + "/"));
             
             if (relevantTags.length > 0) {
               fileLines = (await this.app.vault.read(f)).split('\n');
