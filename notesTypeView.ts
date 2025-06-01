@@ -13,10 +13,12 @@ interface NotesTypeViewData {
 interface LineInfo {
   content: string;
   line: number;
+  heading: string;
 }
 
 class NotesTypeView extends ItemView {
   public notesTypeTag: string
+  public clipboardString : string
   constructor(leaf: WorkspaceLeaf, notesTypeTag: string) {
     super(leaf);
     this.notesTypeTag = notesTypeTag
@@ -39,6 +41,7 @@ class NotesTypeView extends ItemView {
   }
 
   public readonly redraw = async (): Promise<void> => {
+    this.clipboardString = "";
     // Preserve the scroll position
     let scrollPosition = 0;
     const contentContainer = this.containerEl.querySelector('.nav-folder.mod-root.scrollable');
@@ -52,7 +55,34 @@ class NotesTypeView extends ItemView {
         return;
     }
     
-    this.containerEl.createDiv({ cls: 'nav-header', text: "Tags: " + this.notesTypeTag });
+    // Create header container to hold both header text and button
+    const headerContainer = this.containerEl.createDiv({ cls: 'nav-header' });
+    headerContainer.style.display = 'flex';
+    headerContainer.style.justifyContent = 'space-between'; // This already aligns items to opposite ends
+    headerContainer.style.alignItems = 'center';
+    
+    // Add the header text with flex-grow to take available space
+    const headerText = headerContainer.createSpan();
+    headerText.textContent = "Tags: " + this.notesTypeTag;
+    headerText.style.flexGrow = '1'; // Take up available space
+    this.clipboardString += "Tagged with " + this.notesTypeTag + ":\n\n";
+    
+    // Add the button with margin-left for extra spacing
+    const logButton = headerContainer.createEl('button', { 
+      text: 'Copy results to clipboard',
+    });
+    logButton.style.marginLeft = 'auto'; // Forces button to right edge
+    
+    logButton.addEventListener('click', () => {
+      // copy clipboardString to clipboard
+      navigator.clipboard.writeText(this.clipboardString).then(() => {
+        //console.log(this.clipboardString);
+        new Notice('Copied to clipboard');
+      }).catch(err => {
+        console.error('Failed to copy: ', err);
+        new Notice('Failed to copy to clipboard');
+      });
+    });
 
     const rootEl = this.containerEl.createDiv({ cls: 'nav-folder mod-root scrollable' });
     const childrenEl = rootEl.createDiv({ cls: 'nav-folder-children' });
@@ -99,16 +129,16 @@ class NotesTypeView extends ItemView {
             if (relevantTags.length > 0) {
               fileLines = (await this.app.vault.read(f)).split('\n');
               
-              const newLineChar = this.isWindows() ? "\r\n" : "\n";
+              
               
               for (const tag of relevantTags) {
                 const heading = this.getHeadingForLine(fileCache, tag.position.start.line);
                 const lineContent = fileLines[tag.position.start.line]?.trim() || "";
-                const newLineIfNeeded = heading.length !== 0 ? newLineChar : "";
                 
                 lineInfo.push({
-                  content: heading + newLineIfNeeded + lineContent,
-                  line: tag.position.start.line
+                  content: lineContent,
+                  line: tag.position.start.line,
+                  heading: heading
                 });
               }
             }
@@ -198,6 +228,8 @@ class NotesTypeView extends ItemView {
   
   // Helper method to render a note item
   private renderNoteItem(data: NotesTypeViewData, rootEl: HTMLElement, childrenEl: HTMLElement, fragment: DocumentFragment) {
+    const newLineChar = this.isWindows() ? "\r\n" : "\n";
+    
     const navFile = document.createElement('div');
     navFile.className = 'tree-item nav-file recent-files-file';
     
@@ -207,7 +239,8 @@ class NotesTypeView extends ItemView {
     const navFileTitleContent = document.createElement('div');
     navFileTitleContent.className = 'tree-item-inner nav-file-title-content recent-files-title-content internal-link self-wrap-content';
     navFileTitleContent.textContent = data.title;
-    
+    this.clipboardString += "## > " + data.title + newLineChar;
+
     navFileTitle.appendChild(navFileTitleContent);
     navFile.appendChild(navFileTitle);
     
@@ -215,13 +248,25 @@ class NotesTypeView extends ItemView {
     this.setupEventListeners(navFileTitle, data.file, rootEl, navFile, 0);
     
     // Render line info items
+    let lastHeading = "";
     for (const lineInfo of data.lineInfo) {
+
       const navFileLine = document.createElement('div');
       navFileLine.className = 'tree-item-self is-clickable nav-file-title recent-files-title';
       
       const navFileLineContent = document.createElement('div');
       navFileLineContent.className = 'tree-item-inner nav-file-title-content recent-files-title-content internal-link self-wrap-content self-padding-left-10';
-      navFileLineContent.innerText = lineInfo.content;
+    
+      const newLineIfNeeded = lineInfo.heading.length !== 0 ? newLineChar : "";
+      const content = lineInfo.heading + newLineIfNeeded + lineInfo.content;
+      navFileLineContent.innerText = content;
+
+      let clipboardHeading = "";
+      if (lineInfo.heading !== lastHeading && !data.title.endsWith(lineInfo.heading.replace(/^# /g, ''))) {
+        lastHeading = lineInfo.heading;
+        clipboardHeading = lineInfo.heading.length !== 0 ? "##" + lineInfo.heading + newLineIfNeeded + newLineIfNeeded : "";
+      }      
+      this.clipboardString += clipboardHeading + lineInfo.content + newLineChar;
       
       navFileLine.appendChild(navFileLineContent);
       navFile.appendChild(navFileLine);
