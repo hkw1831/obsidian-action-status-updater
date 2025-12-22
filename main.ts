@@ -3073,10 +3073,22 @@ this.addCommand({
 			icon: `blog-to-clipboard-icon`,
 			editorCallback: async (editor: Editor, view: MarkdownView) => {
 				const v = editor.getValue();
-				if (v.includes("#nn") || v.includes("#nl") || v.includes("#nw") || v.includes("#wn") || v.includes("#wl") || v.includes("#ww")) {
-					new Notice(`Will not proceed. As there are unfinished action tag.`);
-					return;
+				const tagsToMatch = ["#wn", "#nn", "#wl", "#nl", "#ww", "#nw"];
+				const fileCache = this.app.metadataCache.getFileCache(view.file);
+				if (fileCache && fileCache.tags) {
+					for (const tagMetadata of fileCache.tags) {
+						const tag = tagMetadata.tag;
+						if (tagsToMatch.includes(tag)) {
+							new Notice(`Will not proceed. As there are unfinished action tag.`);
+							return;
+						}
+					}
 				}
+
+				//if (v.includes("#nn") || v.includes("#nl") || v.includes("#nw") || v.includes("#wn") || v.includes("#wl") || v.includes("#ww")) {
+				//	new Notice(`Will not proceed. As there are unfinished action tag.`);
+				//	return;
+				//}
 				if (!v.includes("<!--more-->")) {
 					try {
 						await navigator.clipboard.writeText("<!--more-->\n\n**目錄：**\n\n* Table of Content\n{:toc}");
