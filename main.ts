@@ -3125,6 +3125,15 @@ this.addCommand({
 				try {
 					await navigator.clipboard.writeText(text);
 					new Notice(`Copied blog content to clipboard!`);
+
+					let t = editor.getValue();
+					t += "\n## Post Published Tasks\n\n";
+					t += `- #nl Publish ${view.file.basename} to Facebook\n`;
+					t += `- #nl Publish ${view.file.basename} to Threads\n`;
+					t += `- #nl Publish ${view.file.basename} to Twitter\n`;
+					t += `- #nl Publish ${view.file.basename} to IG\n`;
+					editor.setValue(t)
+					
 					const foundTagFromCBR = await renameTag(view.file, beforeTagCBR, afterTag);
 					if (foundTagFromCBR) {
 						new Notice(`Update notes type from tag="${beforeTagCBR}" to tag="${afterTag}!`);
