@@ -55,10 +55,8 @@ export class ThreadsToBlogModal extends FuzzySuggestModal<string> {
             
           }
         }
-        if (metadataLineCount == 1 || metadataLineCount == 2) {
-          modifiedLine = modifiedLine.replace("c/t/p", "c/b/d")
-          modifiedLine = modifiedLine.replace("c/t/t", "c/b/d")
-          modifiedLine = modifiedLine.replace("c/t/r", "c/b/d")
+        if (metadataLineCount == 1 && (modifiedLine.startsWith('tags: a/') || modifiedLine.startsWith('tags: b/') || modifiedLine.startsWith('tags: c/'))) {
+          modifiedLine = "tags: c/b/d"
         }
 
         if (/^!\[.*\]\(.*\)/.test(modifiedLine.trim())) {
@@ -72,7 +70,8 @@ export class ThreadsToBlogModal extends FuzzySuggestModal<string> {
     text = text.replace(/## .\n+## [Rr]eferences?[\:]?([\n]*.*)*$/, "");
 
     text += `\n\n---\n\n#nl generate summary for meta description below:\n\n\n\n`
-    text += `---\n\n## References:\n\n- Thread post 1: [[${this.view.file.basename}]]\n- Blog link: \n`
+    text += `---\n\n## References:\n\n- Thread post 1: [[${this.view.file.basename}]]\n- Blog link: \n\n`
+    text += "- #nl move separator and toc to middle of blog\n\n```\n<!--more-->\n\n**目錄：**\n\n* Table of Content\n{:toc}\n```\n\n"
 
     const { vault } = this.app;
 

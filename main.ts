@@ -3079,7 +3079,7 @@ this.addCommand({
 				}
 				if (!v.includes("<!--more-->")) {
 					try {
-						await navigator.clipboard.writeText("<!--more-->");
+						await navigator.clipboard.writeText("<!--more-->\n\n**目錄：**\n\n* Table of Content\n{:toc}");
 						new Notice(`Require "<!--more-->" as excerpt separator before posting.\n"<!--more-->" already in clipboard`);
 					} catch (error) {
 						new Notice(`Require "<!--more-->" as excerpt separator before posting.\n"<!--more-->" cannot be copied to clipboard`);
