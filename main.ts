@@ -32,6 +32,7 @@ import { CheckNotesLinkingModal, CheckNotesLinkingType } from 'checkNotesLinking
 import { CurrentNoteOutstandingActionView, VIEW_TYPE_CURRENT_OURSTANDING_TASK } from 'currentNoteOutstandingActionView';
 import { EchoModal } from 'echoModal';
 import { CurrentNoteAllLineView, VIEW_TYPE_CURRENT_NOTE_ALL_LINE } from 'currentNoteSearchFilterView';
+import { CurrentNoteHighlightView, VIEW_TYPE_CURRENT_NOTE_HIGHLIGHT } from 'currentNoteHighlightView';
 import { AddSpecialCharacterModal } from 'addSpecialCharacterModal';
 import { RecentFilesView, VIEW_TYPE_RECENT_FILE } from 'recentFilesView';
 import { RecentViewedNotesView, VIEW_TYPE_RECENT_VIEWED_NOTES } from 'recentViewedNotesView';
@@ -91,6 +92,7 @@ export default class MyPlugin extends Plugin {
 	public notesTypeView: NotesTypeView;
 	public notesTypeTag : string = ""
 	public currentNoteOutstandingActionView: CurrentNoteOutstandingActionView;
+	public currentNoteHighlightView: CurrentNoteHighlightView;
 	public currentNoteAllLineView: CurrentNoteAllLineView;
 	public recentFilesView: RecentFilesView;
 	public recentViewedNotesView: RecentViewedNotesView;
@@ -98,6 +100,21 @@ export default class MyPlugin extends Plugin {
 	public checkNotesLinkingView: CheckNotesLinkingView;
 	public plugin: MyPlugin = this
 	private lastActiveLeaf: WorkspaceLeaf | null = null;
+
+	public async activateCurrentNoteHighlightView() {
+		let leaf: WorkspaceLeaf | null;
+        [leaf] = this.app.workspace.getLeavesOfType(
+			VIEW_TYPE_CURRENT_NOTE_HIGHLIGHT,
+        );
+        if (!leaf) {
+          leaf = this.app.workspace.getLeftLeaf(false);
+          await leaf?.setViewState({ type: VIEW_TYPE_CURRENT_NOTE_HIGHLIGHT });
+        }
+
+        if (leaf) {
+          this.app.workspace.revealLeaf(leaf);
+        }
+	}
 
 	public async activateNoteListView() {
 		/*
@@ -120,7 +137,7 @@ export default class MyPlugin extends Plugin {
         if (leaf) {
           this.app.workspace.revealLeaf(leaf);
         }
-	  }
+	}
 
 	  public async activateCurrentNoteOutstandingActionView() {
 		let leaf: WorkspaceLeaf | null;
@@ -228,6 +245,15 @@ export default class MyPlugin extends Plugin {
 	
 		this.addRibbonIcon('hash', 'Open Note List View', () => {
 			this.activateNoteListView();
+		});
+
+		this.registerView(
+			VIEW_TYPE_CURRENT_NOTE_HIGHLIGHT,
+			(leaf) => this.currentNoteHighlightView = new CurrentNoteHighlightView(leaf, this.notesTypeTag)
+		);
+
+		this.addRibbonIcon('lucide-highlighter', 'Open Current Note Highlight View', () => {
+			this.activateCurrentNoteHighlightView();
 		});
 
 		this.registerView(
@@ -344,6 +370,9 @@ export default class MyPlugin extends Plugin {
 			if (this.currentNoteOutstandingActionView) {
 				this.currentNoteOutstandingActionView.redraw(true);
 			}
+			if (this.currentNoteHighlightView) {
+				this.currentNoteHighlightView.redraw(true);
+			}
 			if (this.currentNoteAllLineView) {
 				this.currentNoteAllLineView.redraw(true);
 				}
@@ -359,6 +388,9 @@ export default class MyPlugin extends Plugin {
 			if (leaf.view instanceof MarkdownView) {
 				if (this.currentNoteOutstandingActionView) {
 					this.currentNoteOutstandingActionView.redraw(false);
+				}
+				if (this.currentNoteHighlightView) {
+					this.currentNoteHighlightView.redraw(false);
 				}
 				if (this.currentNoteAllLineView) {
 					this.currentNoteAllLineView.redraw(false);
@@ -789,6 +821,17 @@ export default class MyPlugin extends Plugin {
 		});
 
 		this.addCommand({
+			id: "open-current-highlight-action-view",
+			name: "Open Current Highlight Action View",
+			icon: "highlight",
+			callback: () => {
+			//editorCallback: (editor: Editor, view: MarkdownView) => {				
+				this.activateCurrentNoteHighlightView()
+				this.currentNoteHighlightView.redraw(true);
+			}
+		});
+
+				this.addCommand({
 			id: "open-current-outstanding-action-view",
 			name: "Open Current Outstanding Action View",
 			icon: "list-checks",
