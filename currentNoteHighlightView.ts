@@ -210,12 +210,23 @@ class CurrentNoteHighlightView extends ItemView {
     const content = await this.app.vault.read(file);
     const lines = content.split('\n');
     const highlightRe = /==([^=]+)==/g;
+    
+    // Build a set of code block regions to exclude
+    const codeBlockRanges = this.getCodeBlockRanges(lines);
 
     for (let i = 0; i < lines.length; i++) {
       const textLine = lines[i];
       let m: RegExpExecArray | null;
       highlightRe.lastIndex = 0;
       while ((m = highlightRe.exec(textLine)) !== null) {
+        const matchStart = m.index;
+        const matchEnd = m.index + m[0].length;
+        
+        // Skip if this match is inside a code block
+        if (this.isInsideCodeBlock(i, matchStart, matchEnd, codeBlockRanges)) {
+          continue;
+        }
+        
         const inner = m[1].trim();
         // find heading line number and text for this line
         const headingInfo = this.getHeadingInfo(fileCache, i);
@@ -233,6 +244,63 @@ class CurrentNoteHighlightView extends ItemView {
     }
 
     return grouped;
+  }
+
+  // Get ranges of code blocks (both inline and fenced)
+  private getCodeBlockRanges(lines: string[]): Array<{line: number, start: number, end: number}> {
+    const ranges: Array<{line: number, start: number, end: number}> = [];
+    let inFencedBlock = false;
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      // Check for fenced code blocks
+      if (/^```/.test(line.trim())) {
+        if (!inFencedBlock) {
+          inFencedBlock = true;
+          // Mark entire line as code block
+          ranges.push({line: i, start: 0, end: line.length});
+        } else {
+          inFencedBlock = false;
+          // Mark entire line as code block
+          ranges.push({line: i, start: 0, end: line.length});
+        }
+        continue;
+      }
+      
+      // If inside fenced block, mark entire line
+      if (inFencedBlock) {
+        ranges.push({line: i, start: 0, end: line.length});
+        continue;
+      }
+      
+      // Check for inline code blocks (backticks)
+      const inlineCodeRe = /`[^`]+`/g;
+      let match: RegExpExecArray | null;
+      while ((match = inlineCodeRe.exec(line)) !== null) {
+        ranges.push({line: i, start: match.index, end: match.index + match[0].length});
+      }
+    }
+    
+    return ranges;
+  }
+  
+  // Check if a position is inside any code block
+  private isInsideCodeBlock(
+    lineNum: number, 
+    charStart: number, 
+    charEnd: number, 
+    codeBlockRanges: Array<{line: number, start: number, end: number}>
+  ): boolean {
+    for (const range of codeBlockRanges) {
+      if (range.line === lineNum) {
+        // Check if the highlight overlaps with this code block range
+        if (!(charEnd <= range.start || charStart >= range.end)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   // helper: returns heading line and text for given line (0 / empty if none)
