@@ -633,7 +633,7 @@ class CalendarView extends ItemView {
   // Helper method to create and open a journal file
   private async createAndOpenJournalFile(path: string, dateString: string): Promise<void> {
     const formattedDate = window.moment(dateString, "YYYYMMDD").format("MMMM D, YYYY");
-    const content = `---\ntags: b/n/j\n---\n\n`;
+    const content = `---\ntags: b/n/j\n---\n\n## ${dateString}\n\n`;
     
     try {
       const file = await this.app.vault.create(path, content);

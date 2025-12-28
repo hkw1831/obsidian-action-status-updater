@@ -1139,7 +1139,7 @@ export default class MyPlugin extends Plugin {
 				const inboxMd = `J/${currentDate}.md`
 
 				if (vault.getAbstractFileByPath(inboxMd) == null) {
-					await vault.create(inboxMd, `---\ntags: b/n/j\n---\n\n`);
+					await vault.create(inboxMd, `---\ntags: b/n/j\n---\n\n## ${currentDate}\n\n`);
 				}
 
 				const leaf = workspace.getLeaf(false);
