@@ -7,6 +7,8 @@ interface LineInfo {
   content: string;
   line: number;
   tag: string;
+  headingLine: number;   // line number of the heading
+  headingText: string;   // heading text (e.g. "# My Section")
 }
 
 class CurrentNoteOutstandingActionView extends ItemView {
@@ -111,8 +113,10 @@ class CurrentNoteOutstandingActionView extends ItemView {
     
     // Count total actions
     let allActionCount = 0;
-    for (const [_, lineInfos] of filteredLineInfosByTag) {
-      allActionCount += lineInfos.length;
+    for (const [_, headingMap] of filteredLineInfosByTag) {
+      for (const lineInfos of headingMap.values()) {
+        allActionCount += lineInfos.length;
+      }
     }
     
     // Clear the container
@@ -202,9 +206,9 @@ class CurrentNoteOutstandingActionView extends ItemView {
   }
 
   // Process file content and extract LineInfos grouped by tag
-  private async processFile(file: TFile): Promise<Map<string, LineInfo[]>> {
+  private async processFile(file: TFile): Promise<Map<string, Map<number, LineInfo[]>>> {
     const fileCache = this.app.metadataCache.getFileCache(file);
-    const lineInfosByTag = new Map<string, LineInfo[]>();
+    const lineInfosByTag = new Map<string, Map<number, LineInfo[]>>();
     
     if (fileCache && fileCache.tags) {
       const content = await this.app.vault.read(file);
@@ -212,7 +216,7 @@ class CurrentNoteOutstandingActionView extends ItemView {
       
       // Pre-initialize the map with empty arrays for all tags
       this.tagsToMatch.forEach(tag => {
-        lineInfosByTag.set(tag, []);
+        lineInfosByTag.set(tag, new Map<number, LineInfo[]>());
       });
       
       // Process all tags at once to avoid multiple iterations
@@ -220,19 +224,23 @@ class CurrentNoteOutstandingActionView extends ItemView {
         const tag = tagMetadata.tag;
         if (this.tagsToMatch.includes(tag)) {
           const line = tagMetadata.position.start.line;
-          const heading = this.getHeadingForLine(fileCache, line);
+          const headingInfo = this.getHeadingInfo(fileCache, line);
           const lineContent = fileLines[line].trim();
-          const newLineIfNeeded = heading.length != 0 ? (this.isWindows() ? "\r\n" : "\n") : "";
-          const contentToDisplay = heading + newLineIfNeeded + lineContent;
           
-          const lineInfoArray = lineInfosByTag.get(tag) || [];
-          lineInfoArray.push({
-            content: contentToDisplay,
+          const headingMap = lineInfosByTag.get(tag)!;
+          const headingLineKey = headingInfo.line;
+          
+          if (!headingMap.has(headingLineKey)) {
+            headingMap.set(headingLineKey, []);
+          }
+          
+          headingMap.get(headingLineKey)!.push({
+            content: lineContent,
             line: line,
-            tag: tag
+            tag: tag,
+            headingLine: headingInfo.line,
+            headingText: headingInfo.text
           });
-          
-          lineInfosByTag.set(tag, lineInfoArray);
         }
       }
     }
@@ -241,23 +249,35 @@ class CurrentNoteOutstandingActionView extends ItemView {
   }
 
   // Filter LineInfos based on the current filter string
-  private filterLineInfos(lineInfosByTag: Map<string, LineInfo[]>): Map<string, LineInfo[]> {
+  private filterLineInfos(lineInfosByTag: Map<string, Map<number, LineInfo[]>>): Map<string, Map<number, LineInfo[]>> {
     if (this.filterStr === '') {
       return lineInfosByTag;
     }
     
-    const filteredMap = new Map<string, LineInfo[]>();
+    const filteredMap = new Map<string, Map<number, LineInfo[]>>();
     const filterStrLower = this.filterStr.toLowerCase();
     
-    for (const [tag, lineInfos] of lineInfosByTag) {
-      const filteredLineInfos = lineInfos.filter(info => {
-        const contentToDisplayLower = info.content.toLowerCase();
-        return contentToDisplayLower.includes(filterStrLower) || 
-               contentToDisplayLower.match(new RegExp(filterStrLower));
-      });
+    for (const [tag, headingMap] of lineInfosByTag) {
+      const filteredHeadingMap = new Map<number, LineInfo[]>();
       
-      if (filteredLineInfos.length > 0) {
-        filteredMap.set(tag, filteredLineInfos);
+      for (const [headingLine, lineInfos] of headingMap) {
+        const filteredLineInfos = lineInfos.filter(info => {
+          const contentLower = info.content.toLowerCase();
+          try {
+            return contentLower.includes(filterStrLower) || 
+                   new RegExp(filterStrLower).test(contentLower);
+          } catch {
+            return contentLower.includes(filterStrLower);
+          }
+        });
+        
+        if (filteredLineInfos.length > 0) {
+          filteredHeadingMap.set(headingLine, filteredLineInfos);
+        }
+      }
+      
+      if (filteredHeadingMap.size > 0) {
+        filteredMap.set(tag, filteredHeadingMap);
       }
     }
     
@@ -265,43 +285,69 @@ class CurrentNoteOutstandingActionView extends ItemView {
   }
 
   // Render task items efficiently
-  private renderTaskItems(container: HTMLElement, lineInfosByTag: Map<string, LineInfo[]>, file: TFile): void {
-    // Use document fragment for batch updates
+  private renderTaskItems(container: HTMLElement, lineInfosByTag: Map<string, Map<number, LineInfo[]>>, file: TFile): void {
     const fragment = new DocumentFragment();
     
     // Iterate through each tag group
-    for (const [tag, lineInfos] of lineInfosByTag) {
-      if (lineInfos.length === 0) continue;
+    for (const [tag, headingMap] of lineInfosByTag) {
+      if (headingMap.size === 0) continue;
+      
+      // Count total items for this tag
+      let tagCount = 0;
+      for (const lineInfos of headingMap.values()) {
+        tagCount += lineInfos.length;
+      }
       
       // Create tag header
       const tagHeader = document.createElement('div');
       tagHeader.className = 'tree-item nav-file recent-files-file';
-      tagHeader.textContent = tag + " ( " + lineInfos.length + " )";
+      tagHeader.textContent = tag + " ( " + tagCount + " )";
+      tagHeader.style.fontWeight = 'bold';
       fragment.appendChild(tagHeader);
       
-      // Create task items for this tag
-      for (const lineInfo of lineInfos) {
-        const navFile = document.createElement('div');
-        navFile.className = 'tree-item nav-file recent-files-file';
+      // Iterate through each heading group within this tag
+      for (const [headingLine, lineInfos] of headingMap) {
+        if (lineInfos.length === 0) continue;
         
-        const navFileTitle = document.createElement('div');
-        navFileTitle.className = 'tree-item-self is-clickable nav-file-title recent-files-title';
+        // Create heading header (clickable -> jump to heading)
+        const headingHeader = document.createElement('div');
+        headingHeader.className = 'tree-item nav-file recent-files-file';
+        headingHeader.style.cursor = 'pointer';
+        headingHeader.style.paddingLeft = '12px';
+        headingHeader.textContent = (lineInfos[0].headingText && lineInfos[0].headingText.length > 0) 
+          ? lineInfos[0].headingText + ` ( ${lineInfos.length} )` 
+          : `Top ( ${lineInfos.length} )`;
         
-        const navFileTitleContent = document.createElement('div');
-        navFileTitleContent.className = 'tree-item-inner nav-file-title-content recent-files-title-content internal-link self-wrap-content';
-        navFileTitleContent.textContent = lineInfo.content;
+        headingHeader.addEventListener('click', () => {
+          const jumpLine = headingLine || 0;
+          this.focusFileAtLine(file, false, jumpLine);
+        });
         
-        navFileTitle.appendChild(navFileTitleContent);
-        navFile.appendChild(navFileTitle);
+        fragment.appendChild(headingHeader);
         
-        // Add event listeners
-        this.addTaskEventListeners(navFileTitle, file, lineInfo.line);
-        
-        fragment.appendChild(navFile);
+        // Create task items under this heading
+        for (const lineInfo of lineInfos) {
+          const navFile = document.createElement('div');
+          navFile.className = 'tree-item nav-file recent-files-file';
+          
+          const navFileTitle = document.createElement('div');
+          navFileTitle.className = 'tree-item-self is-clickable nav-file-title recent-files-title';
+          
+          const navFileTitleContent = document.createElement('div');
+          navFileTitleContent.className = 'tree-item-inner nav-file-title-content recent-files-title-content internal-link self-wrap-content';
+          navFileTitleContent.textContent = lineInfo.content;
+          
+          navFileTitle.appendChild(navFileTitleContent);
+          navFile.appendChild(navFileTitle);
+          
+          // Add event listeners - click jumps to the action line
+          this.addTaskEventListeners(navFileTitle, file, lineInfo.line);
+          
+          fragment.appendChild(navFile);
+        }
       }
     }
     
-    // Append all elements in one operation
     container.appendChild(fragment);
   }
   
@@ -396,6 +442,24 @@ class CurrentNoteOutstandingActionView extends ItemView {
     }
 
     return currentHeading;
+  }
+  
+  // Helper: returns heading line and text for given line (0 / empty if none)
+  private getHeadingInfo(fileCache: CachedMetadata | null, lineNumber: number): { line: number; text: string } {
+    if (!fileCache || !fileCache.headings || fileCache.headings.length === 0) {
+      return { line: 0, text: '' };
+    }
+    let lastHeadingLine = 0;
+    let lastHeadingText = '';
+    for (const heading of fileCache.headings) {
+      if (heading.position.start.line <= lineNumber) {
+        lastHeadingLine = heading.position.start.line;
+        lastHeadingText = "# " + heading.heading;
+      } else {
+        break;
+      }
+    }
+    return { line: lastHeadingLine, text: lastHeadingText };
   }
 }
 
