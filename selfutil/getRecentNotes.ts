@@ -59,14 +59,15 @@ export function getRecentNotesWithInfo(app: App, limit: number): RecentNoteInfo[
 }
 
 export function getAllNotes(app: App): string[] {
-  const files = app.vault.getMarkdownFiles();
+  // const files = app.vault.getMarkdownFiles();
+  const files = app.vault.getAllLoadedFiles();
   const allNotes = files.map((file) => file.path);
   return allNotes;
 }
 
 export function getAllNotesWithoutMetadata(app: App): string[] {
   let getAllNotesWithoutMetadata: string[] = [];
-  const files = app.vault.getMarkdownFiles();
+  const files = app.vault.getAllLoadedFiles();
   files.forEach((file) => {
     const fileCache : CachedMetadata | null = this.app.metadataCache.getFileCache(file)
     if (fileCache) {
